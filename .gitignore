@@ -31,3 +31,6 @@ __pycache__/
 *.pyc
 .forja/
 *.omr
+
+# las voces de la web son parte de la documentacion
+!docs/audio/*.wav
