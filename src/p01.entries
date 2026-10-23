@@ -1,0 +1,66 @@
+# Puntos de entrada del banco 1 (se ejecuta en 0x6000).
+#
+# Cada uno lleva la instruccion que lo justifica. Los que ponen "pNN:XXXX"
+# vienen de OTRO banco: el trazador de una sola pagina no puede seguirlos,
+# porque en esa direccion -segun lo que haya en el registro del mapper- puede
+# estar cualquiera de seis bancos. Los que ponen "tabla" salen de una tabla
+# del despachador (cartucho.DESPACHADOR), que va pegada detras de su `call` y esta declarada
+# como datos en el .nocode: el trazador tampoco puede seguirla.
+#
+# Los saltos y llamadas DENTRO del propio banco no se ponen aqui: los
+# encuentra tools/z80trace.py solo, siguiendo el flujo.
+#
+# Este fichero lo regenera `make semillas` (tools/bancos.py escribe).
+0x6001   # p00:5FFF sigue de largo (el codigo cruza la frontera de banco)
+0x6060   # p00:5F7A call
+0x60B2   # p00:5F95 call
+0x60EB   # p00:5F98 call
+0x6146   # p00:5E7E call
+0x617C   # p00:42E3 call
+0x618F   # p00:40A1 call
+0x61E6   # p03:BC0E call
+0x61FE   # p03:B49B call
+0x63D4   # p00:44BD entrada 3 de la tabla de 0x44C0 (call 0x4066 en 0x44BD)
+0x64BC   # p00:40AB call
+0x64E3   # p00:469F call
+0x6509   # p00:4552 call
+0x6559   # p00:454F call
+0x65B2   # p15:A2C5 call
+0x65C6   # p00:4974 call
+0x6605   # p00:4994 call
+0x661D   # p04:BCC5 call
+0x67BF   # p02:92F6 call
+0x68EF   # p03:A15A call
+0x68F3   # codigo huerfano: B = 2 y sigue en p01:68F5 (la otra entrada de p01:68EF)
+0x69B8   # p02:94A0 call
+0x69D3   # p02:949D call
+0x6B4D   # p03:B68E call
+0x6BEE   # p02:9386 call
+0x6C15   # p02:938B call
+0x6C1B   # p02:9390 call
+0x6C21   # p02:9395 call
+0x6C5D   # p00:466B call
+0x6CBF   # p00:48D8 call
+0x6D46   # entrada 5 de la tabla p01:71A5
+0x6EC9   # palo 0 de la tabla p01:6ECA (call 0x4067 en p01:6EC1)
+0x6ED2   # palo 1 de la tabla p01:6ECA (call 0x4067 en p01:6EC1)
+0x6F09   # codigo huerfano: 17 bytes que acaban en un salto; el trazado no entra y ninguna instruccion salta, llama o carga 0x6F09
+0x6F1A   # codigo huerfano: 19 bytes que acaban en un salto; el trazado no entra y ninguna instruccion salta, llama o carga 0x6F1A
+0x6F2D   # codigo huerfano: 24 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x6F2D
+0x6F45   # codigo huerfano: 3 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x6F45
+0x6F5A   # codigo huerfano: 5 bytes que acaban en un salto; el trazado no entra y ninguna instruccion salta, llama o carga 0x6F5A
+0x6FC6   # codigo huerfano: 17 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x6FC6
+0x6FD7   # codigo huerfano: 5 bytes que acaban en un salto; el trazado no entra y ninguna instruccion salta, llama o carga 0x6FD7
+0x6FDC   # codigo huerfano: 5 bytes que acaban en un salto; el trazado no entra y ninguna instruccion salta, llama o carga 0x6FDC
+0x6FE1   # comprobacion de yaku 10 de la tabla p01:716B
+0x7035   # p04:A48F call
+0x7083   # p00:48DD call
+0x7144   # p04:A204 call
+0x71CD   # p02:92BD call
+0x7284   # p02:85F5 call
+0x7322   # p04:A23A call
+0x76AE   # codigo huerfano: 39 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x76AE
+0x76D5   # codigo huerfano: 47 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x76D5
+0x7704   # codigo huerfano: 48 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x7704
+0x7734   # codigo huerfano: 30 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x7734
+0x7FC3   # codigo huerfano: 44 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x7FC3

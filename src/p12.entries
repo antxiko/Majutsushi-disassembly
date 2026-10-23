@@ -1,0 +1,52 @@
+# Puntos de entrada del banco 12 (se ejecuta en 0x6000).
+#
+# Cada uno lleva la instruccion que lo justifica. Los que ponen "pNN:XXXX"
+# vienen de OTRO banco: el trazador de una sola pagina no puede seguirlos,
+# porque en esa direccion -segun lo que haya en el registro del mapper- puede
+# estar cualquiera de seis bancos. Los que ponen "tabla" salen de una tabla
+# del despachador (cartucho.DESPACHADOR), que va pegada detras de su `call` y esta declarada
+# como datos en el .nocode: el trazador tampoco puede seguirla.
+#
+# Los saltos y llamadas DENTRO del propio banco no se ponen aqui: los
+# encuentra tools/z80trace.py solo, siguiendo el flujo.
+#
+# Este fichero lo regenera `make semillas` (tools/bancos.py escribe).
+0x6000   # p00:5599 call
+0x6003   # p00:41EB call
+0x6006   # p00:402D call
+0x6875   # codigo huerfano: 38 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x6875
+0x69A0   # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 0
+0x69B6   # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 1
+0x69D6   # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 4
+0x6A01   # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 5
+0x6A15   # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 6
+0x6A25   # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 7
+0x6A37   # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 8
+0x6A48   # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 9
+0x6A4F   # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 10
+0x6A56   # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 11
+0x6AA5   # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 12
+0x6AAF   # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 13
+0x6AB6   # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 14
+0x6AC1   # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 15
+0x6AC7   # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 16
+0x6AD1   # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 17
+0x6AEC   # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 18
+0x6AFB   # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 19
+0x6B01   # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 21
+0x6B07   # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 22
+0x6B11   # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 23
+0x6B18   # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 25
+0x6B23   # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 26
+0x6B2B   # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 27
+0x6B46   # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 28
+0x6B5D   # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 29
+0x6B61   # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 30
+0x6BB4   # comando D0-DF del motor de sonido (tabla 0x6B94, jp (hl) en p12:6B93), entrada 0
+0x6BBC   # comando D0-DF del motor de sonido (tabla 0x6B94, jp (hl) en p12:6B93), entrada 6
+0x6BD7   # comando D0-DF del motor de sonido (tabla 0x6B94, jp (hl) en p12:6B93), entrada 7
+0x6BEE   # comando D0-DF del motor de sonido (tabla 0x6B94, jp (hl) en p12:6B93), entrada 8
+0x6BF8   # comando D0-DF del motor de sonido (tabla 0x6B94, jp (hl) en p12:6B93), entrada 9
+0x6BFA   # comando D0-DF del motor de sonido (tabla 0x6B94, jp (hl) en p12:6B93), entrada 11
+0x6C01   # comando D0-DF del motor de sonido (tabla 0x6B94, jp (hl) en p12:6B93), entrada 12
+0x6C07   # comando D0-DF del motor de sonido (tabla 0x6B94, jp (hl) en p12:6B93), entrada 15

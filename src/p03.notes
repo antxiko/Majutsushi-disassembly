@@ -1,0 +1,1157 @@
+
+
+# --- A MANO: comentarios escritos leyendo el codigo ---
+C 0xA012 pon de la maquina: hace el pon (0x97E6), recoge la mano del que llama y llama a 0x85E0 con C = 0x40
+C 0xA028 el jugador descarta: cambia la ficha de la mano por la tirada 0xC209 con el bit 6 puesto (es de un grupo) y descarta (8D42)
+C 0xA050 vuelve del turno: 0xC215 = 0, 0xC213 = 0, marca +0x40 y pasa al paso 3
+C 0xA060 el kan: 0xC215 elige el paso por la tabla de 0xA064
+C 0xA078 el humano elige la ficha del kan con 0x9B5F y descarta
+C 0xA0A8 kan de la maquina: 0x8578, luego 0xA1C1 y 0x85E0 con C = 0x80
+C 0xA0C1 el jugador descarta con el bit 7 puesto en la ficha
+C 0xA0EE el chi: 0xC215 elige el paso por la tabla de 0xA0F2
+C 0xA114 coge la ficha del muro de atras (0x87E3, 0xC210 y 0x87), la pone en 0xC209 y la dibuja
+C 0xA146 kan cerrado: 0x987E y 0xA114
+C 0xA151 el kan cambia la mano: 0x68EF mira si gana; si es asi 0xC0B1 = 1 y suena el ron (0x4184)
+C 0xA190 descarta la ficha, ordena la mano y la dibuja, y comprueba si se acaba el muro (0xA1A2)
+C 0xA1A2 si el muro de atras ha llegado a 4 fichas (0xC210), mira si hay cuatro kan (0xA771): si es asi 0xC0B1 = 1; si no, 0xC0B8 = 2
+C 0xA1C1 dibuja el grupo bajado de un kan: coloca las fichas (0x991B, 0x99FE, 0xA1EC)
+C 0xA1EC pone las fichas del grupo de kan de cuatro fichas: las dos primeras de lado y las otras dos
+C 0xA27C HL = +0x67 de la mano del jugador 0xC20D
+C 0xA28A DIBUJA EL GRUPO QUE BAJA el jugador (chi, pon o kan): C0x21A + 0xC213 es la opcion; con el bit 6 es un grupo de +0x37
+C 0xA356 el grupo es de cuatro iguales con la ultima ficha tirada
+C 0xA3A5 con el bit 6 puesto: el grupo es uno ya bajado al que se anade la cuarta (kan anadido)
+C 0xA400 las tres fichas del grupo bajado con los bits 6 y 7 (grupo hecho)
+C 0xA413 quita un grupo de la lista de +0x37 (cuenta en +0x3F) y corre los siguientes
+C 0xA41E baja la cuenta de grupos de la mano
+C 0xA425 desplaza los grupos que siguen hacia delante
+C 0xA43B anade la ficha a un grupo que ya estaba
+C 0xA46E la maquina ha elegido (esperar): pone +0x34 = 0xFF, suma 0x10 al marcador y suena
+C 0xA491 marca +0x40 de la mano del jugador 0xC207 a 1
+C 0xA49F anade la ficha A (sin los bits 6-7) a la lista de +0x41 (cuenta en +0x40)
+C 0xA4BA parpadeo del cuadro de la ficha: cada 0x20 cuadros alterna entre 0xA509 y 0xA4D0
+C 0xA4D0 pone el cuadro con la ficha de siempre
+C 0xA509 rellena el cuadro de la ficha con el color 0 (la ficha parpadea)
+C 0xA528 pone la ficha en su sitio con 0x8BC3
+C 0xA561 si la ficha de +0x71 es la de 0xC1C1, mueve el sitio de dibujo a la mano de al lado
+C 0xA580 MUESTRA LA PUNTUACION: cuenta cuantos han salido en 0xC2E0 (0xA594) y dibuja las ventanas
+C 0xA594 cuenta cuantos yaku hay en la lista de 0xC2E0 (pares de dos bytes, 32 como mucho) en 0xC248
+C 0xA5A8 dibuja el rectangulo de la lista (alto segun cuantos, tablas 0xA5E6 y 0xA5EE)
+C 0xA5D5 con el yaku 0x35 pide el sonido 0x17 (0x418F) y rellena su rectangulo
+C 0xA5F6 dibuja la ventana de los yaku con 0x9D1C
+C 0xA637 copia el rectangulo de la pantalla (0,0x14) a la pagina 1
+C 0xA646 y lo devuelve
+C 0xA655 dibuja la mesa de la ronda: textos 0xA699, la esquina (0x584C), los numeros y los vientos de 0xC0B2, 0xC0B3, 0xC0B7
+C 0xA6A7 escribe los dos numeros de 0xC0B4 y 0xC0B5
+C 0xA6BE MUESTRA UNA VOZ: A = 1 pon, 2 chi, 3 kan, 4 ron y 5...: lleva el icono del personaje (0x58A2) y el cuadro de 64 x 64 de la tabla 0xA741
+C 0xA747 cuenta atras del cuadro (0xC24A): al llegar a cero lo borra
+C 0xA74F borra el cuadro del personaje y los sprites
+C 0xA771 mira si algun jugador (D000 + 4 x n) tiene +0x46 igual a 4 (cuatro kan): acarreo
+C 0xA774 recorre las cuatro manos
+C 0xA781 mira si algun +0x46 vale 4 (cuatro kan)
+C 0xA788 siguiente jugador
+C 0xA791 suma uno a +0x46 de la mano del jugador 0xC207 (cuenta de kan)
+C 0xA7A1 pone ocho sprites del cuadro del personaje en 0xCC10 (4 filas de 2) con X, Y y numero
+C 0xA7B3 pone dos sprites de la fila
+C 0xA7BD sigue con la fila de abajo
+C 0xA7C9 pone los colores de los sprites del cuadro (0xCA40)
+C 0xA7CE alterna los dos colores de las ocho lineas
+C 0xA7DB un sprite de cuatro bytes: Y, X, patron; despues el patron sube cuatro
+C 0xA7DD la X del sprite
+C 0xA7DF el patron
+C 0xA7E2 el siguiente patron (de cuatro en cuatro)
+C 0xA7F5 pone los sprites de 0xCC10 fuera de pantalla
+C 0xA803 pantalla de las opciones: 0xC02B elige el paso por la tabla de 0xA807
+C 0xA81C prepara la pantalla de opciones (0xA930 fondo y 0xA9CA diez marcas) y pone el registro 8 del VDP a 8
+C 0xA830 teclas de las opciones: boton, arriba, abajo, derecha, izquierda
+C 0xA836 con el bit 1 (arriba) va a 0xA845
+C 0xA83C el bit 3 (derecha) a 0xA883
+C 0xA83F el bit 4 (el boton) a 0xA892
+C 0xA845 abajo: la opcion sube de 5 en 5 con vuelta a 0 en la 0x0B, y la 5 salta a la 10
+C 0xA892 el boton: si no es la opcion de salir (10) cambia la opcion entre 0 y 1 en 0xC020 + opcion
+C 0xA8BC salir de las opciones: sonido 0x01 y 0xC02B += 1
+C 0xA8C9 acaba las opciones: 0xC02B = 0, 0xC02C = 0 y 0xC02A = 1
+C 0xA8DF borra el recuadro de la opcion elegida (16 x 16, posicion de la tabla 0xA9FF)
+C 0xA8F6 pone el aspecto de los dos sprites del cursor de las opciones (0xCA00 con 9 y 0xCA10 con 2)
+C 0xA907 mueve el cursor de las opciones (suena el sonido 0x06) y coloca los sprites en la casilla de la tabla 0xA9FF
+C 0xA930 dibuja el fondo de las opciones: dos rectangulos, dos ventanas y 16 textos de la tabla 0xA96E
+C 0xA9CA dibuja las diez marcas de las opciones: cada una 0x47 (activada) o 0x48 (no)
+C 0xA9CF dibuja la marca de cada una de las diez opciones
+C 0xA9D2 la opcion es 10 - B
+C 0xA9DF dibuja la marca de la opcion A en su sitio de la tabla 0xA9FF
+C 0xAA15 PANTALLA DE ELEGIR RIVALES: 0xC02C elige el paso por la tabla de 0xAA19
+C 0xAA2D sprites del cursor (0xCA00 con 0x0E), guarda los tres rivales de 0xC031-3 en 0xC233-5 y los dibuja (0xAD6F, 0xAC97)
+C 0xAA54 el jugador humano elige quien va a su derecha: dibuja las cuatro caras (0xAB0A) y baraja (0xAB36)
+C 0xAA5D espera la eleccion (0xAB4C) y pasa al jugador siguiente
+C 0xAA6D sortea quien se sienta en cada sitio (0xAC44) para los tres rivales
+C 0xAA79 el sitio del humano queda en 0xC02F y pone los rivales en la tabla 0xC030 segun el orden de sentarse (0xC22A)
+C 0xAABA espera 0x80 cuadros y dibuja la pantalla con los cuatro sentados (0xAD03)
+C 0xAACD tras la espera, si hay un rival elegido lo busca (0xAAE2) y sale
+C 0xAAE2 busca cual de los tres rivales de 0xC031 es el de 0xC233 + A y deja su numero en 0xC207
+C 0xAAF3 busca el rival de 0xC233 entre los de 0xC031
+C 0xAAF9 cuenta cual es
+C 0xAB0A dibuja las cuatro fichas de viento del sorteo (la ficha 0x38 en cuatro sitios consecutivos, de 12 de ancho)
+C 0xAB36 baraja los cuatro vientos: toma de la tabla 0xAC57 una combinacion al azar (4 bytes) a 0xC21E
+C 0xAB4C teclas del sorteo (izquierda, derecha, boton)
+C 0xAB5B el boton: toma la ficha de viento elegida (0xC21E + 0xC02B), la dibuja (0xABCB, 0xAC14) y, si es la 0x31, el humano se sienta aqui
+C 0xABAA pone el sprite del cursor sobre la ficha elegida (12 de ancho por ficha)
+C 0xABCB dibuja la ficha elegida (0xC02E) en el sitio de la tabla 0xAC0C y guarda en 0xC22A el viento que ha salido
+C 0xAC14 borra la ficha elegida del sorteo y espera
+C 0xAC3C retardo del sorteo
+C 0xAC44 elige una casilla del sorteo al azar (0xC02B = 0-3), repitiendo hasta que haya una libre
+C 0xAC97 dibuja los marcos de los tres rivales con 0x661D (sus caras) y enciende la pantalla
+C 0xAD03 dibuja los rivales tras sentarse, con las caras de 0xC031-3
+C 0xAD6F suma uno (BCD, tope 99) al contador 0xC034 y al de cada uno de los tres rivales
+C 0xAD8C suma uno (BCD, tope 99) al contador del rival A
+C 0xAD9B PANTALLA DE ELEGIR LOS TRES RIVALES: 0xC02C elige el paso por la tabla de 0xAD9F
+C 0xADAB prepara la pantalla (fondo 0x5806, 0x5828, 0x5A22 y los textos de 0xAEB9), sprites del cursor y 0xC221 = 0
+C 0xADDD el humano elige a un rival con 0xAE14; cuando elige a los tres, 0xAEF4 y sigue
+C 0xAE09 espera 0x80 cuadros y 0xC02A = 1
+C 0xAE14 teclas de la eleccion de rivales
+C 0xAE17 bit 0: arriba
+C 0xAE20 bit 3: derecha
+C 0xAE23 bit 4: el boton
+C 0xAE2D pone los dos sprites del cursor en la casilla del rival elegido (tabla 0xAEA9)
+C 0xAE68 el boton: anota el rival en 0xC031 + 0xC02B, suma 1 a 0xC02B y marca (0xAF34)
+C 0xAE85 tapa con el color 0xFF la cara del rival elegido (tabla 0xAE99)
+C 0xAEF4 muestra la cara del rival elegido a 48 de alto con un barrido (copia de 48 filas)
+C 0xAF1E retardo entre cuadros de la cara
+C 0xAF25 pasa a la fila siguiente de la cara (DE + 1) y a la columna (HL + 1)
+C 0xAF34 marca en 0xC221 el bit del rival elegido (tabla 0xAF44)
+C 0xAF4C mueve el cursor hacia abajo al siguiente rival que no se haya elegido ya
+C 0xAF61 hacia arriba al rival anterior libre
+C 0xAF76 izquierda: salta tres rivales
+C 0xAFA1 derecha: salta tres rivales
+C 0xAFCC Z si el rival de 0xC02D ya esta elegido (comprueba su bit en 0xC221)
+C 0xAFDB borra con 0 el rectangulo de la pantalla (212 filas)
+C 0xAFE7 PANTALLA DE LA TABLA DE RIVALES (7 contadores por rival): 0xC02C elige el paso
+C 0xAFFE pone 0x04 en 0xCA20 (96 bytes: color de los sprites del cursor grande) y los dos del cursor (0xCA00 y 0xCA10)
+C 0xB019 carga el fondo (0x57D3, 0x5834), los textos (0xB325), la imagen (0x5A22) y la lista 0xB118
+C 0xB02B dibuja los 7 rectangulos de las filas (0xB26F) y los valores (0xB28A)
+C 0xB056 pasa al paso siguiente de la pantalla (0xC02C += 1)
+C 0xB05B teclas de la pantalla de la tabla: izquierda, derecha, arriba, abajo, botones
+C 0xB061 bit 1: abajo
+C 0xB064 bit 2: izquierda
+C 0xB070 bit 5: la otra tecla
+C 0xB077 cambia de fila: redibuja la tabla de ese rival (0xB111, 0xB26F, 0xB28A) y suena
+C 0xB086 coloca los dos sprites del cursor en la fila de la tabla 0xB153
+C 0xB0AB arriba: la fila baja una con vueltas entre 3 y 7
+C 0xB0CD abajo: la fila sube una con vuelta a 4
+C 0xB100 tecla de salir: suena el sonido 0x01 y acarreo
+C 0xB105 con el boton B pasa al paso 3 con 0x40 cuadros de espera
+C 0xB111 pone la cara del rival A en su sitio (0x661D, posicion 0x0810)
+C 0xB163 teclas del cursor grande
+C 0xB166 bit 0: arriba
+C 0xB16E bits 2 y 3: izquierda y derecha (0xB1DB)
+C 0xB176 bit 4: el boton A
+C 0xB17A bit 5: el boton B
+C 0xB184 coloca los seis sprites del cursor: tres columnas de dos de 16 puntos
+C 0xB1A4 la X de cada pareja
+C 0xB1BB los tres patrones de cada sprite
+C 0xB1DB cambia de columna sumando 4 modulo 8
+C 0xB1E8 mueve a la izquierda dentro de cada mitad de la tabla
+C 0xB20D mueve a la derecha dentro de cada mitad
+C 0xB22F el boton A: si es la casilla 7 o 8, sale; si no, sube el contador de la casilla (0xB2A4)
+C 0xB23F el boton B: baja el contador de la casilla (0xB2AE)
+C 0xB24F sale con la casilla 7: pone a cero 0xC02E y 0xC02C y quita los sprites
+C 0xB26F dibuja siete rectangulos de 64 x 16 (posiciones de la tabla 0xB317)
+C 0xB28A dibuja la barra de cada uno de los siete contadores del rival
+C 0xB2A4 sube un contador y lo redibuja: lee el valor (0xB2BC), lo sube (0xB30B) y repinta la barra
+C 0xB2AE baja un contador y lo redibuja
+C 0xB2BC HL = 0xC040 + 8 x rival (0xC02D) + contador (0xC02E): lee su valor en A
+C 0xB2D0 dibuja la barra del contador: ancho A, color 0x99, 16 de alto
+C 0xB2E6 pinta una marca en la barra (su sitio: A & 0x30 + A & 0x0F)
+C 0xB30B sube el contador en HL si no ha llegado a 0x3F
+C 0xB312 baja el contador en HL si no es cero
+C 0xB325 escribe ocho textos de la tabla 0xB33B
+C 0xB373 PANTALLA DE DOS OPCIONES (grabar, cargar): 0xC02C elige el paso por la tabla de 0xB377
+C 0xB383 apaga, rellena una ventana y la marco, y escribe dos textos de la lista 0x59EA
+C 0xB3C2 teclas de la pantalla de dos opciones (0xB51E): al elegir pone 0xC018 = opcion + 1
+C 0xB3D1 PANTALLA DE CINCO OPCIONES: 0xC02C elige el paso por la tabla de 0xB3D5
+C 0xB3E1 apaga, rellena una ventana de 112 x 136 puntos y escribe cinco textos de la lista 0x59F5
+C 0xB420 teclas de la pantalla de cinco opciones (0xB42F): al elegir pone 0xC019 = opcion + 1
+C 0xB42F arriba y abajo mueven la opcion 0xC02B (0xC211 = la ultima), el boton elige
+C 0xB463 coloca los dos sprites del cursor sobre la opcion (tabla 0xB487)
+C 0xB48C PANTALLA DE GRABAR O CARGAR EN EL OTRO CARTUCHO: 0xC02C elige el paso
+C 0xB498 carga la partida con 0x61FE; si 0xC0E8 dice que ha fallado escribe el mensaje de fallo (0xB4D7), si no el de acabado (0xB4E2)
+C 0xB4CC espera una tecla y pone 0xC02A = 1
+C 0xB4D7 escribe el mensaje de 9 letras en 0xB50A
+C 0xB4E2 escribe el mensaje de 14 letras en 0xB514
+C 0xB4EA dibuja la ventana con 0x9D1C y el texto de HL
+C 0xB51E teclas de una lista de opciones: arriba, abajo y el boton; 0xC02B es la opcion y 0xC211 la ultima
+C 0xB558 coloca los sprites del cursor segun la tabla 0xB57E
+C 0xB580 cuenta cuantos jugadores tienen +0x81 (en espera al acabar la ronda) en 0xC22F
+C 0xB582 cuenta los jugadores en espera
+C 0xB590 uno menos
+C 0xB593 uno mas en 0xC22F
+C 0xB59C PAGA LAS ESPERAS DE UNA RONDA SIN GANADOR: guarda los marcadores (0xC0A0 en 0xC280) y reparte segun cuantos estan en espera (0xC22F)
+C 0xB5C3 nadie o todos en espera: no se paga, solo se dibuja el marcador (0x5FCC, 0x4C33)
+C 0xB5D1 reparte los puntos entre los jugadores: los que estan en espera cobran y los otros pagan (tabla 0xB5CE)
+C 0xB625 apunta cuanto paga o cobra y lo suma con 0x4A17
+C 0xB62E suma el importe al marcador del jugador
+C 0xB635 tabla de pagos de cada jugador (signo y cantidad)
+C 0xB63D FIN DE LA RONDA: mira por orden si hubo tsumo (0xC0C7), ron (0xC0C8), final por agotarse el muro (0xC0CF), cuatro kan (0xC0E5) o un yaku (0xC0E6); si no, 0xC0E4 = 1
+C 0xB66F dibuja el rectangulo del texto de la ronda sin ganador y el aviso
+C 0xB68E 0x6B4D: marca quien esta en espera; 0xB760 dibuja sus manos
+C 0xB6A1 si el que reparte (0xC0B7) no esta en espera y es la primera vuelta (0xC0B2) pasa el turno de reparto: 0xC0B3 += 1 con vuelta a 0 en 4 y entonces 0xC0B2 += 1 (viento)
+C 0xB6B6 el que reparte pasa al siguiente (0xC0B7 + 1 modulo 4)
+C 0xB6BF fin por tsumo del humano o otro: dibuja el aviso y las manos
+C 0xB6F4 fin por tsumo: rectangulo de texto y la mano del ganador boca arriba
+C 0xB724 fin por cuatro kan: muestra el aviso (0xB7C9)
+C 0xB734 fin por ron: la ultima ficha y el aviso (0xB7C4)
+C 0xB74F fin por un yaku especial: muestra el aviso (0xB7CD)
+C 0xB760 dibuja las manos de los tres rivales boca arriba (0xC214 = 1) los que estan en espera
+C 0xB787 rectangulo de aviso de 52 x 20 con ventana
+C 0xB79E rectangulo de aviso de 68 x 20 con ventana
+C 0xB7D1 mira si hay un caso de reparto especial: solo con 0xC1C1 entre 0x34 y 0x37 (primer ciclo) y si nadie lleva grupos (+0x0E a cero)
+C 0xB7E7 quita las fichas repetidas de la mano que se toma para la cuenta (0xC0D0, 14 fichas)
+C 0xB7F4 cuenta cuantas fichas distintas de punta (1, 9) o de honor tiene el jugador 0xC207 en su mano y la ficha 0xC209
+C 0xB816 mira cada ficha de la mano: si es de punta o de honor la anota y quita las iguales
+C 0xB81D recorre las 14 fichas de 0xC0D0
+C 0xB831 suma las que quedan
+C 0xB83A compara con el limite del jugador
+C 0xB87F copia en DE la ficha de HL solo si es honor (>= 0x30) o numero 1 y 9
+C 0xB890 en el primer cuarto de la ronda (0xC1C1 = 0x37) con +0x0E a cero en todas, mira si los cuatro jugadores han tirado el mismo viento (0xC0C9..): 0xC0C8 = 1 y 0xC0B8 = 2
+C 0xB89E mira si algun jugador lleva grupos
+C 0xB8A4 copia el primer descarte de cada jugador a 0xC0C9
+C 0xB8AC solo si es un viento (0x31 a 0x34)
+C 0xB8B5 guarda y pasa al jugador siguiente
+C 0xB8BD mira que los cuatro sean iguales
+C 0xB8D4 PANTALLA DE RESULTADOS FINALES: pinta los jugadores (0xAD03) y sigue con 0xB8DB
+C 0xB8DB dibuja cuatro marcos de 40 x 24 (tabla 0xB93B), cada marco con su ventana; luego ordena (0xB9BA) y escribe los puntos (0xC24D, 0xC250, 0xC253, 0xC256)
+C 0xB943 pone a cero 12 bytes de 0xC24B (los cuatro marcadores finales)
+C 0xB951 reparte los 3000 de ventaja a cada uno de los cuatro jugadores (0xC207 = 0 a 3)
+C 0xB96A marcador final del jugador: tres bytes de 0xC0A0 + 3 x jugador
+C 0xB976 si el signo es cero (positivo)
+C 0xB97B mira la parte baja
+C 0xB981 y la alta, menor de 3 (menos de 30000)
+C 0xB995 negativo: baja la parte media
+C 0xB9A2 si el marcador queda a cero lo deja a cero
+C 0xB9A6 si el byte medio es distinto de cero se queda
+C 0xB9A8 mira el alto
+C 0xB9AD y si los dos son cero cambia el signo
+C 0xB9BA ORDENA LOS JUGADORES POR PUNTOS: 0xB9D1 los lista, 0xBA18 elige el que gana, 0xB951 paga, 0xBAE3 y 0xBB28 pasan los puntos
+C 0xB9D1 anota en 0xC257 los jugadores con 3 o mas de 0xC0A2 (hundred) a su cuenta
+C 0xBA18 compara los marcadores de los jugadores de 0xC257 y deja en 0xC207 el mejor (empates por el siguiente byte)
+C 0xBAD0 A = el byte alto del marcador del jugador A
+C 0xBAD6 A = el byte bajo del marcador del jugador A
+C 0xBAE3 copia el marcador de cada jugador al lugar de 0xC24B (3 bytes por jugador)
+C 0xBB28 reparte el marcador del ganador entre los otros tres (4A20)
+C 0xBB68 guarda los marcadores finales en la tabla de cada rival (0xC080 + 3 x rival)
+C 0xBBA0 PANTALLA DE GRABAR: si no hay otro cartucho (0xF0F5 = 0xFF) espera y sale; si no dibuja la ventana con la lista 0x5A17
+C 0xBBF8 teclas de la pantalla de grabar (0xB51E)
+C 0xBC0E graba la partida (0x61E6) y escribe el mensaje de acabado (0xBC3A) o de fallo (0xBC46)
+C 0xBC28 espera 0x80 cuadros y pone 0xC02A a 1 o 2 segun haya fallado
+C 0xBC66 PANTALLA DE LOS RESULTADOS POR RIVAL: dibuja la lista 0xBD33 y los nueve marcadores de 0xC082..0xC09A y las nueve cuentas de 0xC034..0xC03C
+C 0xBD8E ADAPTA EL ESTILO DE LA MAQUINA A LA MANO GANADORA: a la mano del jugador (humano o el que corresponda) le suma o resta (0xBFB4, 0xBFCA) en los siete contadores +0x90..+0x96 segun los yaku de 0xC2E0
+C 0xBDC1 con el yaku 0x01 en la lista: +0x90 sube 2
+C 0xBDCF si +0x40 es distinto de cero: +0x91 sube 4
+C 0xBDE1 con el yaku 0x05: +0x92 sube 2; si no, con el 0x12: baja 6
+C 0xBDFE con el yaku 0x1B o 0x19: +0x93 sube 8
+C 0xBE1B con el yaku 0x0E o 0x0D: +0x94 sube 5
+C 0xBE38 con el yaku 0x28 (el mas grande): +0x95 sube 0x20
+C 0xBE46 +0x96 sube o baja segun quien haya ganado
+C 0xBE55 busca el yaku B en la lista de 0xC2E0 (pares codigo y valor): acarreo si esta
+C 0xBE58 busca el yaku B en la lista de 0xC2E0
+C 0xBE64 igual para los demas jugadores cuando gana el humano: lo mismo con los otros tres (0xBE76)
+C 0xBE76 ajusta los siete contadores del jugador de 0xCC80
+C 0xBE8D lo hace con los tres rivales
+C 0xBEAD si +0x40 (mano abierta) baja el contador +0x91
+C 0xBF09 ajusta el estilo de los tres rivales (+0x90..+0x96) segun lo que ha pasado en la ronda
+C 0xBF0E por cada rival ajusta con las seis reglas siguientes
+C 0xBF44 si +0x40 sube +0x91
+C 0xBF7A si +0x80 y un azar de 1 entre 4, baja +0x95
+C 0xBFB4 suma A al contador HL = 0xCC80 + DE, con tope 0x3F
+C 0xBFC1 resta A (menos uno si es el humano) al contador
+C 0xBFCA resta A al contador (sin bajar de cero)
+C 0xBFD6 AL EMPEZAR: copia a la mano de cada uno de los tres rivales (+0x90) sus siete contadores de estilo de la tabla 0xC040 (7 bytes por rival)
+# --- fin de lo escrito a mano ---
+
+# --- A MANO: comentarios, nombres y bloques ---
+D 0xA7EF 0xA7F5 posiciones_cuadro  tres posiciones (Y, X) de la tabla de p03:A7A1 (0xA7ED + 2 x A) donde se dibuja el cuadro de la cara que habla: (0x78, 0x84), (0x70, 0x64) y (0x78, 0x44) (el primer byte es la Y del sprite y el segundo la X)
+F 0xA7EF 2
+D 0xBFFE 0xC000 relleno_ff  2 bytes a 0xFF hasta el final del banco: relleno
+
+
+# --- BLOQUES QUE LEE EL CODIGO (seccion que reescribe tools/bloques.py; no editar a mano) ---
+D 0xA000 0xA002 partida_A000  los 2 ultimos bytes de la instruccion de p02:9FFF (CD 2E 9A), que empieza en el banco 2; lo leen p02:9FFF (2 bytes)
+F 0xA000 2
+D 0xA066 0xA070 tabla_A066  5 destinos del despachador p00:4066 (call en p03:A063, el indice en A): A070, A078, A095, A0A8, A0C1; lo leen p03:A063 (10 bytes)
+F 0xA066 w5
+D 0xA0F4 0xA0FE tabla_A0F4  5 destinos del despachador p00:4066 (call en p03:A0F1, el indice en A): A0FE, A146, A151, A17B, A190; lo leen p03:A0F1 (10 bytes)
+F 0xA0F4 w5
+D 0xA699 0xA6A7 tiles_A699  lista de tiles (p00:5363): X, Y y los tiles, 0xFE trae otro X, Y y 0xFF acaba; lo leen p03:A658 (14 bytes)
+F 0xA699 16
+D 0xA809 0xA811 tabla_A809  4 destinos del despachador p00:4066 (call en p03:A806, el indice en A): A811, A81C, A830, A8C9; lo leen p03:A806 (8 bytes)
+F 0xA809 w4
+D 0xAA1B 0xAA27 tabla_AA1B  6 destinos del despachador p00:4066 (call en p03:AA18, el indice en A): AA27, AA54, AA5D, AA6D, AABA, AACD; lo leen p03:AA18 (12 bytes)
+F 0xAA1B w6
+D 0xADA1 0xADAB tabla_ADA1  5 destinos del despachador p00:4066 (call en p03:AD9E, el indice en A): ADAB, ADDD, ADE7, AE01, AE09; lo leen p03:AD9E (10 bytes)
+F 0xADA1 w5
+D 0xAEB9 0xAEF4 tiles_AEB9  lista de tiles (p00:5363): X, Y y los tiles, 0xFE trae otro X, Y y 0xFF acaba; lo leen p03:ADBA (59 bytes)
+F 0xAEB9 16
+D 0xAFED 0xAFF5 tabla_AFED  4 destinos del despachador p00:4066 (call en p03:AFEA, el indice en A): AFF5, B038, B03F, B04B; lo leen p03:AFEA (8 bytes)
+F 0xAFED w4
+D 0xB118 0xB153 tiles_B118  lista de tiles (p00:5363): X, Y y los tiles, 0xFE trae otro X, Y y 0xFF acaba; lo leen p03:B028 (59 bytes)
+F 0xB118 16
+D 0xB379 0xB37D tabla_B379  2 destinos del despachador p00:4066 (call en p03:B376, el indice en A): B37D, B3C2; lo leen p03:B376 (4 bytes)
+F 0xB379 w2
+D 0xB3D7 0xB3DB tabla_B3D7  2 destinos del despachador p00:4066 (call en p03:B3D4, el indice en A): B3DB, B420; lo leen p03:B3D4 (4 bytes)
+F 0xB3D7 w2
+D 0xB492 0xB498 tabla_B492  3 destinos del despachador p00:4066 (call en p03:B48F, el indice en A): B498, B4B5, B4CC; lo leen p03:B48F (6 bytes)
+F 0xB492 w3
+D 0xBBA6 0xBBAE tabla_BBA6  4 destinos del despachador p00:4066 (call en p03:BBA3, el indice en A): BBAE, BBF8, BC0E, BC28; lo leen p03:BBA3 (8 bytes)
+F 0xBBA6 w4
+D 0xBD33 0xBD8E tiles_BD33  lista de tiles (p00:5363): X, Y y los tiles, 0xFE trae otro X, Y y 0xFF acaba; lo leen p03:BC69 (91 bytes)
+F 0xBD33 16
+D 0xA4B2 0xA4BA resto_A4B2  lo apuntan con el banco puesto p03:A2D0 (0xA4B2); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p03:A2D0 (8 bytes)
+F 0xA4B2 16
+D 0xA5E6 0xA5F6 resto_A5E6  lo apuntan con el banco puesto p03:A5B3 (0xA5E6), p03:A5C0 (0xA5EE); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p03:A5B3, p03:A5C0 (16 bytes)
+F 0xA5E6 16
+D 0xA627 0xA637 resto_A627  lo apuntan con el banco puesto p03:A601 (0xA627), p03:A60D (0xA62F); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p03:A601, p03:A60D (16 bytes)
+F 0xA627 16
+D 0xA735 0xA747 resto_A735  lo apuntan con el banco puesto p03:A712 (0xA735), p03:A720 (0xA73B), p03:A6DD (0xA741), p03:A756 (0xA741); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p03:A712, p03:A720, p03:A6DD, p03:A756 (18 bytes)
+F 0xA735 16
+D 0xA96E 0xA9CA resto_A96E  lo apuntan con el banco puesto p03:A95E (0xA96E); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p03:A95E (92 bytes)
+F 0xA96E 16
+D 0xA9FF 0xAA15 resto_A9FF  lo apuntan con el banco puesto p03:A8E2 (0xA9FF), p03:A90D (0xA9FF), p03:A9E0 (0xA9FF); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p03:A8E2, p03:A90D, p03:A9E0 (22 bytes)
+F 0xA9FF 16
+D 0xAC0C 0xAC14 resto_AC0C  lo apuntan con el banco puesto p03:ABD9 (0xAC0C); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p03:ABD9 (8 bytes)
+F 0xAC0C 16
+D 0xAC57 0xAC97 resto_AC57  lo apuntan con el banco puesto p03:AB3D (0xAC57); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p03:AB3D (64 bytes)
+F 0xAC57 16
+D 0xACFD 0xAD03 resto_ACFD  lo apuntan con el banco puesto p03:ACE3 (0xACFD); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p03:ACE3 (6 bytes)
+F 0xACFD 16
+D 0xAD69 0xAD6F resto_AD69  lo apuntan con el banco puesto p03:AD4F (0xAD69); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p03:AD4F (6 bytes)
+F 0xAD69 16
+D 0xAE99 0xAEB9 resto_AE99  lo apuntan con el banco puesto p03:AE88 (0xAE99), p03:AE30 (0xAEA9); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p03:AE88, p03:AE30 (32 bytes)
+F 0xAE99 16
+D 0xAF2E 0xAF34 resto_AF2E  lo apuntan con el banco puesto p03:AF02 (0xAF2E); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p03:AF02 (6 bytes)
+F 0xAF2E 16
+D 0xAF44 0xAF4C resto_AF44  lo apuntan con el banco puesto p03:AF37 (0xAF44), p03:AFCF (0xAF44); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p03:AF37, p03:AFCF (8 bytes)
+F 0xAF44 16
+D 0xB153 0xB163 resto_B153  lo apuntan con el banco puesto p03:B08A (0xB153); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p03:B08A (16 bytes)
+F 0xB153 16
+D 0xB317 0xB325 resto_B317  lo apuntan con el banco puesto p03:B274 (0xB317), p03:B2D6 (0xB317), p03:B2F6 (0xB317); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p03:B274, p03:B2D6, p03:B2F6 (14 bytes)
+F 0xB317 16
+D 0xB33B 0xB373 resto_B33B  lo apuntan con el banco puesto p03:B327 (0xB33B), p03:B187 (0xB363); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p03:B327, p03:B187 (56 bytes)
+F 0xB33B 16
+D 0xB487 0xB48C resto_B487  lo apuntan con el banco puesto p03:B466 (0xB487); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p03:B466 (5 bytes)
+F 0xB487 16
+D 0xB50A 0xB51E resto_B50A  lo apuntan con el banco puesto p03:B4D7 (0xB50A), p03:B4E2 (0xB514); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p03:B4D7, p03:B4E2 (20 bytes)
+F 0xB50A 16
+D 0xB57E 0xB580 resto_B57E  lo apuntan con el banco puesto p03:B563 (0xB57E); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p03:B563 (2 bytes)
+F 0xB57E 16
+D 0xB5CE 0xB5D1 resto_B5CE  lo apuntan con el banco puesto p03:B5D2 (0xB5CE), p03:B5E1 (0xB5CE); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p03:B5D2, p03:B5E1 (3 bytes)
+F 0xB5CE 16
+D 0xB635 0xB63D resto_B635  lo apuntan con el banco puesto p03:B5FF (0xB635), p03:B613 (0xB635), p00:5714 (0xB636); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p03:B5FF, p03:B613, p00:5714 (8 bytes)
+F 0xB635 16
+D 0xB7B5 0xB7D1 resto_B7B5  lo apuntan con el banco puesto p03:B688 (0xB7B5), p03:B70F (0xB7B8), p03:B6C7 (0xB7BF), p03:B746 (0xB7C4), p03:B72C (0xB7C9), p03:B757 (0xB7CD); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p03:B688, p03:B70F, p03:B6C7, p03:B746, p03:B72C, p03:B757 (28 bytes)
+F 0xB7B5 16
+D 0xB86E 0xB872 resto_B86E  lo apuntan con el banco puesto p03:B848 (0xB86E); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p03:B848 (4 bytes)
+F 0xB86E 16
+D 0xB93B 0xB943 resto_B93B  lo apuntan con el banco puesto p03:B8E3 (0xB93B); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p03:B8E3 (8 bytes)
+F 0xB93B 16
+D 0xBC52 0xBC66 resto_BC52  lo apuntan con el banco puesto p03:BC3A (0xBC52), p03:BC46 (0xBC5C); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p03:BC3A, p03:BC46 (20 bytes)
+F 0xBC52 16
+# --- fin de los bloques de bloques.py ---
+
+# --- ANOTACIONES AUTOMATICAS (seccion que reescribe tools/anota.py; no editar a mano) ---
+L 0xA114 coge_del_muro_atras coge la ficha del muro muerto y la pone en 0xC209
+L 0xA28A baja_grupo dibuja el grupo que baja el jugador (chi, pon o kan)
+L 0xA46E declara_riichi la maquina declara riichi: +0x34 = 0xFF y apuesta 1000
+L 0xA4D0 pone_ficha_normal pone la ficha de la mano en su sitio normal
+L 0xA509 ficha_en_blanco rellena el cuadro de la ficha con el color 0
+L 0xA528 ficha_en_su_sitio dibuja la ficha en su sitio
+L 0xA580 muestra_puntuacion muestra los yaku y los puntos de la mano ganadora
+L 0xA655 dibuja_mesa_ronda dibuja los datos de la ronda
+L 0xA6A7 escribe_riichi_honba escribe los numeros de 0xC0B4 y 0xC0B5
+L 0xA6BE muestra_voz muestra la cara del que habla (A = pon, chi, kan, ron...)
+L 0xA747 cuenta_atras_cuadro cuenta atras del cuadro de la voz
+L 0xA74F borra_cuadro_voz borra el cuadro de la cara que habla
+L 0xA791 suma_kan suma uno a los kan del jugador 0xC207
+L 0xB59C paga_esperas paga las esperas de una ronda sin ganador
+L 0xB63D fin_de_ronda fin de la ronda: elige el aviso y quien reparte
+L 0xB890 mira_cuatro_vientos mira si los cuatro han tirado el mismo viento
+L 0xB8D4 resultados_finales pantalla de los resultados finales
+L 0xBD8E adapta_estilo adapta el estilo de los rivales a la mano ganadora
+L 0xBFB4 sube_contador suma A al contador (con tope 0x3F)
+L 0xBFCA baja_contador resta A al contador
+L 0xBFD6 copia_estilos copia los estilos de los tres rivales a sus manos
+C 0xA003 lee el jugador que responde a la ficha tirada
+C 0xA006 guarda el jugador al que le toca (0 = el humano)
+C 0xA009 mano_del_actual: HL = la mano del jugador 0xC207 y la guarda en 0xC0DE
+C 0xA00C apunta a el paso de la respuesta
+C 0xA015 lee el jugador que responde a la ficha tirada
+C 0xA018 guarda el jugador al que le toca (0 = el humano)
+C 0xA01B mano_del_actual: HL = la mano del jugador 0xC207 y la guarda en 0xC0DE
+C 0xA020 prueba_mano_con_ficha: prueba la mano del que responde con la ficha de 0xC209 o C
+C 0xA023 apunta a el paso de la respuesta
+C 0xA032 lee la posicion de la ficha en la mano
+C 0xA035 suma_a_hl: HL = HL + A
+C 0xA03A lee la ficha robada o tirada
+C 0xA041 guarda la ficha robada o tirada
+C 0xA044 descarta: descarta la ficha 0xC209 del jugador 0xC207
+C 0xA047 ordena_mano_actual: ordena las 13 fichas de la mano del jugador actual
+C 0xA04A dibuja_mano: dibuja las 13 fichas de la mano del jugador 0xC207
+C 0xA051 guarda el paso de la respuesta
+C 0xA054 guarda la opcion elegida en el cuadro
+C 0xA057 marca +0x40 de la mano del jugador 0xC207 a 1
+C 0xA05C guarda el paso del turno
+C 0xA063 despacha: salta a la palabra A de la tabla que va detras del call
+C 0xA070 pone 0x08 en 0xCA00 (32 bytes) y cuenta cuantas casillas libres hay en +0x69 (p02:9B3B)
+C 0xA073 apunta a el paso de la respuesta
+C 0xA07C dibuja el grupo bajado de un kan: coloca las fichas (0x991B, 0x99FE, 0xA1EC)
+C 0xA07F lee el jugador al que le toca (0 = el humano)
+C 0xA083 lee el jugador que responde a la ficha tirada
+C 0xA086 guarda el jugador al que le toca (0 = el humano)
+C 0xA08D guarda el jugador al que le toca (0 = el humano)
+C 0xA090 apunta a el paso de la respuesta
+C 0xA095 teclas de la eleccion de ficha cuando ya esta en espera (solo se puede tirar la ultima) (p02:9A2E)
+C 0xA099 lee el jugador que responde a la ficha tirada
+C 0xA09C guarda el jugador al que le toca (0 = el humano)
+C 0xA09F mano_del_actual: HL = la mano del jugador 0xC207 y la guarda en 0xC0DE
+C 0xA0A2 apunta a el paso de la respuesta
+C 0xA0AB dibuja el grupo bajado de un kan: coloca las fichas (0x991B, 0x99FE, 0xA1EC)
+C 0xA0AE lee el jugador que responde a la ficha tirada
+C 0xA0B1 guarda el jugador al que le toca (0 = el humano)
+C 0xA0B4 mano_del_actual: HL = la mano del jugador 0xC207 y la guarda en 0xC0DE
+C 0xA0B9 prueba_mano_con_ficha: prueba la mano del que responde con la ficha de 0xC209 o C
+C 0xA0BC apunta a el paso de la respuesta
+C 0xA0C4 lee el jugador al que le toca (0 = el humano)
+C 0xA0C7 hl_mano_de_a: H += 4 x A (la mano del jugador A)
+C 0xA0CA lee la posicion de la ficha en la mano
+C 0xA0CD suma_a_hl: HL = HL + A
+C 0xA0D2 lee la ficha robada o tirada
+C 0xA0D9 guarda la ficha robada o tirada
+C 0xA0DC descarta: descarta la ficha 0xC209 del jugador 0xC207
+C 0xA0DF ordena_mano_actual: ordena las 13 fichas de la mano del jugador actual
+C 0xA0E5 dibuja_mano: dibuja las 13 fichas de la mano del jugador 0xC207
+C 0xA0F1 despacha: salta a la palabra A de la tabla que va detras del call
+C 0xA0FE coge_del_muro_atras: coge la ficha del muro muerto y la pone en 0xC209
+C 0xA101 lee el jugador que responde a la ficha tirada
+C 0xA104 guarda el jugador al que le toca (0 = el humano)
+C 0xA107 mano_del_actual: HL = la mano del jugador 0xC207 y la guarda en 0xC0DE
+C 0xA10C guarda el paso del turno
+C 0xA110 guarda el paso de la respuesta
+C 0xA117 lee las fichas sacadas del final del muro (por kan)
+C 0xA11F apunta a el muro: 136 fichas (0x88)
+C 0xA122 suma_a_hl: HL = HL + A
+C 0xA126 guarda la ficha robada o tirada
+C 0xA129 lee el jugador al que le toca (0 = el humano)
+C 0xA12D lee el jugador que responde a la ficha tirada
+C 0xA130 guarda el jugador al que le toca (0 = el humano)
+C 0xA133 dibuja_ficha_robada: dibuja la ficha 0xC209 en su sitio
+C 0xA138 guarda 1 si se gana con la ficha de un kan
+C 0xA13B pone el cursor de la mano en la ultima ficha (0xC20A = 0xC211 = 0xC200 + 1) (p02:93F1)
+C 0xA13E suma_kan: suma uno a los kan del jugador 0xC207
+C 0xA142 guarda el jugador al que le toca (0 = el humano)
+C 0xA149 coge_del_muro_atras: coge la ficha del muro muerto y la pone en 0xC209
+C 0xA14C apunta a el paso de la respuesta
+C 0xA154 guarda el jugador al que le toca (0 = el humano)
+C 0xA157 mano_del_actual: HL = la mano del jugador 0xC207 y la guarda en 0xC0DE
+C 0xA15A prueba_ganar_robo: prueba si la mano gana por robo (B = 1)
+C 0xA161 guarda como se gana la mano: 1 por robo, 2 por la ficha tirada
+C 0xA166 lee el jugador que responde a la ficha tirada
+C 0xA169 muestra_voz: muestra la cara del que habla (A = pon, chi, kan, ron...)
+C 0xA16C voz_tsumo: dice TSUMO: la voz 0x16 con el tono del personaje de 0xC207
+C 0xA172 prueba_mano_con_ficha: prueba la mano del que responde con la ficha de 0xC209 o C
+C 0xA175 apunta a el paso de la respuesta
+C 0xA17B teclas de la eleccion de ficha cuando ya esta en espera (solo se puede tirar la ultima) (p02:9A2E)
+C 0xA17F lee el jugador que responde a la ficha tirada
+C 0xA182 guarda el jugador al que le toca (0 = el humano)
+C 0xA185 mano_del_actual: HL = la mano del jugador 0xC207 y la guarda en 0xC0DE
+C 0xA188 cambia de sitio la ficha 0xC209 con una de la mano (jugador de 0xC20D) (p02:8C8E)
+C 0xA18B apunta a el paso de la respuesta
+C 0xA193 ordena_mano_actual: ordena las 13 fichas de la mano del jugador actual
+C 0xA196 dibuja_mano: dibuja las 13 fichas de la mano del jugador 0xC207
+C 0xA19C si el muro de atras ha llegado a 4 fichas (0xC210), mira si hay cuatro kan (0xA771): si es asi 0xC0B1 = 1; si no, 0xC0B8 = 2
+C 0xA1A8 mira si algun jugador (D000 + 4 x n) tiene +0x46 igual a 4 (cuatro kan): acarreo
+C 0xA1B0 guarda como se gana la mano: 1 por robo, 2 por la ficha tirada
+C 0xA1B9 guarda el final de la ronda: 1 sin fichas, 2 hay ganador o aborto
+C 0xA1BD guarda 1 si se anula por cuatro kan
+C 0xA1C4 avanza el sitio de +0x32 de la mano del jugador 0xC20D (suma de la tabla 0x8EB9) (p02:99FE)
+C 0xA1C7 pone las fichas del grupo de kan de cuatro fichas: las dos primeras de lado y las otras dos
+C 0xA1CA dibuja la ficha de la mano del jugador siguiente, de lado, en el sitio del grupo (tabla 0x99CE) (p02:998F)
+C 0xA1D0 hl_mano_de_c20d: H += 4 x 0xC20D (la mano de ese jugador)
+C 0xA1D4 lee el jugador al que le toca (0 = el humano)
+C 0xA1D8 lee el jugador que responde a la ficha tirada
+C 0xA1DB guarda el jugador al que le toca (0 = el humano)
+C 0xA1DE ordena_mano_actual: ordena las 13 fichas de la mano del jugador actual
+C 0xA1E4 dibuja_mano: dibuja las 13 fichas de la mano del jugador 0xC207
+C 0xA1E8 guarda el jugador al que le toca (0 = el humano)
+C 0xA1F3 lee el jugador al que le toca (0 = el humano)
+C 0xA1F7 lee el jugador que responde a la ficha tirada
+C 0xA1FA guarda el jugador al que le toca (0 = el humano)
+C 0xA1FD tamano_ficha: 0xC205/0xC206 = ancho y alto de la ficha del jugador 0xC207
+C 0xA203 hl_mano_de_c20d: H += 4 x 0xC20D (la mano de ese jugador)
+C 0xA207 guarda la X donde se dibuja la ficha
+C 0xA20C guarda la Y donde se dibuja la ficha
+C 0xA20F HL = +0x67 de la mano del jugador 0xC20D
+C 0xA212 lee la opcion elegida en el cuadro
+C 0xA215 palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xA21E hl_mano_de_c20d: H += 4 x 0xC20D (la mano de ese jugador)
+C 0xA222 suma_a_hl: HL = HL + A
+C 0xA226 dibuja_ficha_2: dibuja la ficha A del jugador 0xC207 (sin el cambio por el reverso)
+C 0xA229 avanza el sitio de +0x32 de la mano del jugador 0xC20D (suma de la tabla 0x8EB9) (p02:99FE)
+C 0xA22F hl_mano_de_c20d: H += 4 x 0xC20D (la mano de ese jugador)
+C 0xA233 guarda la X donde se dibuja la ficha
+C 0xA238 guarda la Y donde se dibuja la ficha
+C 0xA241 hl_mano_de_c20d: H += 4 x 0xC20D (la mano de ese jugador)
+C 0xA245 suma_a_hl: HL = HL + A
+C 0xA249 dibuja_ficha_2: dibuja la ficha A del jugador 0xC207 (sin el cambio por el reverso)
+C 0xA24D guarda el jugador al que le toca (0 = el humano)
+C 0xA250 HL = +0x67 de la mano del jugador 0xC20D
+C 0xA253 lee la opcion elegida en el cuadro
+C 0xA256 palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xA25F hl_mano_de_c20d: H += 4 x 0xC20D (la mano de ese jugador)
+C 0xA263 suma_a_hl: HL = HL + A
+C 0xA270 hl_mano_de_c20d: H += 4 x 0xC20D (la mano de ese jugador)
+C 0xA274 suma_a_hl: HL = HL + A
+C 0xA282 hl_mano_de_a: H += 4 x A (la mano del jugador A)
+C 0xA28D guarda el jugador que responde a la ficha tirada
+C 0xA290 tamano_ficha: 0xC205/0xC206 = ancho y alto de la ficha del jugador 0xC207
+C 0xA293 apunta a las opciones de chi y kan (3 bytes)
+C 0xA296 lee la opcion elegida en el cuadro
+C 0xA299 suma_a_hl: HL = HL + A
+C 0xA2A2 calcula en +0x32 de la mano el sitio donde cae el grupo bajado: +0x0E (grupos hechos) y tablas 0x993D por jugador (p02:991B)
+C 0xA2A7 guarda la X donde se dibuja la ficha
+C 0xA2AC guarda la Y donde se dibuja la ficha
+C 0xA2B1 dibuja_ficha_2: dibuja la ficha A del jugador 0xC207 (sin el cambio por el reverso)
+C 0xA2B4 avanza el sitio de +0x32 de la mano del jugador 0xC20D (suma de la tabla 0x8EB9) (p02:99FE)
+C 0xA2B7 avanza el sitio de +0x32 de la mano del jugador 0xC20D (suma de la tabla 0x8EB9) (p02:99FE)
+C 0xA2BC guarda la X donde se dibuja la ficha
+C 0xA2C1 guarda la Y donde se dibuja la ficha
+C 0xA2C6 dibuja_ficha_2: dibuja la ficha A del jugador 0xC207 (sin el cambio por el reverso)
+C 0xA2C9 calcula en +0x32 de la mano el sitio donde cae el grupo bajado: +0x0E (grupos hechos) y tablas 0x993D por jugador (p02:991B)
+C 0xA2CC lee el jugador al que le toca (0 = el humano)
+C 0xA2D3 suma_a_hl: HL = HL + A
+C 0xA2DE hl_mano_de_c20d: H += 4 x 0xC20D (la mano de ese jugador)
+C 0xA2E3 guarda la X donde se dibuja la ficha
+C 0xA2EA guarda la Y donde se dibuja la ficha
+C 0xA2EE apunta a las opciones de chi y kan (3 bytes)
+C 0xA2F1 lee la opcion elegida en el cuadro
+C 0xA2F4 suma_a_hl: HL = HL + A
+C 0xA2FE mano_de_jugador: HL = 0xD000 + 0x400 x 0xC207
+C 0xA302 suma_a_hl: HL = HL + A
+C 0xA30C dibuja_ficha_2: dibuja la ficha A del jugador 0xC207 (sin el cambio por el reverso)
+C 0xA30F avanza el sitio de +0x32 de la mano del jugador 0xC20D (suma de la tabla 0x8EB9) (p02:99FE)
+C 0xA314 guarda la X donde se dibuja la ficha
+C 0xA319 guarda la Y donde se dibuja la ficha
+C 0xA31D dibuja_ficha_2: dibuja la ficha A del jugador 0xC207 (sin el cambio por el reverso)
+C 0xA320 apunta a las opciones de chi y kan (3 bytes)
+C 0xA323 lee la opcion elegida en el cuadro
+C 0xA326 suma_a_hl: HL = HL + A
+C 0xA32E hl_mano_de_c20d: H += 4 x 0xC20D (la mano de ese jugador)
+C 0xA332 suma_a_hl: HL = HL + A
+C 0xA344 lee la ficha robada o tirada
+C 0xA34A anade la ficha A (sin los bits 6-7) a la lista de +0x41 (cuenta en +0x40)
+C 0xA34D lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0xA35A dibuja_ficha_2: dibuja la ficha A del jugador 0xC207 (sin el cambio por el reverso)
+C 0xA35D avanza el sitio de +0x32 de la mano del jugador 0xC20D (suma de la tabla 0x8EB9) (p02:99FE)
+C 0xA362 guarda la X donde se dibuja la ficha
+C 0xA367 guarda la Y donde se dibuja la ficha
+C 0xA370 dibuja_ficha_2: dibuja la ficha A del jugador 0xC207 (sin el cambio por el reverso)
+C 0xA373 apunta a las opciones de chi y kan (3 bytes)
+C 0xA376 lee la opcion elegida en el cuadro
+C 0xA379 suma_a_hl: HL = HL + A
+C 0xA383 hl_mano_de_c20d: H += 4 x 0xC20D (la mano de ese jugador)
+C 0xA387 suma_a_hl: HL = HL + A
+C 0xA399 anade la ficha A (sin los bits 6-7) a la lista de +0x41 (cuenta en +0x40)
+C 0xA39C lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0xA3B1 lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0xA3B9 suma_a_hl: HL = HL + A
+C 0xA3C8 dibuja en el sitio de +0x32 la ficha 0xC209 boca arriba y corre el sitio al siguiente (0x99FE) (p02:9965)
+C 0xA3D7 lee el jugador al que le toca (0 = el humano)
+C 0xA3E2 guarda el jugador al que le toca (0 = el humano)
+C 0xA3E9 guarda el jugador al que le toca (0 = el humano)
+C 0xA3EF lee la ficha robada o tirada
+C 0xA3F5 mano_de_jugador: HL = 0xD000 + 0x400 x 0xC207
+C 0xA417 lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0xA437 guarda 1 si se gana con la ficha del kan de otro
+C 0xA443 lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0xA446 suma_a_hl: HL = HL + A
+C 0xA44B lee la ficha robada o tirada
+C 0xA450 guarda la ficha robada o tirada
+C 0xA455 guarda contador de trabajo de las fichas de la mano
+C 0xA45A guarda las opciones de chi y kan (3 bytes)
+C 0xA464 si en la lista de grupos de +0x37 hay un grupo de esa ficha (pon), lo anota en 0xC21A con el bit 6 (p02:9DEA)
+C 0xA467 apunta a las opciones de chi y kan (3 bytes)
+C 0xA46A con el bit 6 puesto: el grupo es uno ya bajado al que se anade la cuarta (kan anadido)
+C 0xA47D suma_puntos_actual: suma al marcador del jugador 0xC207 el importe C (signo) y DE (BCD)
+C 0xA480 suma 1 a 0xC0B4 en BCD (tope 99) y avisa por 0xA6A7 (p02:89E7)
+C 0xA483 lee el jugador al que le toca (0 = el humano)
+C 0xA48B muestra_voz: muestra la cara del que habla (A = pon, chi, kan, ron...)
+C 0xA48E voz_riichi: dice RIICHI: la voz 0x15 con el tono del personaje de 0xC207
+C 0xA494 hl_mano_de_c20d: H += 4 x 0xC20D (la mano de ese jugador)
+C 0xA4A2 lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0xA4AC suma_a_hl: HL = HL + A
+C 0xA4C9 ficha_en_blanco: rellena el cuadro de la ficha con el color 0
+C 0xA4CD pone_ficha_normal: pone la ficha de la mano en su sitio normal
+C 0xA4DA guarda la X donde se dibuja la ficha
+C 0xA4E0 guarda la Y donde se dibuja la ficha
+C 0xA4E3 lee el jugador al que le toca (0 = el humano)
+C 0xA4E7 lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0xA4EF apunta a cuantas fichas se han robado del muro
+C 0xA4F5 lee el jugador al que le toca (0 = el humano)
+C 0xA4FB guarda el jugador al que le toca (0 = el humano)
+C 0xA4FE lee la ficha robada o tirada
+C 0xA501 dibuja_ficha_2: dibuja la ficha A del jugador 0xC207 (sin el cambio por el reverso)
+C 0xA505 guarda el jugador al que le toca (0 = el humano)
+C 0xA511 lee el ancho de la ficha
+C 0xA515 lee el alto de la ficha
+C 0xA525 vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0xA532 guarda la X donde se dibuja la ficha
+C 0xA538 guarda la Y donde se dibuja la ficha
+C 0xA53B lee el jugador al que le toca (0 = el humano)
+C 0xA53F lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0xA547 apunta a cuantas fichas se han robado del muro
+C 0xA54D lee el jugador al que le toca (0 = el humano)
+C 0xA553 guarda el jugador al que le toca (0 = el humano)
+C 0xA556 lee la ficha robada o tirada
+C 0xA559 dibuja_ficha_clara: dibuja la ficha A con los colores cambiados
+C 0xA55D guarda el jugador al que le toca (0 = el humano)
+C 0xA569 apunta a cuantas fichas se han robado del muro
+C 0xA56E lee el jugador al que le toca (0 = el humano)
+C 0xA575 guarda el jugador al que le toca (0 = el humano)
+C 0xA578 tamano_ficha: 0xC205/0xC206 = ancho y alto de la ficha del jugador 0xC207
+C 0xA57C guarda el jugador al que le toca (0 = el humano)
+C 0xA581 guarda cuantos yaku hay en la lista
+C 0xA584 guarda la linea de la lista de yaku que se escribe
+C 0xA587 copia el rectangulo de la pantalla (0,0x14) a la pagina 1
+C 0xA58A cuenta cuantos yaku hay en la lista de 0xC2E0 (pares de dos bytes, 32 como mucho) en 0xC248
+C 0xA58D dibuja el rectangulo de la lista (alto segun cuantos, tablas 0xA5E6 y 0xA5EE)
+C 0xA590 dibuja la ventana de los yaku con 0x9D1C
+C 0xA596 apunta a la lista de yaku de la mano: pares codigo, valor (32 como mucho)
+C 0xA59E apunta a cuantos yaku hay en la lista
+C 0xA5AF lee cuantos yaku hay en la lista
+C 0xA5B6 suma_a_hl: HL = HL + A
+C 0xA5BC lee cuantos yaku hay en la lista
+C 0xA5C3 suma_a_hl: HL = HL + A
+C 0xA5D1 vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0xA5E2 vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0xA5FD lee cuantos yaku hay en la lista
+C 0xA604 suma_a_hl: HL = HL + A
+C 0xA609 lee cuantos yaku hay en la lista
+C 0xA610 suma_a_hl: HL = HL + A
+C 0xA619 ventana: dibuja una ventana con marco (H = ancho, L = alto, DE = esquina)
+C 0xA623 ventana: dibuja una ventana con marco (H = ancho, L = alto, DE = esquina)
+C 0xA642 vdp_copia: HMMM: copia un rectangulo de la VRAM (origen HL, destino DE, tamano BC, A = paginas)
+C 0xA651 vdp_copia: HMMM: copia un rectangulo de la VRAM (origen HL, destino DE, tamano BC, A = paginas)
+C 0xA658 dibuja_lista_tiles: dibuja una lista de tiles de HL (x, y, tiles; 0xFF acaba)
+C 0xA65B pinta los cuatro tiles de una esquina del marco (p00:584C)
+C 0xA65E escribe_riichi_honba: escribe los numeros de 0xC0B4 y 0xC0B5
+C 0xA661 lee el viento de la ronda (0 este)
+C 0xA66C lee el numero de la mano dentro del viento (0-3)
+C 0xA67F lee el jugador que reparte (0-3)
+C 0xA6AF numero_sin_ceros: escribe B bytes BCD de HL en DE sin ceros por la izquierda
+C 0xA6B2 apunta a las barras de honba (BCD)
+C 0xA6BA numero_sin_ceros: escribe B bytes BCD de HL en DE sin ceros por la izquierda
+C 0xA6C2 pone ocho sprites del cuadro del personaje en 0xCC10 (4 filas de 2) con X, Y y numero
+C 0xA6C7 lee el tiempo que queda de la cara que habla
+C 0xA6CE borra_cuadro_voz: borra el cuadro de la cara que habla
+C 0xA6D3 guarda el tiempo que queda de la cara que habla
+C 0xA6E0 suma_a_hl: HL = HL + A
+C 0xA6F2 vdp_copia: HMMM: copia un rectangulo de la VRAM (origen HL, destino DE, tamano BC, A = paginas)
+C 0xA706 vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0xA70D ventana: dibuja una ventana con marco (H = ancho, L = alto, DE = esquina)
+C 0xA715 suma_a_hl: HL = HL + A
+C 0xA723 suma_a_hl: HL = HL + A
+C 0xA731 vdp_copia: HMMM: copia un rectangulo de la VRAM (origen HL, destino DE, tamano BC, A = paginas)
+C 0xA759 suma_a_hl: HL = HL + A
+C 0xA769 vdp_copia: HMMM: copia un rectangulo de la VRAM (origen HL, destino DE, tamano BC, A = paginas)
+C 0xA76D guarda el tiempo que queda de la cara que habla
+C 0xA7A4 palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xA7B6 un sprite de cuatro bytes: Y, X, patron; despues el patron sube cuatro
+C 0xA806 despacha: salta a la palabra A de la tabla que va detras del call
+C 0xA811 pantalla_off: apaga la pantalla
+C 0xA814 pone el aspecto de los dos sprites del cursor de las opciones (0xCA00 con 9 y 0xCA10 con 2)
+C 0xA817 apunta a variable de los pasos de las pantallas de menu
+C 0xA81F dibuja las diez marcas de las opciones: cada una 0x47 (activada) o 0x48 (no)
+C 0xA822 pantalla_on: enciende la pantalla
+C 0xA82B apunta a variable de los pasos de las pantallas de menu
+C 0xA85F apunta a el paso o la opcion de la pantalla de menu
+C 0xA873 apunta a el paso o la opcion de la pantalla de menu
+C 0xA883 apunta a el paso o la opcion de la pantalla de menu
+C 0xA89A borra el recuadro de la opcion elegida (16 x 16, posicion de la tabla 0xA9FF)
+C 0xA89D lee el paso o la opcion de la pantalla de menu
+C 0xA8A0 apunta a la regla 'comer 断幺' (tanyao con la mano abierta; de serie si)
+C 0xA8AB lee el paso o la opcion de la pantalla de menu
+C 0xA8AE dibuja la marca de la opcion A en su sitio de la tabla 0xA9FF
+C 0xA8B5 lee el paso o la opcion de la pantalla de menu
+C 0xA8B8 dibuja la marca de la opcion A en su sitio de la tabla 0xA9FF
+C 0xA8C1 guarda la tabla de atributos de los sprites (32 de 4 bytes)
+C 0xA8C4 apunta a variable de los pasos de las pantallas de menu
+C 0xA8CD guarda variable de los pasos de las pantallas de menu
+C 0xA8D0 guarda el paso o la opcion de la pantalla de menu
+C 0xA8DB guarda 1 cuando la pantalla de menu ha acabado
+C 0xA8E5 palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xA8F2 vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0xA8FB llena 16 bytes de HL con A (el primer byte y ldir de 15 a los siguientes) (p00:4382)
+C 0xA903 llena 16 bytes de HL con A (el primer byte y ldir de 15 a los siguientes) (p00:4382)
+C 0xA90A lee el paso o la opcion de la pantalla de menu
+C 0xA910 palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xA916 guarda la tabla de atributos de los sprites (32 de 4 bytes)
+C 0xA93A vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0xA947 vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0xA950 ventana: dibuja una ventana con marco (H = ancho, L = alto, DE = esquina)
+C 0xA959 ventana: dibuja una ventana con marco (H = ancho, L = alto, DE = esquina)
+C 0xA966 escribe_texto: escribe un texto de letras de 16 puntos de alto en D,E
+C 0xA9CC apunta a la regla 'comer 断幺' (tanyao con la mano abierta; de serie si)
+C 0xA9D6 dibuja la marca de la opcion A en su sitio de la tabla 0xA9FF
+C 0xA9E3 palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xA9EA apunta a la regla 'comer 断幺' (tanyao con la mano abierta; de serie si)
+C 0xAA18 despacha: salta a la palabra A de la tabla que va detras del call
+C 0xAA32 llena 16 bytes de HL con A (el primer byte y ldir de 15 a los siguientes) (p00:4382)
+C 0xAA35 lee el personaje que juega de rival 1
+C 0xAA3B lee el personaje que juega de rival 2
+C 0xAA41 lee el personaje que juega de rival 3
+C 0xAA48 guarda el jugador al que le toca (0 = el humano)
+C 0xAA4B suma uno (BCD, tope 99) al contador 0xC034 y al de cada uno de los tres rivales
+C 0xAA4E dibuja los marcos de los tres rivales con 0x661D (sus caras) y enciende la pantalla
+C 0xAA57 baraja los cuatro vientos: toma de la tabla 0xAC57 una combinacion al azar (4 bytes) a 0xC21E
+C 0xAA61 apunta a el jugador al que le toca (0 = el humano)
+C 0xAA67 guarda la tabla de atributos de los sprites (32 de 4 bytes)
+C 0xAA70 apunta a el jugador al que le toca (0 = el humano)
+C 0xAA7C guarda el jugador al que le toca (0 = el humano)
+C 0xAA8E suma_a_hl: HL = HL + A
+C 0xAA95 apunta a el personaje que se sienta en cada sitio (4 bytes)
+C 0xAA98 suma_a_hl: HL = HL + A
+C 0xAAA3 suma_a_hl: HL = HL + A
+C 0xAAB4 guarda el temporizador de espera entre pasos
+C 0xAABF limpia_pantalla: apaga la pantalla, quita los sprites y borra la VRAM visible
+C 0xAAC2 dibuja los rivales tras sentarse, con las caras de 0xC031-3
+C 0xAAC7 guarda el temporizador de espera entre pasos
+C 0xAAD3 lee el jugador al que le toca (0 = el humano)
+C 0xAAD9 busca cual de los tres rivales de 0xC031 es el de 0xC233 + A y deja su numero en 0xC207
+C 0xAADE guarda 1 cuando la pantalla de menu ha acabado
+C 0xAAE6 suma_a_hl: HL = HL + A
+C 0xAAEB apunta a el personaje que juega de rival 1
+C 0xAB06 guarda el jugador al que le toca (0 = el humano)
+C 0xAB0E guarda la X donde se dibuja la ficha
+C 0xAB13 guarda la Y donde se dibuja la ficha
+C 0xAB18 guarda el ancho de la ficha
+C 0xAB1D guarda el alto de la ficha
+C 0xAB21 guarda el jugador al que le toca (0 = el humano)
+C 0xAB2B lee la X donde se dibuja la ficha
+C 0xAB30 guarda la X donde se dibuja la ficha
+C 0xAB40 suma_a_hl: HL = HL + A
+C 0xAB5D guarda la tabla de atributos de los sprites (32 de 4 bytes)
+C 0xAB60 pide_sonido_07: pide el sonido 0x07 (el del boton)
+C 0xAB63 lee variable de los pasos de las pantallas de menu
+C 0xAB69 suma_a_hl: HL = HL + A
+C 0xAB74 dibuja la ficha elegida (0xC02E) en el sitio de la tabla 0xAC0C y guarda en 0xC22A el viento que ha salido
+C 0xAB77 borra la ficha elegida del sorteo y espera
+C 0xAB7F lee el jugador al que le toca (0 = el humano)
+C 0xAB89 lee variable de los pasos de las pantallas de menu
+C 0xAB98 lee variable de los pasos de las pantallas de menu
+C 0xABA4 guarda variable de los pasos de las pantallas de menu
+C 0xABA7 pide_sonido_06: pide el sonido 0x06 (el del cursor)
+C 0xABB0 multiplica_b_c: A = B x C
+C 0xABBB guarda la tabla de atributos de los sprites (32 de 4 bytes)
+C 0xABC7 borra con 0 el rectangulo de la pantalla (212 filas)
+C 0xABCD guarda el ancho de la ficha
+C 0xABD2 guarda el alto de la ficha
+C 0xABD5 lee el jugador al que le toca (0 = el humano)
+C 0xABDC suma_a_hl: HL = HL + A
+C 0xABE0 guarda la X donde se dibuja la ficha
+C 0xABE5 guarda la Y donde se dibuja la ficha
+C 0xABE8 apunta a el jugador al que le toca (0 = el humano)
+C 0xABF3 dibuja_ficha_2: dibuja la ficha A del jugador 0xC207 (sin el cambio por el reverso)
+C 0xABFC suma_a_hl: HL = HL + A
+C 0xAC08 guarda el jugador al que le toca (0 = el humano)
+C 0xAC1A suma_a_hl: HL = HL + A
+C 0xAC1F lee variable de los pasos de las pantallas de menu
+C 0xAC25 multiplica_b_c: A = B x C
+C 0xAC34 vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0xAC49 guarda variable de los pasos de las pantallas de menu
+C 0xAC50 lee variable de los pasos de las pantallas de menu
+C 0xACA4 vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0xACAD ventana: dibuja una ventana con marco (H = ancho, L = alto, DE = esquina)
+C 0xACBA vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0xACC3 ventana: dibuja una ventana con marco (H = ancho, L = alto, DE = esquina)
+C 0xACD0 vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0xACD9 ventana: dibuja una ventana con marco (H = ancho, L = alto, DE = esquina)
+C 0xACE6 palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xACEB apunta a el personaje que juega de rival 1
+C 0xACEE suma_a_hl: HL = HL + A
+C 0xACF3 dibuja_cara: dibuja la cara de 48 x 48 del personaje A
+C 0xACF9 pantalla_on: enciende la pantalla
+C 0xAD10 vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0xAD19 ventana: dibuja una ventana con marco (H = ancho, L = alto, DE = esquina)
+C 0xAD26 vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0xAD2F ventana: dibuja una ventana con marco (H = ancho, L = alto, DE = esquina)
+C 0xAD3C vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0xAD45 ventana: dibuja una ventana con marco (H = ancho, L = alto, DE = esquina)
+C 0xAD52 palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xAD57 apunta a el personaje que juega de rival 1
+C 0xAD5A suma_a_hl: HL = HL + A
+C 0xAD5F dibuja_cara: dibuja la cara de 48 x 48 del personaje A
+C 0xAD65 pantalla_on: enciende la pantalla
+C 0xAD7B apunta a el personaje que juega de rival 1
+C 0xAD83 suma uno (BCD, tope 99) al contador del rival A
+C 0xAD8F suma_a_hl: HL = HL + A
+C 0xAD9E despacha: salta a la palabra A de la tabla que va detras del call
+C 0xADB4 dibuja_mesa: carga las fichas y el tapete de los bancos 7-9
+C 0xADBA dibuja_lista_tiles: dibuja una lista de tiles de HL (x, y, tiles; 0xFF acaba)
+C 0xADBD pantalla_on: enciende la pantalla
+C 0xADC6 apunta a los colores de los sprites (4 bloques de 16)
+C 0xADCB llena 16 bytes de HL con A (el primer byte y ldir de 15 a los siguientes) (p00:4382)
+C 0xADD3 llena 16 bytes de HL con A (el primer byte y ldir de 15 a los siguientes) (p00:4382)
+C 0xADE1 muestra la cara del rival elegido a 48 de alto con un barrido (copia de 48 filas)
+C 0xADE7 lee variable de los pasos de las pantallas de menu
+C 0xADEE apunta a el paso o la opcion de la pantalla de menu
+C 0xADF8 guarda la tabla de atributos de los sprites (32 de 4 bytes)
+C 0xAE03 guarda el temporizador de espera entre pasos
+C 0xAE10 guarda 1 cuando la pantalla de menu ha acabado
+C 0xAE2A pide_sonido_06: pide el sonido 0x06 (el del cursor)
+C 0xAE33 palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xAE3E guarda la tabla de atributos de los sprites (32 de 4 bytes)
+C 0xAE50 mueve el cursor hacia abajo al siguiente rival que no se haya elegido ya
+C 0xAE56 hacia arriba al rival anterior libre
+C 0xAE5C izquierda: salta tres rivales
+C 0xAE62 derecha: salta tres rivales
+C 0xAE6B apunta a variable de los pasos de las pantallas de menu
+C 0xAE70 apunta a el personaje que juega de rival 1
+C 0xAE73 suma_a_hl: HL = HL + A
+C 0xAE7D marca en 0xC221 el bit del rival elegido (tabla 0xAF44)
+C 0xAE80 pide_sonido_07: pide el sonido 0x07 (el del boton)
+C 0xAE8B palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xAE95 vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0xAEFA palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xAEFE lee variable de los pasos de las pantallas de menu
+C 0xAF05 palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xAF16 vdp_copia: HMMM: copia un rectangulo de la VRAM (origen HL, destino DE, tamano BC, A = paginas)
+C 0xAF3A suma_a_hl: HL = HL + A
+C 0xAF55 Z si el rival de 0xC02D ya esta elegido (comprueba su bit en 0xC221)
+C 0xAF69 Z si el rival de 0xC02D ya esta elegido (comprueba su bit en 0xC221)
+C 0xAF88 Z si el rival de 0xC02D ya esta elegido (comprueba su bit en 0xC221)
+C 0xAFB4 Z si el rival de 0xC02D ya esta elegido (comprueba su bit en 0xC221)
+C 0xAFD2 suma_a_hl: HL = HL + A
+C 0xAFE3 vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0xAFEA despacha: salta a la palabra A de la tabla que va detras del call
+C 0xAFFB pantalla_off: apaga la pantalla
+C 0xB009 apunta a los colores de los sprites (4 bloques de 16)
+C 0xB00E llena 16 bytes de HL con A (el primer byte y ldir de 15 a los siguientes) (p00:4382)
+C 0xB016 llena 16 bytes de HL con A (el primer byte y ldir de 15 a los siguientes) (p00:4382)
+C 0xB01F escribe ocho textos de la tabla 0xB33B
+C 0xB022 dibuja_mesa: carga las fichas y el tapete de los bancos 7-9
+C 0xB028 dibuja_lista_tiles: dibuja una lista de tiles de HL (x, y, tiles; 0xFF acaba)
+C 0xB02C pone la cara del rival A en su sitio (0x661D, posicion 0x0810)
+C 0xB02F dibuja la barra de cada uno de los siete contadores del rival
+C 0xB032 pantalla_on: enciende la pantalla
+C 0xB038 teclas de la pantalla de la tabla: izquierda, derecha, arriba, abajo, botones
+C 0xB03F teclas del cursor grande
+C 0xB045 guarda el temporizador de espera entre pasos
+C 0xB04B apunta a el temporizador de espera entre pasos
+C 0xB052 guarda 1 cuando la pantalla de menu ha acabado
+C 0xB07A pone la cara del rival A en su sitio (0x661D, posicion 0x0810)
+C 0xB07D dibuja siete rectangulos de 64 x 16 (posiciones de la tabla 0xB317)
+C 0xB080 dibuja la barra de cada uno de los siete contadores del rival
+C 0xB083 pide_sonido_06: pide el sonido 0x06 (el del cursor)
+C 0xB08D suma_a_hl: HL = HL + A
+C 0xB099 guarda la tabla de atributos de los sprites (32 de 4 bytes)
+C 0xB107 guarda el temporizador de espera entre pasos
+C 0xB10C guarda el paso o la opcion de la pantalla de menu
+C 0xB114 dibuja_cara: dibuja la cara de 48 x 48 del personaje A
+C 0xB181 pide_sonido_06: pide el sonido 0x06 (el del cursor)
+C 0xB18A palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xB23A sube un contador y lo redibuja: lee el valor (0xB2BC), lo sube (0xB30B) y repinta la barra
+C 0xB24A baja un contador y lo redibuja
+C 0xB253 guarda el paso o la opcion de la pantalla de menu
+C 0xB26A pide_sonido_07: pide el sonido 0x07 (el del boton)
+C 0xB277 palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xB281 vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0xB293 HL = 0xC040 + 8 x rival (0xC02D) + contador (0xC02E): lee su valor en A
+C 0xB296 dibuja la barra del contador: ancho A, color 0x99, 16 de alto
+C 0xB2A7 sube el contador en HL si no ha llegado a 0x3F
+C 0xB2AA dibuja la barra del contador: ancho A, color 0x99, 16 de alto
+C 0xB2B3 pinta una marca en la barra (su sitio: A & 0x30 + A & 0x0F)
+C 0xB2B8 baja el contador en HL si no es cero
+C 0xB2C2 apunta a la tabla de estilo de los ocho rivales (8 bytes cada uno)
+C 0xB2C5 suma_a_hl: HL = HL + A
+C 0xB2CB suma_a_hl: HL = HL + A
+C 0xB2D9 palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xB2E2 vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0xB2F9 palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xB307 vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0xB333 escribe_texto: escribe un texto de letras de 16 puntos de alto en D,E
+C 0xB376 despacha: salta a la palabra A de la tabla que va detras del call
+C 0xB390 vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0xB399 ventana: dibuja una ventana con marco (H = ancho, L = alto, DE = esquina)
+C 0xB3A6 guarda el numero de opciones del cuadro
+C 0xB3A9 guarda variable de los pasos de las pantallas de menu
+C 0xB3AC pantalla_on: enciende la pantalla
+C 0xB3AF apunta a los colores de los sprites (4 bloques de 16)
+C 0xB3B4 llena 16 bytes de HL con A (el primer byte y ldir de 15 a los siguientes) (p00:4382)
+C 0xB3BC llena 16 bytes de HL con A (el primer byte y ldir de 15 a los siguientes) (p00:4382)
+C 0xB3C6 limpia_pantalla: apaga la pantalla, quita los sprites y borra la VRAM visible
+C 0xB3C9 lee variable de los pasos de las pantallas de menu
+C 0xB3CD guarda la opcion elegida en la pantalla de dos opciones (+1)
+C 0xB3D4 despacha: salta a la palabra A de la tabla que va detras del call
+C 0xB3EE vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0xB3F7 ventana: dibuja una ventana con marco (H = ancho, L = alto, DE = esquina)
+C 0xB402 pantalla_on: enciende la pantalla
+C 0xB407 guarda el numero de opciones del cuadro
+C 0xB40A guarda variable de los pasos de las pantallas de menu
+C 0xB40D apunta a los colores de los sprites (4 bloques de 16)
+C 0xB412 llena 16 bytes de HL con A (el primer byte y ldir de 15 a los siguientes) (p00:4382)
+C 0xB41A llena 16 bytes de HL con A (el primer byte y ldir de 15 a los siguientes) (p00:4382)
+C 0xB424 limpia_pantalla: apaga la pantalla, quita los sprites y borra la VRAM visible
+C 0xB427 lee variable de los pasos de las pantallas de menu
+C 0xB42B guarda la opcion elegida en la pantalla de cinco opciones (+1)
+C 0xB43D pide_sonido_07: pide el sonido 0x07 (el del boton)
+C 0xB442 apunta a variable de los pasos de las pantallas de menu
+C 0xB44B lee el numero de opciones del cuadro
+C 0xB452 lee el numero de opciones del cuadro
+C 0xB455 apunta a variable de los pasos de las pantallas de menu
+C 0xB45D guarda variable de los pasos de las pantallas de menu
+C 0xB460 pide_sonido_06: pide el sonido 0x06 (el del cursor)
+C 0xB469 suma_a_hl: HL = HL + A
+C 0xB46D guarda la tabla de atributos de los sprites (32 de 4 bytes)
+C 0xB48F despacha: salta a la palabra A de la tabla que va detras del call
+C 0xB49B carga_partida: carga la partida del otro cartucho
+C 0xB49E lee 1 si ha fallado el cargar
+C 0xB4A4 escribe el mensaje de 9 letras en 0xB50A
+C 0xB4AA escribe el mensaje de 14 letras en 0xB514
+C 0xB4AF guarda el temporizador de espera entre pasos
+C 0xB4B5 apunta a el temporizador de espera entre pasos
+C 0xB4BA lee 1 si ha fallado el cargar
+C 0xB4C2 guarda 1 cuando la pantalla de menu ha acabado
+C 0xB4D3 guarda 1 cuando la pantalla de menu ha acabado
+C 0xB4F7 vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0xB500 ventana: dibuja una ventana con marco (H = ancho, L = alto, DE = esquina)
+C 0xB52C lee variable de los pasos de las pantallas de menu
+C 0xB532 pide_sonido_07: pide el sonido 0x07 (el del boton)
+C 0xB537 apunta a variable de los pasos de las pantallas de menu
+C 0xB540 lee el numero de opciones del cuadro
+C 0xB547 lee el numero de opciones del cuadro
+C 0xB54A apunta a variable de los pasos de las pantallas de menu
+C 0xB552 guarda variable de los pasos de las pantallas de menu
+C 0xB555 pide_sonido_06: pide el sonido 0x06 (el del cursor)
+C 0xB560 lee variable de los pasos de las pantallas de menu
+C 0xB566 suma_a_hl: HL = HL + A
+C 0xB56C guarda la tabla de atributos de los sprites (32 de 4 bytes)
+C 0xB5A7 lee el jugador al que le toca (0 = el humano)
+C 0xB5B8 reparte los puntos entre los jugadores: los que estan en espera cobran y los otros pagan (tabla 0xB5CE)
+C 0xB5BB dibuja_marcadores: dibuja los cuatro paneles de puntos de los jugadores
+C 0xB5BF guarda el jugador al que le toca (0 = el humano)
+C 0xB5CA guarda el jugador al que le toca (0 = el humano)
+C 0xB5D5 suma_a_hl: HL = HL + A
+C 0xB5E4 suma_a_hl: HL = HL + A
+C 0xB5F1 guarda el jugador al que le toca (0 = el humano)
+C 0xB602 lee el jugador al que le toca (0 = el humano)
+C 0xB605 palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xB616 lee el jugador al que le toca (0 = el humano)
+C 0xB619 palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xB63E guarda el final de la ronda: 1 sin fichas, 2 hay ganador o aborto
+C 0xB644 apunta a 1 si la mano se anula por nueve fichas de punta y honor
+C 0xB652 apunta a 1 si se anula por cuatro riichi
+C 0xB65A apunta a 1 si se anula por cuatro kan
+C 0xB662 apunta a 1 si se anula porque tres jugadores dicen ron
+C 0xB679 vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0xB682 ventana: dibuja una ventana con marco (H = ancho, L = alto, DE = esquina)
+C 0xB68B escribe_texto: escribe un texto de letras de 16 puntos de alto en D,E
+C 0xB691 dibuja las manos de los tres rivales boca arriba (0xC214 = 1) los que estan en espera
+C 0xB694 lee el jugador que reparte (0-3)
+C 0xB6C1 rectangulo de aviso de 68 x 20 con ventana
+C 0xB6CA escribe_texto: escribe un texto de letras de 16 puntos de alto en D,E
+C 0xB6CD ordena_mano_actual: ordena las 13 fichas de la mano del jugador actual
+C 0xB6D0 dibuja_mano: dibuja las 13 fichas de la mano del jugador 0xC207
+C 0xB6D6 lee el jugador al que le toca (0 = el humano)
+C 0xB6DC guarda 1 si las manos se ven boca arriba
+C 0xB6DF guarda el jugador al que le toca (0 = el humano)
+C 0xB6E5 dibuja_mano: dibuja las 13 fichas de la mano del jugador 0xC207
+C 0xB6E9 apunta a el jugador al que le toca (0 = el humano)
+C 0xB6F0 guarda el jugador al que le toca (0 = el humano)
+C 0xB700 vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0xB709 ventana: dibuja una ventana con marco (H = ancho, L = alto, DE = esquina)
+C 0xB712 escribe_texto: escribe un texto de letras de 16 puntos de alto en D,E
+C 0xB717 guarda 1 si las manos se ven boca arriba
+C 0xB71A dibuja_mano: dibuja las 13 fichas de la mano del jugador 0xC207
+C 0xB71D lee la ficha robada o tirada
+C 0xB720 dibuja_ficha_2: dibuja la ficha A del jugador 0xC207 (sin el cambio por el reverso)
+C 0xB726 rectangulo de aviso de 52 x 20 con ventana
+C 0xB72F escribe_texto: escribe un texto de letras de 16 puntos de alto en D,E
+C 0xB736 lee el jugador al que le toca (0 = el humano)
+C 0xB73A borra_cuadro_voz: borra el cuadro de la cara que habla
+C 0xB73D pone_ficha_normal: pone la ficha de la mano en su sitio normal
+C 0xB740 rectangulo de aviso de 68 x 20 con ventana
+C 0xB749 escribe_texto: escribe un texto de letras de 16 puntos de alto en D,E
+C 0xB751 rectangulo de aviso de 52 x 20 con ventana
+C 0xB75A escribe_texto: escribe un texto de letras de 16 puntos de alto en D,E
+C 0xB777 guarda 1 si las manos se ven boca arriba
+C 0xB77C dibuja_mano: dibuja las 13 fichas de la mano del jugador 0xC207
+C 0xB791 vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0xB79A ventana: dibuja una ventana con marco (H = ancho, L = alto, DE = esquina)
+C 0xB7A8 vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0xB7B1 ventana: dibuja una ventana con marco (H = ancho, L = alto, DE = esquina)
+C 0xB7F7 lee el jugador al que le toca (0 = el humano)
+C 0xB805 copia en DE la ficha de HL solo si es honor (>= 0x30) o numero 1 y 9
+C 0xB80B apunta a la ficha robada o tirada
+C 0xB80E copia en DE la ficha de HL solo si es honor (>= 0x30) o numero 1 y 9
+C 0xB84B suma_a_de: DE = DE + A
+C 0xB860 guarda 1 si la mano se anula por nueve fichas de punta y honor
+C 0xB863 lee el jugador al que le toca (0 = el humano)
+C 0xB86A guarda el final de la ronda: 1 sin fichas, 2 hay ganador o aborto
+C 0xB878 lee el jugador al que le toca (0 = el humano)
+C 0xB8CC guarda 1 si se anula por los cuatro vientos iguales
+C 0xB8D0 guarda el final de la ronda: 1 sin fichas, 2 hay ganador o aborto
+C 0xB8D7 dibuja cuatro marcos de 40 x 24 (tabla 0xB93B), cada marco con su ventana; luego ordena (0xB9BA) y escribe los puntos (0xC24D, 0xC250, 0xC253, 0xC256)
+C 0xB8E6 palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xB8F9 vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0xB901 ventana: dibuja una ventana con marco (H = ancho, L = alto, DE = esquina)
+C 0xB909 ORDENA LOS JUGADORES POR PUNTOS: 0xB9D1 los lista, 0xBA18 elige el que gana, 0xB951 paga, 0xBAE3 y 0xBB28 pasan los puntos
+C 0xB914 numero_con_signo: escribe el numero BCD de HL en DE con '-' si es negativo
+C 0xB91F numero_con_signo: escribe el numero BCD de HL en DE con '-' si es negativo
+C 0xB92A numero_con_signo: escribe el numero BCD de HL en DE con '-' si es negativo
+C 0xB935 numero_con_signo: escribe el numero BCD de HL en DE con '-' si es negativo
+C 0xB956 guarda el jugador al que le toca (0 = el humano)
+C 0xB959 marcador final del jugador: tres bytes de 0xC0A0 + 3 x jugador
+C 0xB961 suma_puntos_actual: suma al marcador del jugador 0xC207 el importe C (signo) y DE (BCD)
+C 0xB973 suma_a_hl: HL = HL + A
+C 0xB9B7 suma_puntos_actual: suma al marcador del jugador 0xC207 el importe C (signo) y DE (BCD)
+C 0xB9BD compara los marcadores de los jugadores de 0xC257 y deja en 0xC207 el mejor (empates por el siguiente byte)
+C 0xB9C0 lee el jugador al que le toca (0 = el humano)
+C 0xB9C4 reparte los 3000 de ventaja a cada uno de los cuatro jugadores (0xC207 = 0 a 3)
+C 0xB9C8 guarda el jugador al que le toca (0 = el humano)
+C 0xB9CB copia el marcador de cada jugador al lugar de 0xC24B (3 bytes por jugador)
+C 0xB9DF guarda contador de trabajo de las fichas de la mano
+C 0xB9E2 guarda el jugador al que le toca (0 = el humano)
+C 0xB9E8 lee el jugador al que le toca (0 = el humano)
+C 0xB9F1 suma_a_hl: HL = HL + A
+C 0xB9FF lee contador de trabajo de las fichas de la mano
+C 0xBA05 suma_a_hl: HL = HL + A
+C 0xBA08 lee el jugador al que le toca (0 = el humano)
+C 0xBA0C apunta a contador de trabajo de las fichas de la mano
+C 0xBA10 apunta a el jugador al que le toca (0 = el humano)
+C 0xBA1B A = el byte alto del marcador del jugador A
+C 0xBA26 A = el byte alto del marcador del jugador A
+C 0xBA31 A = el byte alto del marcador del jugador A
+C 0xBA3C A = el byte alto del marcador del jugador A
+C 0xBA4A A = el byte alto del marcador del jugador A
+C 0xBA55 A = el byte alto del marcador del jugador A
+C 0xBA60 A = el byte alto del marcador del jugador A
+C 0xBA67 A = el byte alto del marcador del jugador A
+C 0xBA72 guarda el jugador al que le toca (0 = el humano)
+C 0xBA79 guarda el jugador al que le toca (0 = el humano)
+C 0xBA80 guarda el jugador al que le toca (0 = el humano)
+C 0xBA87 A = el byte bajo del marcador del jugador A
+C 0xBA8E A = el byte bajo del marcador del jugador A
+C 0xBA9A A = el byte bajo del marcador del jugador A
+C 0xBAA1 A = el byte bajo del marcador del jugador A
+C 0xBAAD A = el byte bajo del marcador del jugador A
+C 0xBAB4 A = el byte bajo del marcador del jugador A
+C 0xBAC0 A = el byte bajo del marcador del jugador A
+C 0xBAC7 A = el byte bajo del marcador del jugador A
+C 0xBADD suma_a_hl: HL = HL + A
+C 0xBAF2 lee el jugador al que le toca (0 = el humano)
+C 0xBB01 lee el jugador al que le toca (0 = el humano)
+C 0xBB11 lee el jugador al que le toca (0 = el humano)
+C 0xBB2D apunta a el jugador al que le toca (0 = el humano)
+C 0xBB39 suma_a_hl: HL = HL + A
+C 0xBB44 lee el jugador al que le toca (0 = el humano)
+C 0xBB4D suma_a_hl: HL = HL + A
+C 0xBB58 lee el jugador al que le toca (0 = el humano)
+C 0xBB61 suma_a_hl: HL = HL + A
+C 0xBB6C guarda contador de trabajo de las fichas de la mano
+C 0xBB7A suma_a_hl: HL = HL + A
+C 0xBB7E lee contador de trabajo de las fichas de la mano
+C 0xBB87 suma_a_hl: HL = HL + A
+C 0xBB96 apunta a contador de trabajo de las fichas de la mano
+C 0xBBA3 despacha: salta a la palabra A de la tabla que va detras del call
+C 0xBBAE lee la ranura del otro cartucho (la memoria de partidas)
+C 0xBBB7 guarda el temporizador de espera entre pasos
+C 0xBBBC guarda el paso o la opcion de la pantalla de menu
+C 0xBBC0 limpia_pantalla: apaga la pantalla, quita los sprites y borra la VRAM visible
+C 0xBBC9 pantalla_off: apaga la pantalla
+C 0xBBD6 vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0xBBDF ventana: dibuja una ventana con marco (H = ancho, L = alto, DE = esquina)
+C 0xBBEC guarda el numero de opciones del cuadro
+C 0xBBEF guarda variable de los pasos de las pantallas de menu
+C 0xBBF2 pantalla_on: enciende la pantalla
+C 0xBBFC limpia_pantalla: apaga la pantalla, quita los sprites y borra la VRAM visible
+C 0xBBFF apunta a variable de los pasos de las pantallas de menu
+C 0xBC07 guarda 1 cuando la pantalla de menu ha acabado
+C 0xBC11 lee 1 si ha fallado el grabar
+C 0xBC22 guarda el temporizador de espera entre pasos
+C 0xBC2D lee 1 si ha fallado el grabar
+C 0xBC36 guarda 1 cuando la pantalla de menu ha acabado
+C 0xBC42 dibuja la ventana con 0x9D1C y el texto de HL
+C 0xBC4E dibuja la ventana con 0x9D1C y el texto de HL
+C 0xBC69 dibuja_lista_tiles: dibuja una lista de tiles de HL (x, y, tiles; 0xFF acaba)
+C 0xBC74 numero_con_signo: escribe el numero BCD de HL en DE con '-' si es negativo
+C 0xBC7F numero_con_signo: escribe el numero BCD de HL en DE con '-' si es negativo
+C 0xBC8A numero_con_signo: escribe el numero BCD de HL en DE con '-' si es negativo
+C 0xBC95 numero_con_signo: escribe el numero BCD de HL en DE con '-' si es negativo
+C 0xBCA0 numero_con_signo: escribe el numero BCD de HL en DE con '-' si es negativo
+C 0xBCAB numero_con_signo: escribe el numero BCD de HL en DE con '-' si es negativo
+C 0xBCB6 numero_con_signo: escribe el numero BCD de HL en DE con '-' si es negativo
+C 0xBCC1 numero_con_signo: escribe el numero BCD de HL en DE con '-' si es negativo
+C 0xBCCC numero_con_signo: escribe el numero BCD de HL en DE con '-' si es negativo
+C 0xBCCF apunta a el contador de partidas de la tabla de rivales
+C 0xBCD7 numero_sin_ceros: escribe B bytes BCD de HL en DE sin ceros por la izquierda
+C 0xBCE2 numero_sin_ceros: escribe B bytes BCD de HL en DE sin ceros por la izquierda
+C 0xBCED numero_sin_ceros: escribe B bytes BCD de HL en DE sin ceros por la izquierda
+C 0xBCF8 numero_sin_ceros: escribe B bytes BCD de HL en DE sin ceros por la izquierda
+C 0xBD03 numero_sin_ceros: escribe B bytes BCD de HL en DE sin ceros por la izquierda
+C 0xBD0E numero_sin_ceros: escribe B bytes BCD de HL en DE sin ceros por la izquierda
+C 0xBD19 numero_sin_ceros: escribe B bytes BCD de HL en DE sin ceros por la izquierda
+C 0xBD24 numero_sin_ceros: escribe B bytes BCD de HL en DE sin ceros por la izquierda
+C 0xBD2F numero_sin_ceros: escribe B bytes BCD de HL en DE sin ceros por la izquierda
+C 0xBD91 lee como se gana la mano: 1 por robo, 2 por la ficha tirada
+C 0xBD95 lee el jugador al que le toca (0 = el humano)
+C 0xBD9A lee el jugador que responde a la ficha tirada
+C 0xBDA9 sube_contador: suma A al contador (con tope 0x3F)
+C 0xBDAC con el yaku 0x01 en la lista: +0x90 sube 2
+C 0xBDAF si +0x40 es distinto de cero: +0x91 sube 4
+C 0xBDB2 con el yaku 0x05: +0x92 sube 2; si no, con el 0x12: baja 6
+C 0xBDB5 con el yaku 0x1B o 0x19: +0x93 sube 8
+C 0xBDB8 con el yaku 0x0E o 0x0D: +0x94 sube 5
+C 0xBDBB con el yaku 0x28 (el mas grande): +0x95 sube 0x20
+C 0xBDC3 busca el yaku B en la lista de 0xC2E0 (pares codigo y valor): acarreo si esta
+C 0xBDCC sube_contador: suma A al contador (con tope 0x3F)
+C 0xBDDE sube_contador: suma A al contador (con tope 0x3F)
+C 0xBDE3 busca el yaku B en la lista de 0xC2E0 (pares codigo y valor): acarreo si esta
+C 0xBDED sube_contador: suma A al contador (con tope 0x3F)
+C 0xBDF2 busca el yaku B en la lista de 0xC2E0 (pares codigo y valor): acarreo si esta
+C 0xBDFB baja_contador: resta A al contador
+C 0xBE00 busca el yaku B en la lista de 0xC2E0 (pares codigo y valor): acarreo si esta
+C 0xBE0A sube_contador: suma A al contador (con tope 0x3F)
+C 0xBE0F busca el yaku B en la lista de 0xC2E0 (pares codigo y valor): acarreo si esta
+C 0xBE18 sube_contador: suma A al contador (con tope 0x3F)
+C 0xBE1D busca el yaku B en la lista de 0xC2E0 (pares codigo y valor): acarreo si esta
+C 0xBE27 sube_contador: suma A al contador (con tope 0x3F)
+C 0xBE2C busca el yaku B en la lista de 0xC2E0 (pares codigo y valor): acarreo si esta
+C 0xBE35 sube_contador: suma A al contador (con tope 0x3F)
+C 0xBE3A busca el yaku B en la lista de 0xC2E0 (pares codigo y valor): acarreo si esta
+C 0xBE43 sube_contador: suma A al contador (con tope 0x3F)
+C 0xBE49 lee como se gana la mano: 1 por robo, 2 por la ficha tirada
+C 0xBE52 baja_contador: resta A al contador
+C 0xBE6D lee el jugador al que le toca (0 = el humano)
+C 0xBE7C si +0x40 (mano abierta) baja el contador +0x91
+C 0xBE8E ajusta los siete contadores del jugador de 0xCC80
+C 0xBEA1 busca el yaku B en la lista de 0xC2E0 (pares codigo y valor): acarreo si esta
+C 0xBEC1 busca el yaku B en la lista de 0xC2E0 (pares codigo y valor): acarreo si esta
+C 0xBED0 busca el yaku B en la lista de 0xC2E0 (pares codigo y valor): acarreo si esta
+C 0xBEDE busca el yaku B en la lista de 0xC2E0 (pares codigo y valor): acarreo si esta
+C 0xBEE8 sube_contador: suma A al contador (con tope 0x3F)
+C 0xBEED busca el yaku B en la lista de 0xC2E0 (pares codigo y valor): acarreo si esta
+C 0xBEF6 sube_contador: suma A al contador (con tope 0x3F)
+C 0xBEFC lee como se gana la mano: 1 por robo, 2 por la ficha tirada
+C 0xBF06 sube_contador: suma A al contador (con tope 0x3F)
+C 0xBF15 si +0x40 sube +0x91
+C 0xBF1E si +0x80 y un azar de 1 entre 4, baja +0x95
+C 0xBF41 baja_contador: resta A al contador
+C 0xBF65 baja_contador: resta A al contador
+C 0xBF77 baja_contador: resta A al contador
+C 0xBF87 lee el contador de cuadros
+C 0xBF8F baja_contador: resta A al contador
+C 0xBF97 baja_contador: resta A al contador
+C 0xBFA8 baja_contador: resta A al contador
+C 0xBFAC lee como se gana la mano: 1 por robo, 2 por la ficha tirada
+C 0xBFC2 lee como se gana la mano: 1 por robo, 2 por la ficha tirada
+C 0xBFDF lee el personaje que juega de rival 2
+C 0xBFE8 lee el personaje que juega de rival 3
+C 0xBFF2 apunta a la tabla de estilo de los ocho rivales (8 bytes cada uno)
+C 0xBFF5 suma_a_de: DE = DE + A
+# --- fin de las anotaciones de anota.py ---

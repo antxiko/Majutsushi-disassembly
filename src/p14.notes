@@ -1,0 +1,15 @@
+
+# --- A MANO: comentarios, nombres y bloques ---
+D 0xA000 0xA348 voz_0x13_cola  el resto de la voz digital 0x13 (0x9DA6 en el banco 13)
+F 0xA000 16
+D 0xA348 0xA8E1 voz_0x14  la voz digital 0x14 (la marca del final es 0xAF)
+F 0xA348 16
+D 0xA8E1 0xB373 voz_0x15  la voz digital 0x15 (la marca del final es 0x98)
+F 0xA8E1 16
+D 0xB373 0xBB7B voz_0x16  la voz digital 0x16 (la marca del final es 0x18)
+F 0xB373 16
+D 0xBB7B 0xC000 relleno_ff  1157 bytes a 0xFF hasta el final del banco: relleno (el espacio libre mayor de la ROM)
+F 0xBB7B 16
+
+# --- BLOQUES QUE LEE EL CODIGO (seccion que reescribe tools/bloques.py; no editar a mano) ---
+# --- fin de los bloques de bloques.py ---

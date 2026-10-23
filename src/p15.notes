@@ -1,0 +1,126 @@
+
+
+# --- A MANO: comentarios escritos leyendo el codigo ---
+C 0xA000 copia la tabla de 0xA00C (64 bytes) a 0xC040: los siete contadores de estilo de cada uno de los ocho rivales
+C 0xA04C copia los 8 bytes de estilo de cada uno de los tres rivales elegidos (0xC031-0xC033) de 0xC040 + 8 x (rival - 1) a 0xD490, 0xD890 y 0xDC90 (+0x90 de su mano)
+C 0xA054 copia el estilo de cada rival elegido: 8 bytes de 0xC040 + 8 x (rival - 1)
+C 0xA05F toma la direccion de la tabla de estilos
+C 0xA065 los copia a +0x90 de la mano del rival
+C 0xA069 siguiente rival (0xC031 + 1) y siguiente mano (+0x400)
+C 0xA072 pone a cero 0xC510 (13 bytes)
+C 0xA080 PREPARA LA PARTIDA DE LOS TRES RIVALES: por cada mano (0xD400, 0xD800, 0xDC00) recorre cuatro pasos (0xA0A3, 0xA0B5, 0xA108, 0xA14C)
+C 0xA0A3 pone a cero los campos +0x70 a +0x7F de la mano
+C 0xA0B5 cuenta cuantas fichas de cada palo (0x00, 0x10, 0x20) hay en la mano (0xCC90), y elige el palo que lleva +0x72: el primero que tiene al menos 9 - (+0x93 >> 4)
+C 0xA0BB cuenta las fichas de cada palo de la mano en 0xCC90
+C 0xA0C5 siguiente palo (+0x10)
+C 0xA0CF el limite: 9 - el nibble alto de +0x93
+C 0xA0E5 busca el primer palo que lo alcanza
+C 0xA0E9 el palo siguiente
+C 0xA0ED guarda el palo elegido en +0x72
+C 0xA0F9 cuenta las fichas de la mano (13) cuyo palo (bits 4-5) es C
+C 0xA108 toma +0x92: la manera de pedir
+C 0xA121 con 3 o mas pone (1, 0)
+C 0xA124 guarda el par en +0x73 y +0x74
+C 0xA14C toma +0x91 y +0x94: la manera de llamar
+C 0xA153 +0x91: el nibble alto es la tendencia a llamar
+C 0xA158 solo los cuatro bits altos
+C 0xA162 +0x94: el nibble alto
+C 0xA167 con cero no hace nada
+C 0xA16A con 1 va a 0xA17B
+C 0xA16D con 2 va a 0xA186
+C 0xA170 con valores altos siempre llama
+C 0xA190 copia las diez opciones de reglas por defecto de 0xA19C a 0xC020
+C 0xA1A6 CALCULA LOS FU DE LA MANO en 0xC241: empieza en 0x30 (siete parejas) y, si no lo es, en 0x20
+C 0xA1B4 si la mano es cerrada (+0x40 a cero) y gana por ron (0xC0B1 = 2) suma 10 (0xA299 con C = 0x10)
+C 0xA1CF si gana por robo (0xC0B1 = 1) y no hay el aviso de 0xCD0E, suma 2
+C 0xA1D9 si la pareja (0xCD40) es de honor propio (0x7035 los pone en 0xCD90), suma 2
+C 0xA1F2 suma los fu de los grupos de tripletes (0xCD48 por 0xA22E) y de kan (0xCD4C por 0xA25C)
+C 0xA1FE si la ficha de espera es la pareja o una espera de un hueco (0xA209-0xA22A): suma 2 con 0xA297
+C 0xA20E espera igual que la pareja: si la ficha es de numero 7 sirve
+C 0xA219 espera por un hueco: la siguiente
+C 0xA223 si es del borde de numero 3 sirve
+C 0xA22E fu de cada triplete: 2 por triplete de numeros de 2 a 8, doble por honor o extremo; doble si es cerrado
+C 0xA25C fu de cada kan: 8, doble por honor o extremo, doble si es cerrado
+C 0xA26E guarda el kan y mira si la ficha esta en la lista de descartes
+C 0xA272 +0x41 de la mano
+C 0xA27F busca la ficha entre los descartes
+C 0xA28A si esta, el kan vale el doble
+C 0xA297 suma 2 fu
+C 0xA299 suma C al valor (BCD) de DE
+C 0xA29E mira si la ficha A es de numero entre 2 y 8 (acarreo si no lo es)
+C 0xA2A8 BARAJA EL MURO: rellena 0xC100 con las 136 fichas (0x88) en orden al azar
+C 0xA2C5 saca una ficha al azar (0xC190 = cuantas veces ha salido cada una, 4 como mucho): 1-9, 0x11-0x19, 0x21-0x29 y 0x31-0x37
+C 0xA2F3 cuenta una ficha mas de ese numero
+C 0xA2F6 pasa el numero a su codigo: 1-9
+C 0xA2F9 10-18: palo 1
+C 0xA2FE 19-27: palo 2
+C 0xA303 28-34: honores desde 0x31
+# --- fin de lo escrito a mano ---
+
+# --- A MANO: comentarios, nombres y bloques ---
+D 0xAE00 0xB6E2 voz_0x17  la voz digital 0x17 (con el banco 15 en 0xA000, p12:6059): la marca del final es 0xAF
+F 0xAE00 16
+D 0xB6E2 0xC000 voz_0x18  la voz digital 0x18 (la marca del final es 0xAF)
+F 0xB6E2 16
+
+
+# --- BLOQUES QUE LEE EL CODIGO (seccion que reescribe tools/bloques.py; no editar a mano) ---
+D 0xAAA0 0xAD8B bloques_AAA0  lista de tiles (p00:58C5): X, Y y bloques (bit 7: n tiles seguidos; si no, un tile repetido n veces), 0xFF acaba; lo leen p00:5816 (747 bytes)
+F 0xAAA0 16
+D 0xAD8B 0xAE00 relleno_ff  117 bytes a 0xFF entre dos bloques, que no lee nadie: relleno; lo leen nadie (117 bytes)
+F 0xAD8B 16
+D 0xA00C 0xA04C resto_A00C  lo apuntan con el banco puesto p15:A000 (0xA00C); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p15:A000 (64 bytes)
+F 0xA00C 16
+D 0xA19C 0xA1A6 resto_A19C  lo apuntan con el banco puesto p15:A190 (0xA19C); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p15:A190 (10 bytes)
+F 0xA19C 16
+D 0xA306 0xAAA0 resto_A306  lo apuntan con el banco puesto p01:7BA4 (0xA306), p01:7DF4 (0xA306), p01:7BD2 (0xA35C), p01:7E03 (0xA35C), p01:7CB8 (0xA589), p01:7CC7 (0xA5D7); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p01:7BA4, p01:7DF4, p01:7BD2, p01:7E03, p01:7CB8, p01:7CC7 (1946 bytes)
+F 0xA306 16
+# --- fin de los bloques de bloques.py ---
+
+# --- ANOTACIONES AUTOMATICAS (seccion que reescribe tools/anota.py; no editar a mano) ---
+L 0xA000 copia_estilos_rivales copia a 0xC040 la tabla de estilos de los ocho rivales
+L 0xA04C estilos_a_manos pone a cada rival elegido su estilo en +0x90 de su mano
+L 0xA080 prepara_ia prepara la partida de los tres rivales de la maquina
+L 0xA190 opciones_por_defecto pone las diez opciones de reglas por defecto
+L 0xA1A6 calcula_fu calcula los fu de la mano
+L 0xA2A8 baraja baraja el muro de 136 fichas en 0xC100
+L 0xA2C5 ficha_al_azar saca una ficha al azar de las que quedan
+C 0xA003 apunta a la tabla de estilo de los ocho rivales (8 bytes cada uno)
+C 0xA051 apunta a el personaje que juega de rival 1
+C 0xA05C apunta a la tabla de estilo de los ocho rivales (8 bytes cada uno)
+C 0xA089 pone a cero los campos +0x70 a +0x7F de la mano
+C 0xA08C cuenta cuantas fichas de cada palo (0x00, 0x10, 0x20) hay en la mano (0xCC90), y elige el palo que lleva +0x72: el primero que tiene al menos 9 - (+0x93 >> 4)
+C 0xA08F toma +0x92: la manera de pedir
+C 0xA092 toma +0x91 y +0x94: la manera de llamar
+C 0xA0C0 cuenta las fichas de la mano (13) cuyo palo (bits 4-5) es C
+C 0xA12F lee el contador de cuadros
+C 0xA13E lee el contador de cuadros
+C 0xA17B lee el contador de cuadros
+C 0xA186 lee el contador de cuadros
+C 0xA193 apunta a la regla 'comer 断幺' (tanyao con la mano abierta; de serie si)
+C 0xA1AC lee 1 si la mano es de siete parejas
+C 0xA1BF lee como se gana la mano: 1 por robo, 2 por la ficha tirada
+C 0xA1C6 suma C al valor (BCD) de DE
+C 0xA1D5 suma C al valor (BCD) de DE
+C 0xA1DD lee la pareja de la mano
+C 0xA1E0 apunta a los honores que cuentan de yaku (5)
+C 0xA1EF suma C al valor (BCD) de DE
+C 0xA1F5 fu de cada triplete: 2 por triplete de numeros de 2 a 8, doble por honor o extremo; doble si es cerrado
+C 0xA1F8 apunta a los kan de la mano
+C 0xA1FB fu de cada kan: 8, doble por honor o extremo, doble si es cerrado
+C 0xA202 lee la pareja de la mano
+C 0xA20B apunta a las escaleras de la mano (4)
+C 0xA237 mira si la ficha A es de numero entre 2 y 8 (acarreo si no lo es)
+C 0xA245 lee la ficha robada o tirada
+C 0xA24B lee como se gana la mano: 1 por robo, 2 por la ficha tirada
+C 0xA255 suma C al valor (BCD) de DE
+C 0xA265 mira si la ficha A es de numero entre 2 y 8 (acarreo si no lo es)
+C 0xA290 suma C al valor (BCD) de DE
+C 0xA2AA apunta a el muro: 136 fichas (0x88)
+C 0xA2AF ficha_al_azar: saca una ficha al azar de las que quedan
+C 0xA2B6 suma_a_hl: HL = HL + A
+C 0xA2D1 apunta a cuantas veces ha salido cada ficha al barajar
+C 0xA2D4 suma_a_hl: HL = HL + A
+C 0xA2EB apunta a cuantas veces ha salido cada ficha al barajar
+C 0xA2EE suma_a_hl: HL = HL + A
+# --- fin de las anotaciones de anota.py ---

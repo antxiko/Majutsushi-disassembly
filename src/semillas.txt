@@ -1,0 +1,145 @@
+# --- CODIGO HUERFANO (tools/huerfanas.py --semillas) ---
+p00 0x4102 1 2 3  # codigo huerfano: 5 bytes que acaban en un salto; el trazado no entra y ninguna instruccion salta, llama o carga 0x4102
+p00 0x4199 1 2 3  # codigo huerfano: 5 bytes que acaban en un salto; el trazado no entra y ninguna instruccion salta, llama o carga 0x4199
+p00 0x419E 1 2 3  # codigo huerfano: 5 bytes que acaban en un salto; el trazado no entra y ninguna instruccion salta, llama o carga 0x419E
+p00 0x41A8 1 2 3  # codigo huerfano: 5 bytes que acaban en un salto; el trazado no entra y ninguna instruccion salta, llama o carga 0x41A8
+p00 0x4246 1 2 3  # codigo huerfano: 5 bytes que acaban en un salto; el trazado no entra y ninguna instruccion salta, llama o carga 0x4246
+p00 0x4D12 1 2 3  # codigo huerfano: 19 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x4D12
+p00 0x4D56 1 2 3  # codigo huerfano: 25 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x4D56
+p00 0x4D6F 1 2 3  # codigo huerfano: 12 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x4D6F
+p00 0x4D7B 1 2 3  # codigo huerfano: 14 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x4D7B
+p00 0x4DAD 1 2 3  # codigo huerfano: 34 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x4DAD
+p00 0x4DCF 1 2 3  # codigo huerfano: 12 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x4DCF
+p00 0x4DDB 1 2 3  # codigo huerfano: 14 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x4DDB
+p00 0x4E09 1 2 3  # codigo huerfano: 30 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x4E09
+p00 0x4F64 1 2 3  # codigo huerfano: 62 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x4F64
+p00 0x4FA2 1 2 3  # codigo huerfano: 43 bytes que acaban en un salto; el trazado no entra y ninguna instruccion salta, llama o carga 0x4FA2
+p00 0x4FCD 1 2 3  # codigo huerfano: 12 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x4FCD
+p00 0x4FD9 1 2 3  # codigo huerfano: 12 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x4FD9
+p00 0x51B5 1 2 3  # codigo huerfano: 17 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x51B5
+p00 0x51C6 1 2 3  # codigo huerfano: 51 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x51C6
+p00 0x51F9 1 2 3  # codigo huerfano: 59 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x51F9
+p00 0x5383 1 2 3  # codigo huerfano: 21 bytes que acaban en un salto; el trazado no entra y ninguna instruccion salta, llama o carga 0x5383
+p00 0x5840 1 2 3  # codigo huerfano: 12 bytes que acaban en un salto; el trazado no entra y ninguna instruccion salta, llama o carga 0x5840
+p00 0x59C1 1 2 3  # codigo huerfano: 12 bytes que acaban en un salto; el trazado no entra y ninguna instruccion salta, llama o carga 0x59C1
+p00 0x5DC7 1 2 3  # codigo huerfano: 30 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x5DC7
+p01 0x6F09 1 2 3  # codigo huerfano: 17 bytes que acaban en un salto; el trazado no entra y ninguna instruccion salta, llama o carga 0x6F09
+p01 0x6F1A 1 2 3  # codigo huerfano: 19 bytes que acaban en un salto; el trazado no entra y ninguna instruccion salta, llama o carga 0x6F1A
+p01 0x6F2D 1 2 3  # codigo huerfano: 24 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x6F2D
+p01 0x6F45 1 2 3  # codigo huerfano: 3 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x6F45
+p01 0x6F5A 1 2 3  # codigo huerfano: 5 bytes que acaban en un salto; el trazado no entra y ninguna instruccion salta, llama o carga 0x6F5A
+p01 0x6FC6 1 2 3  # codigo huerfano: 17 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x6FC6
+p01 0x6FD7 1 2 3  # codigo huerfano: 5 bytes que acaban en un salto; el trazado no entra y ninguna instruccion salta, llama o carga 0x6FD7
+p01 0x6FDC 1 2 3  # codigo huerfano: 5 bytes que acaban en un salto; el trazado no entra y ninguna instruccion salta, llama o carga 0x6FDC
+p01 0x76AE 1 2 3  # codigo huerfano: 39 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x76AE
+p01 0x76D5 1 2 3  # codigo huerfano: 47 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x76D5
+p01 0x7704 1 2 3  # codigo huerfano: 48 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x7704
+p01 0x7734 1 2 3  # codigo huerfano: 30 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x7734
+p01 0x7FC3 1 2 3  # codigo huerfano: 44 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x7FC3
+p02 0x88E0 1 2 3  # codigo huerfano: 6 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x88E0
+p02 0x98D1 1 2 3  # codigo huerfano: 3 bytes que acaban en un salto; el trazado no entra y ninguna instruccion salta, llama o carga 0x98D1
+p03 0xABC5 1 2 3  # codigo huerfano: 6 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0xABC5
+p03 0xAFDB 1 2 3  # codigo huerfano: 12 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0xAFDB
+p04 0xB691 1 2 4  # codigo huerfano: 4 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0xB691
+p12 0x6875 12 13 14  # codigo huerfano: 38 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x6875
+
+# --- A MANO: tablas de saltos y retornos por la pila ---
+p12 0x69A0 12 13 14  # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 0
+p12 0x69B6 12 13 14  # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 1
+p12 0x69D6 12 13 14  # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 4
+p12 0x6A01 12 13 14  # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 5
+p12 0x6A15 12 13 14  # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 6
+p12 0x6A25 12 13 14  # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 7
+p12 0x6A37 12 13 14  # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 8
+p12 0x6A48 12 13 14  # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 9
+p12 0x6A4F 12 13 14  # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 10
+p12 0x6A56 12 13 14  # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 11
+p12 0x6AA5 12 13 14  # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 12
+p12 0x6AAF 12 13 14  # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 13
+p12 0x6AB6 12 13 14  # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 14
+p12 0x6AC1 12 13 14  # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 15
+p12 0x6AC7 12 13 14  # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 16
+p12 0x6AD1 12 13 14  # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 17
+p12 0x6AEC 12 13 14  # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 18
+p12 0x6AFB 12 13 14  # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 19
+p12 0x6B01 12 13 14  # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 21
+p12 0x6B07 12 13 14  # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 22
+p12 0x6B11 12 13 14  # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 23
+p12 0x6B18 12 13 14  # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 25
+p12 0x6B23 12 13 14  # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 26
+p12 0x6B2B 12 13 14  # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 27
+p12 0x6B46 12 13 14  # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 28
+p12 0x6B5D 12 13 14  # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 29
+p12 0x6B61 12 13 14  # comando E0-FF del motor de sonido (tabla 0x6962, jp (hl) en p12:6961), entrada 30
+p12 0x6BB4 12 13 14  # comando D0-DF del motor de sonido (tabla 0x6B94, jp (hl) en p12:6B93), entrada 0
+p12 0x6BBC 12 13 14  # comando D0-DF del motor de sonido (tabla 0x6B94, jp (hl) en p12:6B93), entrada 6
+p12 0x6BD7 12 13 14  # comando D0-DF del motor de sonido (tabla 0x6B94, jp (hl) en p12:6B93), entrada 7
+p12 0x6BEE 12 13 14  # comando D0-DF del motor de sonido (tabla 0x6B94, jp (hl) en p12:6B93), entrada 8
+p12 0x6BF8 12 13 14  # comando D0-DF del motor de sonido (tabla 0x6B94, jp (hl) en p12:6B93), entrada 9
+p12 0x6BFA 12 13 14  # comando D0-DF del motor de sonido (tabla 0x6B94, jp (hl) en p12:6B93), entrada 11
+p12 0x6C01 12 13 14  # comando D0-DF del motor de sonido (tabla 0x6B94, jp (hl) en p12:6B93), entrada 12
+p12 0x6C07 12 13 14  # comando D0-DF del motor de sonido (tabla 0x6B94, jp (hl) en p12:6B93), entrada 15
+p00 0x499E 1 2 3  # estado 0-2 de la maquina de estados: el despachador de 0x4271 deja 0x499E como retorno (push hl en p00:426D)
+p04 0xA37E 1 2 4  # comprobacion de yaku 0 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+p04 0xA506 1 2 4  # comprobacion de yaku 1 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+p04 0xA350 1 2 4  # comprobacion de yaku 2 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+p04 0xA325 1 2 4  # comprobacion de yaku 3 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+p04 0xA411 1 2 4  # comprobacion de yaku 4 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+p04 0xA4D0 1 2 4  # comprobacion de yaku 5 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+p04 0xA4E7 1 2 4  # comprobacion de yaku 6 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+p04 0xA4BE 1 2 4  # comprobacion de yaku 7 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+p04 0xA4F3 1 2 4  # comprobacion de yaku 8 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+p04 0xA53E 1 2 4  # comprobacion de yaku 9 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+p01 0x6FE1 1 2 3  # comprobacion de yaku 10 de la tabla p01:716B
+p04 0xA45F 1 2 4  # comprobacion de yaku 11 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+p04 0xA3AD 1 2 4  # comprobacion de yaku 12 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+p04 0xA431 1 2 4  # comprobacion de yaku 13 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+p04 0xA48A 1 2 4  # comprobacion de yaku 14 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+p04 0xA526 1 2 4  # comprobacion de yaku 15 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+p04 0xA56F 1 2 4  # comprobacion de yaku 16 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+p04 0xA5C4 1 2 4  # comprobacion de yaku 17 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+p04 0xA81E 1 2 4  # comprobacion de yaku 18 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+p04 0xA61D 1 2 4  # comprobacion de yaku 19 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+p04 0xA665 1 2 4  # comprobacion de yaku 20 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+p04 0xA6A8 1 2 4  # comprobacion de yaku 21 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+p04 0xA6BB 1 2 4  # comprobacion de yaku 22 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+p04 0xA6EB 1 2 4  # comprobacion de yaku 23 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+p04 0xA752 1 2 4  # comprobacion de yaku 24 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+p04 0xA78F 1 2 4  # comprobacion de yaku 25 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+p04 0xA7B8 1 2 4  # comprobacion de yaku 26 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+p04 0xA864 1 2 4  # comprobacion de yaku 27 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+p04 0xA897 1 2 4  # comprobacion de yaku 28 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+p04 0xA1C8 1 2 4  # comprobacion de yaku 29 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+p04 0xA1D9 1 2 4  # comprobacion de yaku 30 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+p04 0xA1F4 1 2 4  # comprobacion de yaku 31 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+p04 0xA000 1 2 4  # comprobacion de la tabla p01:71A5 (call 0x4067 en p01:6D2D, banco 4 en 0xA000), entrada 3
+p04 0xA280 1 2 4  # comprobacion de la tabla p01:71A5 (call 0x4067 en p01:6D2D, banco 4 en 0xA000), entrada 4
+p01 0x6D46 1 2 3  # entrada 5 de la tabla p01:71A5
+p04 0xA02C 1 2 4  # comprobacion de la tabla p01:71A5 (call 0x4067 en p01:6D2D, banco 4 en 0xA000), entrada 6
+p04 0xA05D 1 2 4  # comprobacion de la tabla p01:71A5 (call 0x4067 en p01:6D2D, banco 4 en 0xA000), entrada 7
+p04 0xA2BE 1 2 4  # comprobacion de la tabla p01:71A5 (call 0x4067 en p01:6D2D, banco 4 en 0xA000), entrada 8
+p04 0xA08A 1 2 4  # comprobacion de la tabla p01:71A5 (call 0x4067 en p01:6D2D, banco 4 en 0xA000), entrada 9
+p04 0xA0C5 1 2 4  # comprobacion de la tabla p01:71A5 (call 0x4067 en p01:6D2D, banco 4 en 0xA000), entrada 10
+p04 0xA0F8 1 2 4  # comprobacion de la tabla p01:71A5 (call 0x4067 en p01:6D2D, banco 4 en 0xA000), entrada 11
+p04 0xA157 1 2 4  # comprobacion de la tabla p01:71A5 (call 0x4067 en p01:6D2D, banco 4 en 0xA000), entrada 12
+p04 0xA2DF 1 2 4  # comprobacion de la tabla p01:71A5 (call 0x4067 en p01:6D2D, banco 4 en 0xA000), entrada 13
+p04 0xA19D 1 2 4  # comprobacion de la tabla p01:71A5 (call 0x4067 en p01:6D2D, banco 4 en 0xA000), entrada 14
+p04 0xA2A6 1 2 4  # comprobacion de la tabla p01:71A5 (call 0x4067 en p01:6D2D, banco 4 en 0xA000), entrada 15
+p04 0xA212 1 2 4  # comprobacion de la tabla p01:71A5 (call 0x4067 en p01:6D2D, banco 4 en 0xA000), entrada 16
+p04 0xA24F 1 2 4  # comprobacion de la tabla p01:71A5 (call 0x4067 en p01:6D2D, banco 4 en 0xA000), entrada 17
+p01 0x6EC9 1 2 3  # palo 0 de la tabla p01:6ECA (call 0x4067 en p01:6EC1)
+p01 0x6ED2 1 2 3  # palo 1 de la tabla p01:6ECA (call 0x4067 en p01:6EC1)
+p01 0x6F09 1 2 3  # palo 2 de la tabla p01:6ECA (call 0x4067 en p01:6EC1)
+p01 0x6F1A 1 2 3  # palo 3 de la tabla p01:6ECA (call 0x4067 en p01:6EC1)
+p02 0x9AE3 1 2 3  # entrada 0 de la tabla p02:9ADB (call 0x4067 en p02:9ABA)
+p02 0x9AEA 1 2 3  # entrada 1 de la tabla p02:9ADB (call 0x4067 en p02:9ABA)
+p02 0x9B28 1 2 3  # entrada 0 de la tabla p02:9B20 (call 0x4067 en p02:9B00)
+p02 0x9B2F 1 2 3  # entrada 1 de la tabla p02:9B20 (call 0x4067 en p02:9B00)
+p00 0x533F 1 2 3  # codigo huerfano: pone 0xC0B9 a cero y sigue en p00:5347; ninguna instruccion lo llama ni lo carga
+p00 0x5342 1 2 3  # codigo huerfano: pone 0xC0B9 a uno y sigue en p00:5347 (la otra entrada de p00:533F)
+p00 0x5367 1 2 3  # codigo huerfano: C = 0 y sigue en p00:5369 (la otra entrada de p00:5363)
+p00 0x5565 1 2 3  # codigo huerfano: pone 0xC0B9 a cero y sigue en p00:556D; ninguna instruccion lo llama
+p00 0x5568 1 2 3  # codigo huerfano: pone 0xC0B9 a uno y sigue en p00:556D (la otra entrada de p00:5565)
+p00 0x570B 1 2 3  # codigo huerfano: call 0x5746 y sigue en p00:570E
+p01 0x68F3 1 2 3  # codigo huerfano: B = 2 y sigue en p01:68F5 (la otra entrada de p01:68EF)
+p03 0xBFAB 1 2 3  # codigo huerfano: A = A - 1 si 0xC0B1 = 1 y sigue en p03:BFB4 (suma al contador)

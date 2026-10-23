@@ -1,0 +1,834 @@
+
+
+# --- A MANO: comentarios escritos leyendo el codigo ---
+C 0xA000 yaku 0x20 (limite, 0x81): cuatro tripletes cerrados (suuankou) con la espera distinta de la pareja; medido con tools/prueba_yaku.py
+C 0xA02C yaku 0x22 (limite): los tres dragones en tripletes (daisangen)
+C 0xA04D busca en los cuatro grupos de 0xCD95 el codigo C: Z si esta
+C 0xA052 busca el codigo C entre los cuatro grupos de 0xCD95 (sin los bits 6-7)
+C 0xA05A no esta: pone NZ
+C 0xA05D yaku 0x23 (limite): pareja de viento y tres tripletes de viento (shousuushii)
+C 0xA08A yaku 0x24 (limite): todo honores (tsuuiisou)
+C 0xA0A0 todos los grupos deben ser de honor (a partir de 0x31)
+C 0xA0A9 lo son: yaku 0x24
+C 0xA0AB ANOTA UN YAKU: C = su codigo y B = su valor (0x81 y 0x82 son limites) en la primera casilla libre de 0xC2E0; 0xCD00 = 1 si es limite
+C 0xA0B4 busca la primera casilla libre de la lista de yaku
+C 0xA0C5 yaku 0x25 (limite): todo terminales 1 y 9 (chinroutou)
+C 0xA0DB cada grupo debe ser de numero 1 o 9: si no, no hay yaku
+C 0xA0E3 resta 2 y compara con 7: los numeros de 2 a 8 lo anulan
+C 0xA0EB todos cumplen: yaku 0x25
+C 0xA0F8 yaku 0x26 (limite): todo verde (ryuuiisou): bambu 2, 3, 4, 6, 8 y el dragon verde (lista 0xA151)
+C 0xA119 las parejas del jugador deben ser de dragon verde (0x22) o no tener
+C 0xA133 busca la ficha en la lista de las seis verdes
+C 0xA157 yaku 0x27 (limite): las nueve puertas (chuuren poutou)
+C 0xA168 recorre los nueve numeros del palo comprobando que hay al menos uno de cada
+C 0xA171 comprueba que el 1 y el 9 tienen tres
+C 0xA17D mira la ficha de espera: si es 1 o 9 espera con tres y si no con dos
+C 0xA19D yaku 0x28 (limite): los trece huerfanos (kokushi musou)
+C 0xA1B5 busca la ficha 0xC209 en 0xCD20 y deja Z si su cuenta (0xCD30) es 1
+C 0xA1C8 yaku 0x29 (limite): el que reparte gana con su primera ficha (tenhou)
+C 0xA1D9 yaku 0x2A (limite): un jugador que no reparte gana en su primer robo (chiihou)
+C 0xA1F4 yaku 0x2B (limite): gana por ron antes de haber tirado nada (renhou); medido con prueba_yaku
+C 0xA212 yaku 0x2C (limite, con la opcion 0xC025): cuatro tripletes de numeros seguidos
+C 0xA22A copia las cuatro fichas de cuatro grupos de numeros a 0xCC80
+C 0xA235 las ordena
+C 0xA240 mira que sean consecutivas (diferencia -1)
+C 0xA24F yaku 0x2D (limite, con la opcion 0xC026): siete parejas seguidas del mismo palo (2 a 8 o 1 a 7)
+C 0xA280 yaku 0x30 (doble limite, 0x82): cuatro tripletes cerrados con espera de pareja (suuankou tanki); medido
+C 0xA2A6 yaku 0x31 (doble limite): los trece huerfanos con espera de trece fichas
+C 0xA2BE yaku 0x32 (doble limite): cuatro tripletes de viento (daisuushii)
+C 0xA2CE mira que los cuatro grupos sean de viento (0x31-0x34)
+C 0xA2D9 yaku 0x32
+C 0xA2DF yaku 0x33 (doble limite): las nueve puertas con espera de nueve fichas
+C 0xA2F0 las nueve puertas dobles: cuenta de cada numero
+C 0xA2F9 el 1 y el 9 con tres cada uno
+C 0xA305 la ficha extra: si es 1 o 9 espera con tres y si no con dos
+C 0xA325 yaku 0x01 (valor 1): riichi (+0x34 puesto y +0x35 sin poner)
+C 0xA344 busca la primera casilla libre de la lista de yaku
+C 0xA350 yaku 0x02 (valor 2): riichi con ippatsu (gana a los 5 robos o menos)
+C 0xA37E yaku 0x1D (valor 3): doble riichi con ippatsu
+C 0xA3AD pinfu: sin siete parejas; cuenta de las manos
+C 0xA3B6 si la opcion 0xC021 es cero mira la bandera de 0xCD0F
+C 0xA3EA la espera no es por el centro: mira cada escalera
+C 0xA3F4 si la ficha esta al extremo de la escalera hay espera por dos lados
+C 0xA411 yaku 0x04 (valor 1): robo con la mano cerrada (menzen tsumo); medido
+C 0xA431 yaku 0x05 (valor 1): todo numeros de 2 a 8 (tanyao); medido
+C 0xA444 recorre las fichas buscando un numero de 2 a 8
+C 0xA44C los honores no valen
+C 0xA454 siguiente ficha
+C 0xA45F yaku 0x06 (valor 1): dos escaleras iguales (iipeikou); medido
+C 0xA478 busca dos escaleras iguales seguidas
+C 0xA48A yaku 0x07: tripletes de honor que cuentan (yakuhai): su valor es cuantos; medido
+C 0xA4B6 siguiente casilla
+C 0xA4BE yaku 0x08 (valor 1): ganar con la ficha de despues de un kan (rinshan kaihou)
+C 0xA4D0 yaku 0x09 (valor 1): robar la ultima ficha del muro (haitei)
+C 0xA4E7 yaku 0x0A (valor 1): ganar con la ultima ficha tirada (houtei)
+C 0xA4F3 yaku 0x0B (valor 1): ganar con la ficha de un kan de otro (chankan)
+C 0xA506 yaku 0x0C (valor 2): doble riichi
+C 0xA526 yaku 0x0E (valor 2): cuatro tripletes (toitoi)
+C 0xA53E yaku 0x0F (valor 2): dos pares de escaleras iguales (ryanpeikou)
+C 0xA55D Z si las cuatro escaleras de 0xCD44 forman dos pares iguales
+C 0xA56F yaku 0x10: escalera 123-456-789 de un palo (ittsu); medido, valor 2 cerrada y 1 abierta
+C 0xA594 anota el yaku C con valor 2 si la mano es cerrada (+0x40 a cero) y 1 si no
+C 0xA5A6 mira si hay en la lista de escaleras las que empiezan en +3 y +6 de la primera
+C 0xA5B9 busca la ficha D entre las escaleras
+C 0xA5C4 yaku 0x11: la misma escalera en los tres palos (sanshoku doujun); medido
+C 0xA5DA mira si el numero se repite en tres de las escaleras
+C 0xA5E5 segundo numero
+C 0xA5EC tercero
+C 0xA5FD cuenta en cuantos palos (0x10 de diferencia) esta la escalera de numero E en 0xCD44
+C 0xA606 busca el numero E en las escaleras
+C 0xA61D yaku 0x12: todos los grupos con un 1, un 9 o un honor (chanta); medido
+C 0xA645 mira que las escaleras de 0xCD44 empiecen por 1 o por 7
+C 0xA65B pone el acarreo si la ficha es de honor o 1 o 9; Z/NZ para 2-8
+C 0xA665 yaku 0x13 (valor 2): tres tripletes cerrados (sanankou); medido
+C 0xA68F cuenta los tripletes cerrados: sin los bits 6-7 y distintos de la ficha de ron
+C 0xA6A8 yaku 0x14 (valor 2): tres kan (sankantsu)
+C 0xA6BB yaku 0x15 (valor 2): tres tripletes de numeros seguidos (sanrenkou)
+C 0xA6D4 compara cada ficha con la siguiente: iguales menos uno
+C 0xA6EB yaku 0x16 (valor 2): tres tripletes del mismo numero en tres palos (sanshoku doukou)
+C 0xA721 mira si algun numero tiene tres tripletes
+C 0xA732 cuenta cuantos grupos de 0xCD95 son de numero (menos de 0x31) y deja sus valores en 0xCC80
+C 0xA73B recoge los grupos de numero
+C 0xA749 los guarda y cuenta los de numero
+C 0xA752 yaku 0x17 (valor 2): dos dragones en tripletes y el tercero de pareja (shousangen)
+C 0xA77E busca la ficha D entre los grupos
+C 0xA78F yaku 0x18 (valor 2): todo terminales y honores (honroutou)
+C 0xA7B8 yaku 0x19: un solo palo con honores (honitsu); medido, valor 3 cerrada y 2 abierta
+C 0xA810 pone el acarreo si la ficha es de honor o no del palo E
+C 0xA81E yaku 0x1A: todos los grupos con un 1 o un 9, sin honores (junchan); medido
+C 0xA836 mira que las escaleras sean de un palo
+C 0xA84A mira que los grupos sean de un palo
+C 0xA864 yaku 0x1B: un solo palo sin honores (chinitsu), valor 6 cerrada y 5 abierta
+C 0xA885 mira si todas las fichas de 0xCD20 son del mismo palo (Z)
+C 0xA88D mira que todos los grupos sean del palo E
+C 0xA897 yaku 0x1C: los dora (fichas que dan puntos extra), valor = cuantos; medido
+C 0xA8BE cuenta cuantas fichas de la mano coinciden con los indicadores de dora (0xC027 = solo el de arriba)
+C 0xA8C6 cuenta tambien los indicadores de debajo (urados)
+C 0xA8D6 cuenta cuantas fichas de la mano son iguales a un indicador de dora
+C 0xA8DC cuenta la coincidencia
+C 0xA8E8 y si es de grupo (bits 6-7 = 3) suma uno a C
+C 0xA8E9 siguiente indicador y suma los dora de las fichas de grupo
+C 0xA8EC siguiente indicador
+C 0xA8F2 suma los de tripletes y kan (0xA8F9)
+C 0xA904 convierte los indicadores 0xC182, 0xC183 en las fichas que valen (el siguiente numero, o la tabla 0xA93C para los honores)
+C 0xA912 convierte un indicador: el numero siguiente (de 9 pasa a 1)
+C 0xA91E suma uno al numero
+C 0xA923 con 10 vuelve a 1
+C 0xA934 guarda y sigue con el indicador siguiente
+C 0xA943 MUESTRA LA PUNTUACION DE LA MANO GANADORA: borra los pagos (0xADE9), mira quien paga (0xAB91) y, si el primer yaku es el 0x35, la muestra especial (0xAE13, 0xAE27)
+C 0xA950 escribe la lista de yaku (0xA978), y si 0xCD00 = 0 (mano normal) calcula los puntos (0xAB6E, 0xA9E7, 0xAA51) y paga (0xACB4)
+C 0xA967 mano especial (0xCD00 = 1): 0xAA2F, 0xAAAC y paga
+C 0xA978 escribe uno a uno los yaku de 0xC2E0: cada uno con su nombre (tabla 0x6664) y sus han; va sumando los han en 0xC237 (BCD)
+C 0xA9A0 escribe el nombre del yaku A en la linea que toca (0x4F: 0xAB4F) con la tabla de textos 0x6664
+C 0xA9B4 escribe el valor del yaku (han): con 0xCD00 = 0 los dibuja con 0x5ABF (dos tiles); si no, los suma a 0xC237 sin dibujar
+C 0xA9E7 escribe los puntos de la mano normal: lineas de texto (0x663B, 0x5AB8): fu, han y total
+C 0xAA24 dibuja la linea de la lista de yaku y vuelve
+C 0xAA2F escribe el limite de la mano especial (mangan, haneman, baiman, sanbaiman, yakuman: tabla 0x6640 segun 0xC238)
+C 0xAA51 BUSCA EN LA TABLA DE PUNTOS: segun han (0xC237), fu (0xC236), reparto (0xC0B1: robo o ron) y si es el que reparte (0xC23D) mira en las tablas 0xAF5D y 0xB049 los puntos
+C 0xAA91 la mano es un limite (0xC23C): tablas 0xB049 + 0xC23D
+C 0xAAAC puntos de la mano especial: tablas 0xB07D, y suma los honba (0xC239)
+C 0xAAE3 reparte el pago entre B jugadores
+C 0xAAF0 DIBUJA EL PAGO: paga los honba, la riichi (0xC0B4) y los puntos de la mano
+C 0xAB2E dibuja una cifra del pago en DE (ceros por la izquierda, en blanco mientras C = 0)
+C 0xAB37 dibuja un numero del pago
+C 0xAB4F devuelve en A la posicion de linea de la lista de yaku (de 0xC248 y 0xC232)
+C 0xAB6E calcula 0xC23C: el limite (5 = yakuman si han >= 0x15; 4 si >= 0x12 (3 si >= 0x10, 2 si >= 8, 1 si 7))
+C 0xAB91 mira si el que gana es el que reparte (0xC0B7): 0xC23D = 0 si lo es, 1 si no
+C 0xABBC paga las barras de honba (0xC0B5 x 100): ellos pagan 100 por honba al ganador (0x4A20)
+C 0xABD9 cada uno de los otros jugadores paga los honba al ganador
+C 0xAC01 el ganador cobra los honba de cada otro
+C 0xAC13 el ganador cobra los honba de los otros tres
+C 0xAC34 cobra de cada uno las barras de honba
+C 0xAC43 el ganador cobra las barras de riichi (0xC0B4): suma a su cuenta 1000 por barra
+C 0xAC7B cobra las barras de riichi
+C 0xAC8A convierte el numero BCD de A a binario (decenas x 10 + unidades)
+C 0xAC9D reparte los puntos entre los pagadores: repite B veces (0xC23B, 0xC23A)
+C 0xACA7 paga a los otros dos
+C 0xACB4 REPARTE LOS PUNTOS DE LA MANO: si es robo (0xC0B1 = 1) paga cada uno la parte que le toca y el que reparte el doble; si es ron paga solo el que tiro (0xC207 o 0xC20D)
+C 0xADA2 reparte la mano que gana el que reparte: cada uno de los otros tres paga lo mismo (0xC23A, 0xC23B)
+C 0xADE9 borra los cuatro marcadores de pagos (0xADE1 + 3 x jugador) y 0xC239, 0xC23A, 0xC23B, 0xC23E-0xC240
+C 0xAE13 muestra el yaku especial 0x35 (nombre de la tabla 0x6664) y la linea del limite
+C 0xAE27 paga el limite especial (0xC238 = 3): reparte lo de la tabla 0xB07D entre los otros
+C 0xAEBA reparte la mano que gana el que no reparte con robo: los otros dos pagan lo mismo y el que reparte paga el doble (0xAC9D)
+C 0xAF08 dibuja el numero del pago (C23F, C240) en la linea E: cinco cifras y dos ceros
+C 0xAF3A dibuja una cifra del pago con ceros en blanco (0x5AC6)
+C 0xAF43 dibuja una cifra del pago
+C 0xB0D9 PANTALLA DEL FINAL DE LA MANO (EFECTO): copia los sprites y 0xC24D elige el paso por la tabla de 0xB0E0
+C 0xB0EC primer paso: 0xB15E, carga una imagen de fondo (0x5810) y 0xC004 = 0x80
+C 0xB109 paso de fundido hacia dentro: sube los colores (0xB181) hasta que acaba (0xC248)
+C 0xB111 carga las imagenes (0x5AAA, 0x56DF) y pasa al paso siguiente
+C 0xB11C paso de las estrellas: 0xB261 y, al acabar (0xC253), cuenta 0xC00A y pide el sonido 0x03 (0x41A3)
+C 0xB134 paso de fundido hacia fuera (0xB188): al acabar pone 0xC00A = 0x20
+C 0xB146 espera 0xC00A cuadros y pone 0xC0B0 = 0
+C 0xB150 copia la paleta de 0xB241 (32 bytes) a 0xC200 y la aplica
+C 0xB15E pone 0xC200 (33 bytes) a cero, 0xC00A = 0x20 y empieza el fundido
+C 0xB170 aplica la paleta, 0xC24A = 0xC249 = 0x0F (cuadros por paso) y 0xC248 = 1
+C 0xB181 un paso de fundido hacia dentro de la paleta de 0xC200 hacia la de 0xB241: cada color sube un nivel de cada canal hasta llegar a su valor
+C 0xB18F cada 0x0F cuadros sube de un nivel cada canal de los 16 colores: de rojo y verde (nibble alto y bajo) y de azul
+C 0xB19F un paso de fundido: mira cada color de la paleta
+C 0xB1A4 nivel de color de destino (byte alto del nibble)
+C 0xB1AE si ya es igual no lo toca
+C 0xB1B5 el nivel actual del color
+C 0xB1C1 siguiente color
+C 0xB1D6 cada 0x0F cuadros baja un nivel cada canal de los 16 colores de 0xC200 hacia cero
+C 0xB1E3 un paso de fundido a negro: baja el nivel
+C 0xB205 escribe en el VDP los 16 colores de 0xC200 (4EB2)
+C 0xB209 aplica los 16 colores
+C 0xB21B pone 0xC248 a cero cuando los 32 bytes de la paleta ya valen cero
+C 0xB22C pone 0xC248 a cero cuando la paleta ya es igual a la de destino (0xB241)
+C 0xB261 anima las estrellas: 0xB283 y, al pasar de 8 pasos (0xC24E), 0xC253 = 1
+C 0xB270 siguiente paso de la animacion: 0xC24F += 1 y 0xC250 = 0
+C 0xB27E A = byte A de la tabla HL
+C 0xB283 un paso de las estrellas: 0xC24F elige por la tabla de 0xB292 el paso
+C 0xB29E 0xC250 elige por la tabla de 0xB2A7: carga sprites (0xB323 a 0xCC00, 28 bytes) y colores (0xB33F a 0xCA00)
+C 0xB2CF pone los siete sprites de la estrella y dibuja los tiles 0x91 en 3 x 2 sitios (0xB301)
+C 0xB2E5 dibuja los tiles 0x91 de la estrella
+C 0xB2E9 siguiente columna de tiles
+C 0xB2F7 pone a cero los contadores de la animacion
+C 0xB307 HL = tabla de la estrella del paso 0xC24E (0xB347)
+C 0xB310 recorre B sprites del bloque (de 4 en 4 bytes) poniendoles el numero A
+C 0xB34F mueve las estrellas: 0xC251 elige por la tabla de 0xB358 y las desplaza por 0xB3F3
+C 0xB366 mueve los siete sprites 0xC252 veces: a cada uno le suma (0xC254, 0xC255)
+C 0xB373 pone los sprites fuera de pantalla (0x4E83) y siguiente paso
+C 0xB379 lee el siguiente movimiento de la lista 0xB3A2 + 0xC24E: cuadros y desplazamiento X e Y
+C 0xB3F3 suma el desplazamiento (0xC254, 0xC255) a los siete sprites de 0xCC00
+C 0xB3F8 mueve cada sprite de la estrella
+C 0xB3FB suma el desplazamiento Y
+C 0xB401 suma el desplazamiento X
+C 0xB40F 0xC250 elige por la tabla de 0xB418 un paso del dibujo del marco (copia un cuadro de 48 x 48 de 0xB44C en 0xB43C)
+C 0xB45C pone un marco de 8 x 8 tiles (0xB4B9) alrededor del cuadro
+C 0xB479 prepara el texto que acompana: si es la 0xC24E = 0 borra el rectangulo (0xB493); lista de tiles de 0xB535
+C 0xB493 rectangulo de la ventana (0x142C) borrado y ventana nueva de 10 x 8
+C 0xB4A8 espera 0xC252 cuadros, borra el rectangulo (0xB528) y pasa a la siguiente estrella
+C 0xB4B9 dibuja un marco de tiles 0x14..0x1B con esquinas (para la ventana con borde de dibujo)
+C 0xB516 lado izquierdo del marco con el tile 0x19
+C 0xB528 rellena de ceros el rectangulo 0x1830 de 64 x 48 (borra la ventana)
+C 0xB680 A = el byte A de la tabla HL
+C 0xB685 el objeto ix pasa al paso siguiente: (ix+0) += 1 y (ix+1) = 0
+C 0xB68D (ix+1) += 1: sigue en el mismo estado
+C 0xB691 baja el temporizador (ix+3)
+C 0xB695 inicia las caras de los rivales: pone a cero 0xC300, 0xC301 y 0xC25D (34 bytes), y pone los sprites fuera de pantalla
+C 0xB6AC ANIMACION DE LOS RIVALES: dibuja con 0xBA72 y para cada uno de los tres (B = 3, 2, 1) apunta ix a su objeto de 11 bytes en 0xC25D
+C 0xB6C2 (ix+4) = 1 si el rival es quien ha ganado (0xC207), 0xC275 = su numero, 0xC276 = el personaje que es
+C 0xB6EE pone en (ix+3) el tiempo que dura el cuadro de esta cara (tabla 0xB70E o 0xB720)
+C 0xB787 baja el temporizador (ix+3)
+C 0xB78B un paso de este rival: 0xC27F += 1, mueve su cara con 0xB87A, 0xBCF4, 0xBD5E, 0xBEF9 y 0xBA72; (ix+0) elige por la tabla de 0xB7A7
+C 0xB7BA espera el temporizador y luego dibuja el gesto de la cara (tablas 0xB896 y 0xB8A8, por personaje)
+C 0xB7E5 si es el rival 1 del personaje 1 el gesto dura 2 (si no 8)
+C 0xB7F3 gesto de despues: acaba con el gesto de 0xBAB0 o 0xBAA7 y la boca (0xBAB9)
+C 0xB838 espera y quita el gesto: vuelve al estado 0
+C 0xB846 dibuja un dibujo de tiles de HL (X, Y, tiles... 0xFE = nueva linea, 0xFF = acaba) con la posicion de (ix+5, ix+6)
+C 0xB854 siguiente tile de la lista de la cara
+C 0xB868 pinta un tile (0x53DE) de 8 x 8 desde la pagina 1 a la pagina 0
+C 0xB87A pone en (ix+5, ix+6) la posicion de la cara de este rival (tabla 0xB88E)
+C 0xBA72 copia los colores de los sprites: a cada sprite de 0xCC00 le pone color 0 si su Y es 0xE0
+C 0xBA7A copia el color de cada sprite
+C 0xBA87 rellena los 16 bytes de color
+C 0xBA8F DE = el sprite de la cara del personaje 0xC275 (tabla 0xBAA2)
+C 0xBAB9 sonido y boca por el codigo del personaje: tabla 0xBABF
+C 0xBAE3 dibuja el cuadro de la cara de 0xBB7C (tabla de sprites): cada cuatro bytes (Y, X, patron, color) con la posicion de (ix+5, ix+6)
+C 0xBAF7 un sprite del cuadro de la cara: Y, X, patron y color
+C 0xBB03 ajusta la X con la posicion de la cara
+C 0xBB0E copia el patron y el color
+C 0xBB12 el patron y el color
+C 0xBB19 sigue con el siguiente sprite
+C 0xBCA5 si la cara lleva menos de 2 cuadros pone la cabeza de 0xBA5B
+C 0xBCB3 si lleva 4 cuadros o mas pone la cara de 0x661D (el cuadro de personaje) en su sitio
+C 0xBCC9 dibuja el gesto de la tabla 0xBCD6 segun el cuadro (ix+1)
+C 0xBCF4 solo en los cuadros pares y si no es el humano
+C 0xBCFA no si es el humano
+C 0xBD02 solo los personajes 6 y 3
+C 0xBD0E elige la lista de gestos segun el personaje (3, 1 u otro)
+C 0xBD5E gesto del personaje 1 (parpadeo): tabla 0xBD84
+C 0xBE25 baja el temporizador (ix+3)
+C 0xBE29 gestos del personaje 2: si (ix+4) es cero vuelve; cada dos cuadros elige un paso por la tabla de 0xBE47
+C 0xBEC6 mueve la cara de 0xBEE8 en dos sprites
+C 0xBEDB suma el desplazamiento al sprite
+C 0xBEDC suma a la Y
+C 0xBEDF suma a la X
+C 0xBEF2 baja el contador 0xC301
+C 0xBEF9 gestos del personaje 8: 0xC300 elige el paso por la tabla de 0xBF15
+C 0xBF39 pone 0xC301 con el tiempo del paso (tabla 0xBF46)
+C 0xBF4B dibuja el gesto 0xC300 (tabla 0xBF5B)
+# --- fin de lo escrito a mano ---
+
+# --- A MANO: comentarios, nombres y bloques ---
+D 0xA0F1 0xA0F8 terminales  siete bytes: 6 y los seis numeros 1 y 9 de cada palo (0x01, 0x09, 0x11, 0x19, 0x21, 0x29): ninguna instruccion trazada los apunta (p04:A0F8 empieza justo detras y usa 0xA151); no se ha medido que los lea nadie
+
+
+# --- BLOQUES QUE LEE EL CODIGO (seccion que reescribe tools/bloques.py; no editar a mano) ---
+D 0xB0E2 0xB0EC tabla_B0E2  5 destinos del despachador p00:4066 (call en p04:B0DF, el indice en A): B0EC, B109, B11C, B134, B146; lo leen p04:B0DF (10 bytes)
+F 0xB0E2 w5
+D 0xB292 0xB29C tabla_B292  5 destinos del despachador p00:4066 (call en p04:B28F, el indice en A): B29C, B29E, B40F, B479, B4A8; lo leen p04:B28F (10 bytes)
+F 0xB292 w5
+D 0xB2A7 0xB2AD tabla_B2A7  3 destinos del despachador p00:4066 (call en p04:B2A4, el indice en A): B2AD, B34F, B409; lo leen p04:B2A4 (6 bytes)
+F 0xB2A7 w3
+D 0xB358 0xB35E tabla_B358  3 destinos del despachador p00:4066 (call en p04:B355, el indice en A): B35E, B366, B373; lo leen p04:B355 (6 bytes)
+F 0xB358 w3
+D 0xB418 0xB41E tabla_B418  3 destinos del despachador p00:4066 (call en p04:B415, el indice en A): B41E, B45C, B476; lo leen p04:B415 (6 bytes)
+F 0xB418 w3
+D 0xB7A7 0xB7AF tabla_B7A7  4 destinos del despachador p00:4066 (call en p04:B7A4, el indice en A): B7AF, B7BA, B7F3, B838; lo leen p04:B7A4 (8 bytes)
+F 0xB7A7 w4
+D 0xBABF 0xBAE3 tabla_BABF  18 destinos del despachador p00:4066 (call en p04:BABC, el indice en A): BB3D, BB3A, BB3D, BB32, BB28, BAE8, BB3A, BB1B, BB3E, BB3A, BB2D, BB3A, BB20, BAE3, BB3D, BB3D, BB3D, BB3D; lo leen p04:BABC (36 bytes)
+F 0xBABF w8
+D 0xBE47 0xBE57 tabla_BE47  8 destinos del despachador p00:4066 (call en p04:BE44, el indice en A): BE57, BE71, BE71, BE71, BE7F, BE97, BEAC, BEB8; lo leen p04:BE44 (16 bytes)
+F 0xBE47 w8
+D 0xBF15 0xBF1F tabla_BF15  5 destinos del despachador p00:4066 (call en p04:BF12, el indice en A): BF1F, BF2A, BF2A, BF2A, BF30; lo leen p04:BF12 (10 bytes)
+F 0xBF15 w5
+D 0xBF97 0xC000 relleno_ff  105 bytes a 0xFF hasta el final del banco: relleno; lo leen nadie (105 bytes)
+F 0xBF97 16
+D 0xA151 0xA157 resto_A151  lo apuntan con el banco puesto p04:A0FC (0xA151), p04:A12E (0xA151); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p04:A0FC, p04:A12E (6 bytes)
+F 0xA151 16
+D 0xA789 0xA78F resto_A789  lo apuntan con el banco puesto p04:A75F (0xA789); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p04:A75F (6 bytes)
+F 0xA789 16
+D 0xA93C 0xA943 resto_A93C  lo apuntan con el banco puesto p04:A92C (0xA93C); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p04:A92C (7 bytes)
+F 0xA93C 16
+D 0xAB66 0xAB6E resto_AB66  lo apuntan con el banco puesto p04:AB53 (0xAB66); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p04:AB53 (8 bytes)
+F 0xAB66 16
+D 0xADE1 0xADE9 resto_ADE1  lo apuntan con el banco puesto p04:ABCC (0xADE1), p04:ABF4 (0xADE1), p04:AC27 (0xADE1), p04:AC6E (0xADE1), p04:ACBE (0xADE1), p04:ACD4 (0xADE1); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p04:ABCC, p04:ABF4, p04:AC27, p04:AC6E, p04:ACBE, p04:ACD4 (8 bytes)
+F 0xADE1 16
+D 0xAF5D 0xB0D9 resto_AF5D  lo apuntan con el banco puesto p04:AA5A (0xAF5D), p00:41E6 (0xB000), p00:421C (0xB000), p00:4240 (0xB000), p00:4252 (0xB000), p04:AA94 (0xB049); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p04:AA5A, p00:41E6, p00:421C, p00:4240, p00:4252, p04:AA94 (380 bytes)
+F 0xAF5D 16
+D 0xB241 0xB261 resto_B241  lo apuntan con el banco puesto p04:B150 (0xB241), p04:B19A (0xB241), p04:B22E (0xB241); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p04:B150, p04:B19A, p04:B22E (32 bytes)
+F 0xB241 16
+D 0xB318 0xB34F resto_B318  lo apuntan con el banco puesto p04:B2B0 (0xB323), p04:B2BB (0xB33F), p04:B30A (0xB347); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p04:B2B0, p04:B2BB, p04:B30A (55 bytes)
+F 0xB318 16
+D 0xB3A2 0xB3F3 resto_B3A2  lo apuntan con el banco puesto p04:B37C (0xB3A2); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p04:B37C (81 bytes)
+F 0xB3A2 16
+D 0xB43C 0xB45C resto_B43C  lo apuntan con el banco puesto p04:B422 (0xB43C), p04:B45F (0xB43C), p04:B42B (0xB44C); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p04:B422, p04:B45F, p04:B42B (32 bytes)
+F 0xB43C 16
+D 0xB535 0xB680 resto_B535  lo apuntan con el banco puesto p04:B482 (0xB535); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p04:B482 (331 bytes)
+F 0xB535 16
+D 0xB6EA 0xB6EE resto_B6EA  lo apuntan con el banco puesto p04:B6B3 (0xB6EA); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p04:B6B3 (4 bytes)
+F 0xB6EA 16
+D 0xB70E 0xB787 resto_B70E  lo apuntan con el banco puesto p04:B6F0 (0xB70E), p04:B6F9 (0xB720); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p04:B6F0, p04:B6F9 (121 bytes)
+F 0xB70E 16
+D 0xB88E 0xBA72 resto_B88E  lo apuntan con el banco puesto p04:B87E (0xB88E), p04:B7CA (0xB896), p04:B7C1 (0xB8A8), p04:BCAC (0xBA5B); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p04:B87E, p04:B7CA, p04:B7C1, p04:BCAC (484 bytes)
+F 0xB88E 16
+D 0xBAA2 0xBAB9 resto_BAA2  lo apuntan con el banco puesto p04:BA93 (0xBAA2), p04:B80B (0xBAA7), p04:B802 (0xBAB0); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p04:BA93, p04:B80B, p04:B802 (23 bytes)
+F 0xBAA2 16
+D 0xBB46 0xBCA5 resto_BB46  lo apuntan con el banco puesto p04:BAEB (0xBB46), p04:BAE3 (0xBB7C), p04:BB1B (0xBB95), p04:BB23 (0xBBB9), p04:BB28 (0xBBD5), p04:BEB0 (0xBC33); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p04:BAEB, p04:BAE3, p04:BB1B, p04:BB23, p04:BB28, p04:BEB0 (351 bytes)
+F 0xBB46 16
+D 0xBCD6 0xBCF4 resto_BCD6  lo apuntan con el banco puesto p04:BCC9 (0xBCD6); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p04:BCC9 (30 bytes)
+F 0xBCD6 16
+D 0xBD34 0xBD5E resto_BD34  lo apuntan con el banco puesto p04:BD0E (0xBD34); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p04:BD0E (42 bytes)
+F 0xBD34 16
+D 0xBD84 0xBE25 resto_BD84  lo apuntan con el banco puesto p04:BD7A (0xBD84), p04:BD18 (0xBD8D), p04:BD1F (0xBDD9); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p04:BD7A, p04:BD18, p04:BD1F (161 bytes)
+F 0xBD84 16
+D 0xBE68 0xBE71 resto_BE68  lo apuntan con el banco puesto p04:BE57 (0xBE68); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p04:BE57 (9 bytes)
+F 0xBE68 16
+D 0xBE8E 0xBE97 resto_BE8E  lo apuntan con el banco puesto p04:BE86 (0xBE8E); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p04:BE86 (9 bytes)
+F 0xBE8E 16
+D 0xBEA3 0xBEAC resto_BEA3  lo apuntan con el banco puesto p04:BE9B (0xBEA3); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p04:BE9B (9 bytes)
+F 0xBEA3 16
+D 0xBEE8 0xBEF2 resto_BEE8  lo apuntan con el banco puesto p04:BECD (0xBEE8); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p04:BECD (10 bytes)
+F 0xBEE8 16
+D 0xBF46 0xBF4B resto_BF46  lo apuntan con el banco puesto p04:BF3C (0xBF46); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p04:BF3C (5 bytes)
+F 0xBF46 16
+D 0xBF5B 0xBF97 resto_BF5B  lo apuntan con el banco puesto p04:BF4E (0xBF5B); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p04:BF4E (60 bytes)
+F 0xBF5B 16
+# --- fin de los bloques de bloques.py ---
+
+# --- ANOTACIONES AUTOMATICAS (seccion que reescribe tools/anota.py; no editar a mano) ---
+L 0xA0AB anota_yaku anota el yaku C con valor B en 0xC2E0
+L 0xA341 anota_yaku_valor anota el yaku C con valor B en la primera casilla libre de 0xC2E0
+L 0xA943 puntua_mano puntua la mano ganadora y paga
+L 0xAAF0 dibuja_pago dibuja el pago de la mano
+L 0xACB4 reparte_puntos reparte los puntos de la mano ganadora
+L 0xB0D9 efecto_final_mano el efecto de fondo del final de la mano
+L 0xB6AC anima_rivales anima las caras de los tres rivales
+C 0xA006 cuenta_tripletes: cuenta los tripletes de la lista 0xCD48
+C 0xA00A cuenta_kan: cuenta los kan de la lista 0xCD4C
+C 0xA011 apunta a los grupos de la mano (4)
+C 0xA01D lee la ficha robada o tirada
+C 0xA021 lee la pareja de la mano
+C 0xA028 anota_yaku: anota el yaku C con valor B en 0xC2E0
+C 0xA030 cuenta_kan: cuenta los kan de la lista 0xCD4C
+C 0xA039 busca en los cuatro grupos de 0xCD95 el codigo C: Z si esta
+C 0xA03E busca en los cuatro grupos de 0xCD95 el codigo C: Z si esta
+C 0xA043 busca en los cuatro grupos de 0xCD95 el codigo C: Z si esta
+C 0xA049 anota_yaku: anota el yaku C con valor B en 0xC2E0
+C 0xA065 cuenta_tripletes: cuenta los tripletes de la lista 0xCD48
+C 0xA069 cuenta_kan: cuenta los kan de la lista 0xCD4C
+C 0xA070 lee la pareja de la mano
+C 0xA07C busca en los cuatro grupos de 0xCD95 el codigo C: Z si esta
+C 0xA086 anota_yaku: anota el yaku C con valor B en 0xC2E0
+C 0xA090 cuenta_tripletes: cuenta los tripletes de la lista 0xCD48
+C 0xA094 cuenta_kan: cuenta los kan de la lista 0xCD4C
+C 0xA09B apunta a los grupos de la mano (4)
+C 0xA0B1 apunta a la lista de yaku de la mano: pares codigo, valor (32 como mucho)
+C 0xA0C1 guarda 1 si la mano es de limite
+C 0xA0CB cuenta_tripletes: cuenta los tripletes de la lista 0xCD48
+C 0xA0CF cuenta_kan: cuenta los kan de la lista 0xCD4C
+C 0xA0D6 apunta a los grupos de la mano (4)
+C 0xA0ED anota_yaku: anota el yaku C con valor B en 0xC2E0
+C 0xA0FF lee la pareja de la mano
+C 0xA114 apunta a las escaleras de la mano (4)
+C 0xA124 apunta a los grupos de la mano (4)
+C 0xA14D anota_yaku: anota el yaku C con valor B en 0xC2E0
+C 0xA161 apunta a las fichas distintas de la mano
+C 0xA18E apunta a cuantas hay de cada una
+C 0xA191 suma_a_hl: HL = HL + A
+C 0xA199 anota_yaku: anota el yaku C con valor B en 0xC2E0
+C 0xA1A7 mira_trece_huerfanos: compara 0xCD20 con la mano de los trece huerfanos
+C 0xA1AB busca la ficha 0xC209 en 0xCD20 y deja Z si su cuenta (0xCD30) es 1
+C 0xA1B1 anota_yaku: anota el yaku C con valor B en 0xC2E0
+C 0xA1B8 apunta a cuantas hay de cada una
+C 0xA1BB lee la ficha robada o tirada
+C 0xA1CD lee cuantas fichas se han robado del muro
+C 0xA1D5 anota_yaku: anota el yaku C con valor B en 0xC2E0
+C 0xA1DE lee cuantas fichas se han robado del muro
+C 0xA1E6 mira_manos_con_grupos: 0xCD01 = 1 si algun jugador ha bajado grupos
+C 0xA1E9 lee 1 si algun jugador ha bajado grupos
+C 0xA1F0 anota_yaku: anota el yaku C con valor B en 0xC2E0
+C 0xA1FA lee la direccion de la mano que se analiza y el byte siguiente (16 bits)
+C 0xA204 mira_manos_con_grupos: 0xCD01 = 1 si algun jugador ha bajado grupos
+C 0xA207 lee 1 si algun jugador ha bajado grupos
+C 0xA20E anota_yaku: anota el yaku C con valor B en 0xC2E0
+C 0xA217 cuenta_tripletes: cuenta los tripletes de la lista 0xCD48
+C 0xA21B cuenta_kan: cuenta los kan de la lista 0xCD4C
+C 0xA222 apunta a los grupos de la mano (4)
+C 0xA24B anota_yaku: anota el yaku C con valor B en 0xC2E0
+C 0xA254 lee la direccion de la mano que se analiza y el byte siguiente (16 bits)
+C 0xA25E apunta a cuantas hay de cada una
+C 0xA26A apunta a las fichas distintas de la mano
+C 0xA27C anota_yaku: anota el yaku C con valor B en 0xC2E0
+C 0xA284 cuenta_kan: cuenta los kan de la lista 0xCD4C
+C 0xA28B apunta a los grupos de la mano (4)
+C 0xA297 lee la ficha robada o tirada
+C 0xA29B lee la pareja de la mano
+C 0xA2B0 mira_trece_huerfanos: compara 0xCD20 con la mano de los trece huerfanos
+C 0xA2B4 busca la ficha 0xC209 en 0xCD20 y deja Z si su cuenta (0xCD30) es 1
+C 0xA2C2 cuenta_kan: cuenta los kan de la lista 0xCD4C
+C 0xA2C9 apunta a los grupos de la mano (4)
+C 0xA2E9 apunta a las fichas distintas de la mano
+C 0xA316 apunta a cuantas hay de cada una
+C 0xA319 suma_a_hl: HL = HL + A
+C 0xA32F lee la direccion de la mano que se analiza y el byte siguiente (16 bits)
+C 0xA341 apunta a la lista de yaku de la mano: pares codigo, valor (32 como mucho)
+C 0xA359 lee la direccion de la mano que se analiza y el byte siguiente (16 bits)
+C 0xA363 lee la direccion de la mano que se analiza y el byte siguiente (16 bits)
+C 0xA36A lee cuantas fichas se han robado del muro
+C 0xA37A anota_yaku_valor: anota el yaku C con valor B en la primera casilla libre de 0xC2E0
+C 0xA385 lee la direccion de la mano que se analiza y el byte siguiente (16 bits)
+C 0xA38F lee la direccion de la mano que se analiza y el byte siguiente (16 bits)
+C 0xA396 lee cuantas fichas se han robado del muro
+C 0xA3A9 anota_yaku_valor: anota el yaku C con valor B en la primera casilla libre de 0xC2E0
+C 0xA3C1 lee la direccion de la mano que se analiza y el byte siguiente (16 bits)
+C 0xA3CB cuenta_escaleras: cuenta las escaleras de la lista 0xCD44
+C 0xA3D1 pon_vientos_propios: pone en 0xCD90 los honores que cuentan: viento de la ronda, el propio y dragones
+C 0xA3D4 apunta a los honores que cuentan de yaku (5)
+C 0xA3D7 lee la pareja de la mano
+C 0xA3E1 lee la ficha robada o tirada
+C 0xA3E7 apunta a las escaleras de la mano (4)
+C 0xA40D anota_yaku_valor: anota el yaku C con valor B en la primera casilla libre de 0xC2E0
+C 0xA415 lee como se gana la mano: 1 por robo, 2 por la ficha tirada
+C 0xA41A lee la direccion de la mano que se analiza y el byte siguiente (16 bits)
+C 0xA42D anota_yaku_valor: anota el yaku C con valor B en la primera casilla libre de 0xC2E0
+C 0xA437 lee la direccion de la mano que se analiza y el byte siguiente (16 bits)
+C 0xA441 apunta a las fichas distintas de la mano
+C 0xA45B anota_yaku_valor: anota el yaku C con valor B en la primera casilla libre de 0xC2E0
+C 0xA469 lee la direccion de la mano que se analiza y el byte siguiente (16 bits)
+C 0xA473 apunta a las escaleras de la mano (4)
+C 0xA486 anota_yaku_valor: anota el yaku C con valor B en la primera casilla libre de 0xC2E0
+C 0xA48F pon_vientos_propios: pone en 0xCD90 los honores que cuentan: viento de la ronda, el propio y dragones
+C 0xA49B anota_yaku_valor: anota el yaku C con valor B en la primera casilla libre de 0xC2E0
+C 0xA49F apunta a los grupos de la mano (4)
+C 0xA4AB apunta a los honores que cuentan de yaku (5)
+C 0xA4C3 lee 1 si se gana con la ficha de un kan
+C 0xA4CC anota_yaku_valor: anota el yaku C con valor B en la primera casilla libre de 0xC2E0
+C 0xA4D7 lee cuantas fichas se han robado del muro
+C 0xA4DA apunta a las fichas sacadas del final del muro (por kan)
+C 0xA4E3 anota_yaku_valor: anota el yaku C con valor B en la primera casilla libre de 0xC2E0
+C 0xA4F9 lee 1 si se gana con la ficha del kan de otro
+C 0xA502 anota_yaku_valor: anota el yaku C con valor B en la primera casilla libre de 0xC2E0
+C 0xA50F lee la direccion de la mano que se analiza y el byte siguiente (16 bits)
+C 0xA522 anota_yaku_valor: anota el yaku C con valor B en la primera casilla libre de 0xC2E0
+C 0xA52B cuenta_tripletes: cuenta los tripletes de la lista 0xCD48
+C 0xA52F cuenta_kan: cuenta los kan de la lista 0xCD4C
+C 0xA53A anota_yaku_valor: anota el yaku C con valor B en la primera casilla libre de 0xC2E0
+C 0xA542 lee la direccion de la mano que se analiza y el byte siguiente (16 bits)
+C 0xA54C Z si las cuatro escaleras de 0xCD44 forman dos pares iguales
+C 0xA554 anota_yaku_valor: anota el yaku C con valor B en la primera casilla libre de 0xC2E0
+C 0xA563 apunta a las escaleras de la mano (4)
+C 0xA574 cuenta_escaleras: cuenta las escaleras de la lista 0xCD44
+C 0xA57A apunta a las escaleras de la mano (4)
+C 0xA587 mira si hay en la lista de escaleras las que empiezan en +3 y +6 de la primera
+C 0xA5A2 anota_yaku_valor: anota el yaku C con valor B en la primera casilla libre de 0xC2E0
+C 0xA5B4 apunta a las escaleras de la mano (4)
+C 0xA5C9 cuenta_escaleras: cuenta las escaleras de la lista 0xCD44
+C 0xA5CF apunta a las escaleras de la mano (4)
+C 0xA5F3 cuenta en cuantos palos (0x10 de diferencia) esta la escalera de numero E en 0xCD44
+C 0xA5F9 anota el yaku C con valor 2 si la mano es cerrada (+0x40 a cero) y 1 si no
+C 0xA601 apunta a las escaleras de la mano (4)
+C 0xA627 lee la pareja de la mano
+C 0xA62A pone el acarreo si la ficha es de honor o 1 o 9; Z/NZ para 2-8
+C 0xA62E apunta a los grupos de la mano (4)
+C 0xA638 pone el acarreo si la ficha es de honor o 1 o 9; Z/NZ para 2-8
+C 0xA640 apunta a las escaleras de la mano (4)
+C 0xA657 anota el yaku C con valor 2 si la mano es cerrada (+0x40 a cero) y 1 si no
+C 0xA66A cuenta_tripletes: cuenta los tripletes de la lista 0xCD48
+C 0xA66E cuenta_kan: cuenta los kan de la lista 0xCD4C
+C 0xA675 apunta a los grupos de la mano (4)
+C 0xA683 anota_yaku_valor: anota el yaku C con valor B en la primera casilla libre de 0xC2E0
+C 0xA68B lee la ficha robada o tirada
+C 0xA69D lee como se gana la mano: 1 por robo, 2 por la ficha tirada
+C 0xA6AD cuenta_kan: cuenta los kan de la lista 0xCD4C
+C 0xA6B7 anota_yaku_valor: anota el yaku C con valor B en la primera casilla libre de 0xC2E0
+C 0xA6C0 cuenta cuantos grupos de 0xCD95 son de numero (menos de 0x31) y deja sus valores en 0xCC80
+C 0xA6E7 anota_yaku_valor: anota el yaku C con valor B en la primera casilla libre de 0xC2E0
+C 0xA6F0 cuenta cuantos grupos de 0xCD95 son de numero (menos de 0x31) y deja sus valores en 0xCC80
+C 0xA714 suma_a_hl: HL = HL + A
+C 0xA72E anota_yaku_valor: anota el yaku C con valor B en la primera casilla libre de 0xC2E0
+C 0xA757 lee la pareja de la mano
+C 0xA762 suma_a_hl: HL = HL + A
+C 0xA775 anota_yaku_valor: anota el yaku C con valor B en la primera casilla libre de 0xC2E0
+C 0xA779 apunta a los grupos de la mano (4)
+C 0xA793 cuenta_kan: cuenta los kan de la lista 0xCD4C
+C 0xA79A lee la pareja de la mano
+C 0xA79D pone el acarreo si la ficha es de honor o 1 o 9; Z/NZ para 2-8
+C 0xA7A1 apunta a los grupos de la mano (4)
+C 0xA7A9 pone el acarreo si la ficha es de honor o 1 o 9; Z/NZ para 2-8
+C 0xA7B4 anota_yaku_valor: anota el yaku C con valor B en la primera casilla libre de 0xC2E0
+C 0xA7BD apunta a las fichas distintas de la mano
+C 0xA7C9 pone el acarreo si la ficha es de honor o no del palo E
+C 0xA7D0 lee las fichas distintas de la mano
+C 0xA7D6 lee la pareja de la mano
+C 0xA7D9 pone el acarreo si la ficha es de honor o no del palo E
+C 0xA7DD apunta a las escaleras de la mano (4)
+C 0xA7E6 apunta a los grupos de la mano (4)
+C 0xA7EF lee la direccion de la mano que se analiza y el byte siguiente (16 bits)
+C 0xA7FD anota_yaku_valor: anota el yaku C con valor B en la primera casilla libre de 0xC2E0
+C 0xA807 pone el acarreo si la ficha es de honor o no del palo E
+C 0xA822 lee 1 si la mano es de siete parejas
+C 0xA827 lee la pareja de la mano
+C 0xA831 apunta a las escaleras de la mano (4)
+C 0xA845 apunta a los grupos de la mano (4)
+C 0xA868 mira si todas las fichas de 0xCD20 son del mismo palo (Z)
+C 0xA871 lee la direccion de la mano que se analiza y el byte siguiente (16 bits)
+C 0xA881 anota_yaku_valor: anota el yaku C con valor B en la primera casilla libre de 0xC2E0
+C 0xA89D cuenta tambien los indicadores de debajo (urados)
+C 0xA8A0 lee la direccion de la mano que se analiza y el byte siguiente (16 bits)
+C 0xA8AF cuenta cuantas fichas de la mano coinciden con los indicadores de dora (0xC027 = solo el de arriba)
+C 0xA8BA anota_yaku_valor: anota el yaku C con valor B en la primera casilla libre de 0xC2E0
+C 0xA8D1 apunta a la mano de trabajo de 14 fichas ordenada
+C 0xA92F suma_a_hl: HL = HL + A
+C 0xA946 mira si el que gana es el que reparte (0xC0B7): 0xC23D = 0 si lo es, 1 si no
+C 0xA949 lee la lista de yaku de la mano: pares codigo, valor (32 como mucho)
+C 0xA953 lee 1 si la mano es de limite
+C 0xA95A calcula 0xC23C: el limite (5 = yakuman si han >= 0x15; 4 si >= 0x12 (3 si >= 0x10, 2 si >= 8, 1 si 7))
+C 0xA95D escribe los puntos de la mano normal: lineas de texto (0x663B, 0x5AB8): fu, han y total
+C 0xA960 BUSCA EN LA TABLA DE PUNTOS: segun han (0xC237), fu (0xC236), reparto (0xC0B1: robo o ron) y si es el que reparte (0xC23D) mira en las tablas 0xAF5D y 0xB049 los puntos
+C 0xA963 reparte_puntos: reparte los puntos de la mano ganadora
+C 0xA96A puntos de la mano especial: tablas 0xB07D, y suma los honba (0xC239)
+C 0xA96D reparte_puntos: reparte los puntos de la mano ganadora
+C 0xA971 muestra el yaku especial 0x35 (nombre de la tabla 0x6664) y la linea del limite
+C 0xA974 paga el limite especial (0xC238 = 3): reparte lo de la tabla 0xB07D entre los otros
+C 0xA97A guarda los han de la mano (BCD)
+C 0xA97F apunta a la lista de yaku de la mano: pares codigo, valor (32 como mucho)
+C 0xA988 escribe el nombre del yaku A en la linea que toca (0x4F: 0xAB4F) con la tabla de textos 0x6664
+C 0xA98F escribe el valor del yaku (han): con 0xCD00 = 0 los dibuja con 0x5ABF (dos tiles); si no, los suma a 0xC237 sin dibujar
+C 0xA992 apunta a la linea de la lista de yaku que se escribe
+C 0xA9A1 devuelve en A la posicion de linea de la lista de yaku (de 0xC248 y 0xC232)
+C 0xA9AC palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xA9B5 lee 1 si la mano es de limite
+C 0xA9C0 apunta a los han de la mano (BCD)
+C 0xA9C6 devuelve en A la posicion de linea de la lista de yaku (de 0xC248 y 0xC232)
+C 0xA9DD guarda el limite de la mano especial
+C 0xA9E0 apunta a los han de la mano (BCD)
+C 0xA9EE devuelve en A la posicion de linea de la lista de yaku (de 0xC248 y 0xC232)
+C 0xA9FD lee los fu de la mano (nivel)
+C 0xAA12 lee los han de la mano (BCD)
+C 0xAA21 devuelve en A la posicion de linea de la lista de yaku (de 0xC248 y 0xC232)
+C 0xAA36 palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xAA3A devuelve en A la posicion de linea de la lista de yaku (de 0xC248 y 0xC232)
+C 0xAA4B palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xAA57 lee 0 si gana el que reparte, 1 si no
+C 0xAA5D palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xAA60 lee como se gana la mano: 1 por robo, 2 por la ficha tirada
+C 0xAA64 palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xAA67 lee los han de la mano (BCD)
+C 0xAA6D palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xAA70 lee los fu de la mano (nivel)
+C 0xAA74 suma_a_hl: HL = HL + A
+C 0xAA7D guarda lo que paga cada jugador (alto)
+C 0xAA82 guarda lo que paga cada jugador (bajo)
+C 0xAA88 guarda la clase de limite (mangan, haneman...)
+C 0xAA97 palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xAA9A lee como se gana la mano: 1 por robo, 2 por la ficha tirada
+C 0xAA9E palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xAAA1 lee la clase de limite (mangan, haneman...)
+C 0xAAA6 suma_a_hl: HL = HL + A
+C 0xAAB2 palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xAAB5 lee como se gana la mano: 1 por robo, 2 por la ficha tirada
+C 0xAAB9 palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xAABC lee el limite de la mano especial
+C 0xAAC1 suma_a_hl: HL = HL + A
+C 0xAAC6 guarda lo que paga cada jugador (alto)
+C 0xAACC guarda lo que paga cada jugador (bajo)
+C 0xAACF lee el limite de la mano especial
+C 0xAAD7 lee los han de la mano (BCD)
+C 0xAAF3 el ganador cobra los honba de los otros tres
+C 0xAAF6 paga las barras de honba (0xC0B5 x 100): ellos pagan 100 por honba al ganador (0x4A20)
+C 0xAAF9 devuelve en A la posicion de linea de la lista de yaku (de 0xC248 y 0xC232)
+C 0xAB08 dibuja una cifra del pago en DE (ceros por la izquierda, en blanco mientras C = 0)
+C 0xAB0E dibuja una cifra del pago en DE (ceros por la izquierda, en blanco mientras C = 0)
+C 0xAB18 dibuja una cifra del pago en DE (ceros por la izquierda, en blanco mientras C = 0)
+C 0xAB22 dibuja una cifra del pago en DE (ceros por la izquierda, en blanco mientras C = 0)
+C 0xAB26 dibuja una cifra del pago en DE (ceros por la izquierda, en blanco mientras C = 0)
+C 0xAB2A dibuja una cifra del pago en DE (ceros por la izquierda, en blanco mientras C = 0)
+C 0xAB56 suma_a_hl: HL = HL + A
+C 0xAB5A lee la linea de la lista de yaku que se escribe
+C 0xAB70 lee los han de la mano (BCD)
+C 0xAB8D guarda la clase de limite (mangan, haneman...)
+C 0xAB9A lee el jugador que responde a la ficha tirada
+C 0xAB9D apunta a el jugador que reparte (0-3)
+C 0xABA6 guarda 0 si gana el que reparte, 1 si no
+C 0xABAC lee el jugador al que le toca (0 = el humano)
+C 0xABAF apunta a el jugador que reparte (0-3)
+C 0xABB8 guarda 0 si gana el que reparte, 1 si no
+C 0xABC1 lee como se gana la mano: 1 por robo, 2 por la ficha tirada
+C 0xABC9 lee el jugador al que le toca (0 = el humano)
+C 0xABCF palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xABD2 lee las barras de honba (BCD)
+C 0xABD5 convierte el numero BCD de A a binario (decenas x 10 + unidades)
+C 0xABED apunta a el jugador al que le toca (0 = el humano)
+C 0xABF7 palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xABFA lee las barras de honba (BCD)
+C 0xABFD convierte el numero BCD de A a binario (decenas x 10 + unidades)
+C 0xAC18 lee como se gana la mano: 1 por robo, 2 por la ficha tirada
+C 0xAC1E lee el jugador que responde a la ficha tirada
+C 0xAC24 lee el jugador al que le toca (0 = el humano)
+C 0xAC2A palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xAC2D lee las barras de honba (BCD)
+C 0xAC30 convierte el numero BCD de A a binario (decenas x 10 + unidades)
+C 0xAC48 lee como se gana la mano: 1 por robo, 2 por la ficha tirada
+C 0xAC51 hl_mano_de_c20d: H += 4 x 0xC20D (la mano de ese jugador)
+C 0xAC5B lee el jugador que responde a la ficha tirada
+C 0xAC61 lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0xAC6B lee el jugador al que le toca (0 = el humano)
+C 0xAC71 palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xAC74 lee las barras de riichi sobre la mesa (BCD)
+C 0xAC77 convierte el numero BCD de A a binario (decenas x 10 + unidades)
+C 0xAC94 multiplica_b_c: A = B x C
+C 0xACA1 lee lo que paga cada jugador (bajo)
+C 0xACBB lee el jugador al que le toca (0 = el humano)
+C 0xACC1 palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xACC8 lee lo que paga cada jugador (bajo)
+C 0xACCD lee lo que paga cada jugador (alto)
+C 0xACD1 lee el jugador que responde a la ficha tirada
+C 0xACD7 palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xACE0 lee lo que paga cada jugador (bajo)
+C 0xACE8 lee lo que paga cada jugador (alto)
+C 0xACEF dibuja_pago: dibuja el pago de la mano
+C 0xACF3 lee 0 si gana el que reparte, 1 si no
+C 0xACFF apunta a el jugador que reparte (0-3)
+C 0xAD05 apunta a el jugador al que le toca (0 = el humano)
+C 0xAD0E palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xAD15 lee lo que paga cada jugador (bajo)
+C 0xAD1A lee lo que paga cada jugador (alto)
+C 0xAD23 reparte los puntos entre los pagadores: repite B veces (0xC23B, 0xC23A)
+C 0xAD26 lee la clase de limite (mangan, haneman...)
+C 0xAD2C lee 1 si la mano es de limite
+C 0xAD32 lee los han de la mano (BCD)
+C 0xAD3B palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xAD3E lee los fu de la mano (nivel)
+C 0xAD42 suma_a_hl: HL = HL + A
+C 0xAD48 guarda lo que paga cada jugador (alto)
+C 0xAD4D guarda lo que paga cada jugador (bajo)
+C 0xAD50 lee lo que paga cada jugador (bajo)
+C 0xAD54 lee lo que paga cada jugador (alto)
+C 0xAD60 lee el jugador que reparte (0-3)
+C 0xAD66 palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xAD6D lee lo que paga cada jugador (bajo)
+C 0xAD72 lee lo que paga cada jugador (alto)
+C 0xAD76 lee el jugador al que le toca (0 = el humano)
+C 0xAD7C palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xAD8B dibuja_pago: dibuja el pago de la mano
+C 0xAD8F lee lo que paga cada jugador (bajo)
+C 0xAD93 lee lo que paga cada jugador (alto)
+C 0xADA7 apunta a el jugador que reparte (0-3)
+C 0xADB0 palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xADB7 lee lo que paga cada jugador (bajo)
+C 0xADBC lee lo que paga cada jugador (alto)
+C 0xADC5 reparte los puntos entre los pagadores: repite B veces (0xC23B, 0xC23A)
+C 0xADC8 lee el jugador que reparte (0-3)
+C 0xADCE palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xADDD dibuja_pago: dibuja el pago de la mano
+C 0xADF1 palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xAE03 guarda lo que paga cada jugador (bajo)
+C 0xAE06 guarda lo que paga cada jugador (alto)
+C 0xAE18 palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xAE23 dibuja la linea de la lista de yaku y vuelve
+C 0xAE29 guarda el limite de la mano especial
+C 0xAE2C puntos de la mano especial: tablas 0xB07D, y suma los honba (0xC239)
+C 0xAE2F lee 0 si gana el que reparte, 1 si no
+C 0xAE3B apunta a el jugador que reparte (0-3)
+C 0xAE44 palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xAE4A lee lo que paga cada jugador (bajo)
+C 0xAE4F lee lo que paga cada jugador (alto)
+C 0xAE58 reparte los puntos entre los pagadores: repite B veces (0xC23B, 0xC23A)
+C 0xAE5B lee lo que paga cada jugador (bajo)
+C 0xAE5F lee lo que paga cada jugador (alto)
+C 0xAE6B lee lo que paga cada jugador (bajo)
+C 0xAE6F lee lo que paga cada jugador (alto)
+C 0xAE7B lee el jugador que reparte (0-3)
+C 0xAE81 palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xAE88 lee lo que paga cada jugador (bajo)
+C 0xAE8D lee lo que paga cada jugador (alto)
+C 0xAE91 lee como se gana la mano: 1 por robo, 2 por la ficha tirada
+C 0xAE98 lee el jugador que responde a la ficha tirada
+C 0xAE9E lee el jugador al que le toca (0 = el humano)
+C 0xAEA4 palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xAEB6 dibuja el numero del pago (C23F, C240) en la linea E: cinco cifras y dos ceros
+C 0xAEBF apunta a el jugador que reparte (0-3)
+C 0xAEC8 palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xAECE lee lo que paga cada jugador (bajo)
+C 0xAED3 lee lo que paga cada jugador (alto)
+C 0xAEDC reparte los puntos entre los pagadores: repite B veces (0xC23B, 0xC23A)
+C 0xAEDF lee como se gana la mano: 1 por robo, 2 por la ficha tirada
+C 0xAEE6 lee el jugador que responde a la ficha tirada
+C 0xAEEC lee el jugador al que le toca (0 = el humano)
+C 0xAEF2 palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xAF04 dibuja el numero del pago (C23F, C240) en la linea E: cinco cifras y dos ceros
+C 0xAF14 dibuja una cifra del pago con ceros en blanco (0x5AC6)
+C 0xAF1A dibuja una cifra del pago con ceros en blanco (0x5AC6)
+C 0xAF24 dibuja una cifra del pago con ceros en blanco (0x5AC6)
+C 0xAF2E dibuja una cifra del pago con ceros en blanco (0x5AC6)
+C 0xAF32 dibuja una cifra del pago con ceros en blanco (0x5AC6)
+C 0xAF36 dibuja una cifra del pago con ceros en blanco (0x5AC6)
+C 0xB0DF despacha: salta a la palabra A de la tabla que va detras del call
+C 0xB0F4 guarda el temporizador de espera entre pasos
+C 0xB10C lee cuantos yaku hay en la lista
+C 0xB114 carga otra imagen de los bancos 10-11 (p00:56DF)
+C 0xB129 copia la paleta de 0xB241 (32 bytes) a 0xC200 y la aplica
+C 0xB12C pide_orden_81: pide la orden 0x81 del motor de sonido (ritmo)
+C 0xB137 lee cuantos yaku hay en la lista
+C 0xB14C guarda 1 cuando la partida esta lista
+C 0xB153 apunta a contador de trabajo de las fichas de la mano
+C 0xB161 apunta a la X de la ficha en la hoja de tiles
+C 0xB175 guarda el tiempo que queda de la cara que habla
+C 0xB17D guarda cuantos yaku hay en la lista
+C 0xB184 pone 0xC248 a cero cuando la paleta ya es igual a la de destino (0xB241)
+C 0xB188 cada 0x0F cuadros baja un nivel cada canal de los 16 colores de 0xC200 hacia cero
+C 0xB18B pone 0xC248 a cero cuando los 32 bytes de la paleta ya valen cero
+C 0xB197 apunta a contador de trabajo de las fichas de la mano
+C 0xB1D2 escribe en el VDP los 16 colores de 0xC200 (4EB2)
+C 0xB1DE apunta a contador de trabajo de las fichas de la mano
+C 0xB201 escribe en el VDP los 16 colores de 0xC200 (4EB2)
+C 0xB20F pon_color: escribe el color D,E en la paleta A
+C 0xB21D apunta a contador de trabajo de las fichas de la mano
+C 0xB226 apunta a cuantos yaku hay en la lista
+C 0xB231 apunta a contador de trabajo de las fichas de la mano
+C 0xB23B apunta a cuantos yaku hay en la lista
+C 0xB28F despacha: salta a la palabra A de la tabla que va detras del call
+C 0xB2A4 despacha: salta a la palabra A de la tabla que va detras del call
+C 0xB2B3 apunta a la tabla de atributos de los sprites (32 de 4 bytes)
+C 0xB2BE apunta a los colores de los sprites (4 bloques de 16)
+C 0xB2D2 apunta a la tabla de atributos de los sprites (32 de 4 bytes)
+C 0xB2D7 recorre B sprites del bloque (de 4 en 4 bytes) poniendoles el numero A
+C 0xB2DD HL = tabla de la estrella del paso 0xC24E (0xB347)
+C 0xB303 dibuja_tile: dibuja el tile A de 8 x 8 en D,E
+C 0xB355 despacha: salta a la palabra A de la tabla que va detras del call
+C 0xB35E lee el siguiente movimiento de la lista 0xB3A2 + 0xC24E: cuadros y desplazamiento X e Y
+C 0xB37F palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xB388 A = byte A de la tabla HL
+C 0xB409 quita_sprites: pone todos los sprites fuera de pantalla
+C 0xB415 despacha: salta a la palabra A de la tabla que va detras del call
+C 0xB425 palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xB42E palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xB436 vdp_copia: HMMM: copia un rectangulo de la VRAM (origen HL, destino DE, tamano BC, A = paginas)
+C 0xB462 palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xB470 dibuja un marco de tiles 0x14..0x1B con esquinas (para la ventana con borde de dibujo)
+C 0xB47E rectangulo de la ventana (0x142C) borrado y ventana nueva de 10 x 8
+C 0xB485 palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xB488 dibuja_lista_tiles: dibuja una lista de tiles de HL (x, y, tiles; 0xFF acaba)
+C 0xB49C vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0xB4A5 ventana: dibuja una ventana con marco (H = ancho, L = alto, DE = esquina)
+C 0xB4AD rellena de ceros el rectangulo 0x1830 de 64 x 48 (borra la ventana)
+C 0xB4BB dibuja_tile: dibuja el tile A de 8 x 8 en D,E
+C 0xB4CA dibuja_tile: dibuja el tile A de 8 x 8 en D,E
+C 0xB4D7 dibuja_tile: dibuja el tile A de 8 x 8 en D,E
+C 0xB4E6 dibuja_tile: dibuja el tile A de 8 x 8 en D,E
+C 0xB4F3 dibuja_tile: dibuja el tile A de 8 x 8 en D,E
+C 0xB502 dibuja_tile: dibuja el tile A de 8 x 8 en D,E
+C 0xB50F dibuja_tile: dibuja el tile A de 8 x 8 en D,E
+C 0xB520 dibuja_tile: dibuja el tile A de 8 x 8 en D,E
+C 0xB531 vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0xB6A8 quita_sprites: pone todos los sprites fuera de pantalla
+C 0xB6B6 A = el byte A de la tabla HL
+C 0xB6BC suma_a_hl: HL = HL + A
+C 0xB6C8 apunta a el personaje que se sienta en cada sitio (4 bytes)
+C 0xB6CB suma_a_hl: HL = HL + A
+C 0xB6D4 lee el jugador al que le toca (0 = el humano)
+C 0xB6E3 un paso de este rival: 0xC27F += 1, mueve su cara con 0xB87A, 0xBCF4, 0xBD5E, 0xBEF9 y 0xBA72; (ix+0) elige por la tabla de 0xB7A7
+C 0xB6FF palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xB705 A = el byte A de la tabla HL
+C 0xB78F pone en (ix+5, ix+6) la posicion de la cara de este rival (tabla 0xB88E)
+C 0xB792 solo en los cuadros pares y si no es el humano
+C 0xB795 gesto del personaje 1 (parpadeo): tabla 0xBD84
+C 0xB798 gestos del personaje 8: 0xC300 elige el paso por la tabla de 0xBF15
+C 0xB79B copia los colores de los sprites: a cada sprite de 0xCC00 le pone color 0 si su Y es 0xE0
+C 0xB7A4 despacha: salta a la palabra A de la tabla que va detras del call
+C 0xB7AF quita_sprites: pone todos los sprites fuera de pantalla
+C 0xB7BE pone en (ix+5, ix+6) la posicion de la cara de este rival (tabla 0xB88E)
+C 0xB7D0 palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xB7D3 dibuja un dibujo de tiles de HL (X, Y, tiles... 0xFE = nueva linea, 0xFF = acaba) con la posicion de (ix+5, ix+6)
+C 0xB7DC si es el rival 1 del personaje 1 el gesto dura 2 (si no 8)
+C 0xB7F6 baja el temporizador (ix+3)
+C 0xB7FF pone en (ix+5, ix+6) la posicion de la cara de este rival (tabla 0xB88E)
+C 0xB811 A = el byte A de la tabla HL
+C 0xB81B sonido y boca por el codigo del personaje: tabla 0xBABF
+C 0xB81E pone en (ix+3) el tiempo que dura el cuadro de esta cara (tabla 0xB70E o 0xB720)
+C 0xB833 dibuja el gesto de la tabla 0xBCD6 segun el cuadro (ix+1)
+C 0xB83C pone en (ix+3) el tiempo que dura el cuadro de esta cara (tabla 0xB70E o 0xB720)
+C 0xB85E pinta un tile (0x53DE) de 8 x 8 desde la pagina 1 a la pagina 0
+C 0xB86B origen_tile: HL = el origen en la hoja de tiles del tile A
+C 0xB873 vdp_copia: HMMM: copia un rectangulo de la VRAM (origen HL, destino DE, tamano BC, A = paginas)
+C 0xB881 suma_a_hl: HL = HL + A
+C 0xBA75 apunta a los colores de los sprites (4 bloques de 16)
+C 0xBA96 A = el byte A de la tabla HL
+C 0xBA99 apunta a la tabla de atributos de los sprites (32 de 4 bytes)
+C 0xBA9C suma_a_hl: HL = HL + A
+C 0xBABC despacha: salta a la palabra A de la tabla que va detras del call
+C 0xBAE8 si lleva 4 cuadros o mas pone la cara de 0x661D (el cuadro de personaje) en su sitio
+C 0xBAF1 palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xBAF4 DE = el sprite de la cara del personaje 0xC275 (tabla 0xBAA2)
+C 0xBB20 si lleva 4 cuadros o mas pone la cara de 0x661D (el cuadro de personaje) en su sitio
+C 0xBB32 si lleva 4 cuadros o mas pone la cara de 0x661D (el cuadro de personaje) en su sitio
+C 0xBB3A si lleva 4 cuadros o mas pone la cara de 0x661D (el cuadro de personaje) en su sitio
+C 0xBB3E si la cara lleva menos de 2 cuadros pone la cabeza de 0xBA5B
+C 0xBCAF dibuja un dibujo de tiles de HL (X, Y, tiles... 0xFE = nueva linea, 0xFF = acaba) con la posicion de (ix+5, ix+6)
+C 0xBCC5 dibuja_cara: dibuja la cara de 48 x 48 del personaje A
+C 0xBCCF palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xBCD2 dibuja un dibujo de tiles de HL (X, Y, tiles... 0xFE = nueva linea, 0xFF = acaba) con la posicion de (ix+5, ix+6)
+C 0xBD2A palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xBD2D DE = el sprite de la cara del personaje 0xC275 (tabla 0xBAA2)
+C 0xBD30 un sprite del cuadro de la cara: Y, X, patron y color
+C 0xBD7D DE = el sprite de la cara del personaje 0xC275 (tabla 0xBAA2)
+C 0xBD80 un sprite del cuadro de la cara: Y, X, patron y color
+C 0xBE35 pone en (ix+5, ix+6) la posicion de la cara de este rival (tabla 0xB88E)
+C 0xBE38 lee el contador de cuadros
+C 0xBE44 despacha: salta a la palabra A de la tabla que va detras del call
+C 0xBE5F DE = el sprite de la cara del personaje 0xC275 (tabla 0xBAA2)
+C 0xBE62 un sprite del cuadro de la cara: Y, X, patron y color
+C 0xBE71 mueve la cara de 0xBEE8 en dos sprites
+C 0xBE74 baja el temporizador (ix+3)
+C 0xBE7F mueve la cara de 0xBEE8 en dos sprites
+C 0xBE82 baja el temporizador (ix+3)
+C 0xBE97 baja el temporizador (ix+3)
+C 0xBEAC baja el temporizador (ix+3)
+C 0xBEB8 baja el temporizador (ix+3)
+C 0xBEBC si lleva 4 cuadros o mas pone la cara de 0x661D (el cuadro de personaje) en su sitio
+C 0xBED0 A = el byte A de la tabla HL
+C 0xBF09 pone en (ix+5, ix+6) la posicion de la cara de este rival (tabla 0xB88E)
+C 0xBF12 despacha: salta a la palabra A de la tabla que va detras del call
+C 0xBF1F pone 0xC301 con el tiempo del paso (tabla 0xBF46)
+C 0xBF22 dibuja el gesto 0xC300 (tabla 0xBF5B)
+C 0xBF2A baja el contador 0xC301
+C 0xBF30 baja el contador 0xC301
+C 0xBF3F A = el byte A de la tabla HL
+C 0xBF51 palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0xBF54 DE = el sprite de la cara del personaje 0xC275 (tabla 0xBAA2)
+C 0xBF57 un sprite del cuadro de la cara: Y, X, patron y color
+# --- fin de las anotaciones de anota.py ---

@@ -1,0 +1,105 @@
+# Puntos de entrada del banco 4 (se ejecuta en 0xa000).
+#
+# Cada uno lleva la instruccion que lo justifica. Los que ponen "pNN:XXXX"
+# vienen de OTRO banco: el trazador de una sola pagina no puede seguirlos,
+# porque en esa direccion -segun lo que haya en el registro del mapper- puede
+# estar cualquiera de seis bancos. Los que ponen "tabla" salen de una tabla
+# del despachador (cartucho.DESPACHADOR), que va pegada detras de su `call` y esta declarada
+# como datos en el .nocode: el trazador tampoco puede seguirla.
+#
+# Los saltos y llamadas DENTRO del propio banco no se ponen aqui: los
+# encuentra tools/z80trace.py solo, siguiendo el flujo.
+#
+# Este fichero lo regenera `make semillas` (tools/bancos.py escribe).
+0xA000   # comprobacion de la tabla p01:71A5 (call 0x4067 en p01:6D2D, banco 4 en 0xA000), entrada 3
+0xA02C   # comprobacion de la tabla p01:71A5 (call 0x4067 en p01:6D2D, banco 4 en 0xA000), entrada 6
+0xA05D   # comprobacion de la tabla p01:71A5 (call 0x4067 en p01:6D2D, banco 4 en 0xA000), entrada 7
+0xA08A   # comprobacion de la tabla p01:71A5 (call 0x4067 en p01:6D2D, banco 4 en 0xA000), entrada 9
+0xA0C5   # comprobacion de la tabla p01:71A5 (call 0x4067 en p01:6D2D, banco 4 en 0xA000), entrada 10
+0xA0F8   # comprobacion de la tabla p01:71A5 (call 0x4067 en p01:6D2D, banco 4 en 0xA000), entrada 11
+0xA157   # comprobacion de la tabla p01:71A5 (call 0x4067 en p01:6D2D, banco 4 en 0xA000), entrada 12
+0xA19D   # comprobacion de la tabla p01:71A5 (call 0x4067 en p01:6D2D, banco 4 en 0xA000), entrada 14
+0xA1C8   # comprobacion de yaku 29 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+0xA1D9   # comprobacion de yaku 30 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+0xA1F4   # comprobacion de yaku 31 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+0xA212   # comprobacion de la tabla p01:71A5 (call 0x4067 en p01:6D2D, banco 4 en 0xA000), entrada 16
+0xA24F   # comprobacion de la tabla p01:71A5 (call 0x4067 en p01:6D2D, banco 4 en 0xA000), entrada 17
+0xA280   # comprobacion de la tabla p01:71A5 (call 0x4067 en p01:6D2D, banco 4 en 0xA000), entrada 4
+0xA2A6   # comprobacion de la tabla p01:71A5 (call 0x4067 en p01:6D2D, banco 4 en 0xA000), entrada 15
+0xA2BE   # comprobacion de la tabla p01:71A5 (call 0x4067 en p01:6D2D, banco 4 en 0xA000), entrada 8
+0xA2DF   # comprobacion de la tabla p01:71A5 (call 0x4067 en p01:6D2D, banco 4 en 0xA000), entrada 13
+0xA325   # comprobacion de yaku 3 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+0xA350   # comprobacion de yaku 2 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+0xA37E   # comprobacion de yaku 0 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+0xA3AD   # comprobacion de yaku 12 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+0xA411   # comprobacion de yaku 4 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+0xA431   # comprobacion de yaku 13 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+0xA45F   # comprobacion de yaku 11 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+0xA48A   # comprobacion de yaku 14 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+0xA4BE   # comprobacion de yaku 7 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+0xA4D0   # comprobacion de yaku 5 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+0xA4E7   # comprobacion de yaku 6 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+0xA4F3   # comprobacion de yaku 8 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+0xA506   # comprobacion de yaku 1 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+0xA526   # comprobacion de yaku 15 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+0xA53E   # comprobacion de yaku 9 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+0xA56F   # comprobacion de yaku 16 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+0xA5C4   # comprobacion de yaku 17 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+0xA61D   # comprobacion de yaku 19 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+0xA665   # comprobacion de yaku 20 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+0xA6A8   # comprobacion de yaku 21 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+0xA6BB   # comprobacion de yaku 22 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+0xA6EB   # comprobacion de yaku 23 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+0xA752   # comprobacion de yaku 24 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+0xA78F   # comprobacion de yaku 25 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+0xA7B8   # comprobacion de yaku 26 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+0xA81E   # comprobacion de yaku 18 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+0xA864   # comprobacion de yaku 27 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+0xA897   # comprobacion de yaku 28 de la tabla p01:716B (call 0x4067 en p01:6CF8, banco 4 en 0xA000)
+0xA943   # p00:45A8 call
+0xB0D9   # p00:42F3 call
+0xB0EC   # p04:B0DF entrada 0 de la tabla de 0xB0E2 (call 0x4066 en 0xB0DF)
+0xB109   # p04:B0DF entrada 1 de la tabla de 0xB0E2 (call 0x4066 en 0xB0DF)
+0xB11C   # p04:B0DF entrada 2 de la tabla de 0xB0E2 (call 0x4066 en 0xB0DF)
+0xB134   # p04:B0DF entrada 3 de la tabla de 0xB0E2 (call 0x4066 en 0xB0DF)
+0xB146   # p04:B0DF entrada 4 de la tabla de 0xB0E2 (call 0x4066 en 0xB0DF)
+0xB29C   # p04:B28F entrada 0 de la tabla de 0xB292 (call 0x4066 en 0xB28F)
+0xB29E   # p04:B28F entrada 1 de la tabla de 0xB292 (call 0x4066 en 0xB28F)
+0xB2AD   # p04:B2A4 entrada 0 de la tabla de 0xB2A7 (call 0x4066 en 0xB2A4)
+0xB34F   # p04:B2A4 entrada 1 de la tabla de 0xB2A7 (call 0x4066 en 0xB2A4)
+0xB35E   # p04:B355 entrada 0 de la tabla de 0xB358 (call 0x4066 en 0xB355)
+0xB366   # p04:B355 entrada 1 de la tabla de 0xB358 (call 0x4066 en 0xB355)
+0xB373   # p04:B355 entrada 2 de la tabla de 0xB358 (call 0x4066 en 0xB355)
+0xB409   # p04:B2A4 entrada 2 de la tabla de 0xB2A7 (call 0x4066 en 0xB2A4)
+0xB40F   # p04:B28F entrada 2 de la tabla de 0xB292 (call 0x4066 en 0xB28F)
+0xB41E   # p04:B415 entrada 0 de la tabla de 0xB418 (call 0x4066 en 0xB415)
+0xB45C   # p04:B415 entrada 1 de la tabla de 0xB418 (call 0x4066 en 0xB415)
+0xB476   # p04:B415 entrada 2 de la tabla de 0xB418 (call 0x4066 en 0xB415)
+0xB479   # p04:B28F entrada 3 de la tabla de 0xB292 (call 0x4066 en 0xB28F)
+0xB4A8   # p04:B28F entrada 4 de la tabla de 0xB292 (call 0x4066 en 0xB28F)
+0xB691   # codigo huerfano: 4 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0xB691
+0xB695   # p00:4798 call
+0xB6AC   # p00:47AA call
+0xB7AF   # p04:B7A4 entrada 0 de la tabla de 0xB7A7 (call 0x4066 en 0xB7A4)
+0xB7BA   # p04:B7A4 entrada 1 de la tabla de 0xB7A7 (call 0x4066 en 0xB7A4)
+0xB7F3   # p04:B7A4 entrada 2 de la tabla de 0xB7A7 (call 0x4066 en 0xB7A4)
+0xB838   # p04:B7A4 entrada 3 de la tabla de 0xB7A7 (call 0x4066 en 0xB7A4)
+0xBAE3   # p04:BABC entrada 13 de la tabla de 0xBABF (call 0x4066 en 0xBABC)
+0xBAE8   # p04:BABC entrada 5 de la tabla de 0xBABF (call 0x4066 en 0xBABC)
+0xBB1B   # p04:BABC entrada 7 de la tabla de 0xBABF (call 0x4066 en 0xBABC)
+0xBB20   # p04:BABC entrada 12 de la tabla de 0xBABF (call 0x4066 en 0xBABC)
+0xBB28   # p04:BABC entrada 4 de la tabla de 0xBABF (call 0x4066 en 0xBABC)
+0xBB2D   # p04:BABC entrada 10 de la tabla de 0xBABF (call 0x4066 en 0xBABC)
+0xBB32   # p04:BABC entrada 3 de la tabla de 0xBABF (call 0x4066 en 0xBABC)
+0xBB3A   # p04:BABC entrada 1 de la tabla de 0xBABF (call 0x4066 en 0xBABC)
+0xBB3D   # p04:BABC entrada 0 de la tabla de 0xBABF (call 0x4066 en 0xBABC)
+0xBB3E   # p04:BABC entrada 8 de la tabla de 0xBABF (call 0x4066 en 0xBABC)
+0xBE57   # p04:BE44 entrada 0 de la tabla de 0xBE47 (call 0x4066 en 0xBE44)
+0xBE71   # p04:BE44 entrada 1 de la tabla de 0xBE47 (call 0x4066 en 0xBE44)
+0xBE7F   # p04:BE44 entrada 4 de la tabla de 0xBE47 (call 0x4066 en 0xBE44)
+0xBE97   # p04:BE44 entrada 5 de la tabla de 0xBE47 (call 0x4066 en 0xBE44)
+0xBEAC   # p04:BE44 entrada 6 de la tabla de 0xBE47 (call 0x4066 en 0xBE44)
+0xBEB8   # p04:BE44 entrada 7 de la tabla de 0xBE47 (call 0x4066 en 0xBE44)
+0xBF1F   # p04:BF12 entrada 0 de la tabla de 0xBF15 (call 0x4066 en 0xBF12)
+0xBF2A   # p04:BF12 entrada 1 de la tabla de 0xBF15 (call 0x4066 en 0xBF12)
+0xBF30   # p04:BF12 entrada 4 de la tabla de 0xBF15 (call 0x4066 en 0xBF12)

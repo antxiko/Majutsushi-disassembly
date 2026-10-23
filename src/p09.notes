@@ -1,0 +1,71 @@
+
+# --- BLOQUES QUE LEE EL CODIGO (seccion que reescribe tools/bloques.py; no editar a mano) ---
+D 0xA000 0xA319 tiles_9FB9_cola  los dibujos de 36 tiles de una entrada de la imagen 8225 de p00:5911: 24 por tile, tiles de 3 bits por punto (p00:5949) (sigue del banco 8); lo leen p00:5720 (793 bytes)
+F 0xA000 24
+D 0xA319 0xA661 tiles_A319  los dibujos de 35 tiles de una entrada de la imagen 8225 de p00:5911: 24 por tile, tiles de 3 bits por punto (p00:5949); lo leen p00:5720 (840 bytes)
+F 0xA319 24
+D 0xA661 0xA709 tiles_A661  los dibujos de 7 tiles de una entrada de la imagen 8225 de p00:5911: 24 por tile, tiles de 3 bits por punto (p00:5949); lo leen p00:5720 (168 bytes)
+F 0xA661 24
+D 0xA709 0xA721 tiles_A709  los dibujos de 1 tiles de una entrada de la imagen 8225 de p00:5911: 24 por tile, tiles de 3 bits por punto (p00:5949); lo leen p00:5720 (24 bytes)
+F 0xA709 24
+D 0xA721 0xA731 tiles_A721  los dibujos de 2 tiles de una entrada de la imagen 82AA de p00:5911: 8 por tile, tiles de 1 bits por punto (p00:5949); lo leen p00:5733 (16 bytes)
+F 0xA721 8
+D 0xA731 0xA741 tiles_A731  los dibujos de 2 tiles de una entrada de la imagen 82AA de p00:5911: 8 por tile, tiles de 1 bits por punto (p00:5949); lo leen p00:5733 (16 bytes)
+F 0xA731 8
+D 0xA741 0xA781 tiles_A741  los dibujos de 8 tiles de una entrada de la imagen 82AA de p00:5911: 8 por tile, tiles de 1 bits por punto (p00:5949); lo leen p00:5733 (64 bytes)
+F 0xA741 8
+D 0xA781 0xA789 tiles_A781  los dibujos de 1 tiles de una entrada de la imagen 82AA de p00:5911: 8 por tile, tiles de 1 bits por punto (p00:5949); lo leen p00:5733 (8 bytes)
+F 0xA781 8
+D 0xA789 0xA7D9 tiles_A789  los dibujos de 5 tiles de una entrada de la imagen 82AA de p00:5911: 16 por tile, tiles de 2 bits por punto (p00:5949); lo leen p00:5733 (80 bytes)
+F 0xA789 16
+D 0xA7D9 0xAAB9 tiles_A7D9  los dibujos de 46 tiles de una entrada de la imagen 82AA de p00:5911: 16 por tile, tiles de 2 bits por punto (p00:5949); lo leen p00:5733 (736 bytes)
+F 0xA7D9 16
+D 0xAAB9 0xAB49 tiles_AAB9  los dibujos de 9 tiles de una entrada de la imagen 82AA de p00:5911: 16 por tile, tiles de 2 bits por punto (p00:5949); lo leen p00:5733 (144 bytes)
+F 0xAAB9 16
+D 0xAB49 0xABA9 tiles_AB49  los dibujos de 6 tiles de una entrada de la imagen 82AA de p00:5911: 16 por tile, tiles de 2 bits por punto (p00:5949); lo leen p00:5733 (96 bytes)
+F 0xAB49 16
+D 0xABA9 0xAC59 tiles_ABA9  los dibujos de 11 tiles de una entrada de la imagen 82AA de p00:5911: 16 por tile, tiles de 2 bits por punto (p00:5949); lo leen p00:5733 (176 bytes)
+F 0xABA9 16
+D 0xAC59 0xAC89 tiles_AC59  los dibujos de 3 tiles de una entrada de la imagen 82AA de p00:5911: 16 por tile, tiles de 2 bits por punto (p00:5949); lo leen p00:5733 (48 bytes)
+F 0xAC59 16
+D 0xAC89 0xACC9 tiles_AC89  los dibujos de 4 tiles de una entrada de la imagen 82AA de p00:5911: 16 por tile, tiles de 2 bits por punto (p00:5949); lo leen p00:5733 (64 bytes)
+F 0xAC89 16
+D 0xACC9 0xAD19 tiles_ACC9  los dibujos de 5 tiles de una entrada de la imagen 82AA de p00:5911: 16 por tile, tiles de 2 bits por punto (p00:5949); lo leen p00:5733 (80 bytes)
+F 0xACC9 16
+D 0xAD19 0xAD29 tiles_AD19  los dibujos de 1 tiles de una entrada de la imagen 82AA de p00:5911: 16 por tile, tiles de 2 bits por punto (p00:5949); lo leen p00:5733 (16 bytes)
+F 0xAD19 16
+D 0xAD29 0xAD39 tiles_AD29  los dibujos de 1 tiles de una entrada de la imagen 82AA de p00:5911: 16 por tile, tiles de 2 bits por punto (p00:5949); lo leen p00:5733 (16 bytes)
+F 0xAD29 16
+D 0xAD39 0xAD49 tiles_AD39  los dibujos de 1 tiles de una entrada de la imagen 82AA de p00:5911: 16 por tile, tiles de 2 bits por punto (p00:5949); lo leen p00:5733 (16 bytes)
+F 0xAD39 16
+D 0xAD49 0xAD59 tiles_AD49  los dibujos de 1 tiles de una entrada de la imagen 82AA de p00:5911: 16 por tile, tiles de 2 bits por punto (p00:5949); lo leen p00:5733 (16 bytes)
+F 0xAD49 16
+D 0xAD59 0xAD79 tiles_AD59  los dibujos de 2 tiles de una entrada de la imagen 82AA de p00:5911: 16 por tile, tiles de 2 bits por punto (p00:5949); lo leen p00:5733 (32 bytes)
+F 0xAD59 16
+D 0xAD79 0xB121 tiles_AD79  los dibujos de 39 tiles de una entrada de la imagen 82AA de p00:5911: 24 por tile, tiles de 3 bits por punto (p00:5949); lo leen p00:5733 (936 bytes)
+F 0xAD79 24
+D 0xB121 0xB451 tiles_B121  los dibujos de 34 tiles de una entrada de la imagen 82AA de p00:5911: 24 por tile, tiles de 3 bits por punto (p00:5949); lo leen p00:5733 (816 bytes)
+F 0xB121 24
+D 0xB451 0xB4E1 tiles_B451  los dibujos de 6 tiles de una entrada de la imagen 82AA de p00:5911: 24 por tile, tiles de 3 bits por punto (p00:5949); lo leen p00:5733 (144 bytes)
+F 0xB451 24
+D 0xB4E1 0xB4F9 tiles_B4E1  los dibujos de 1 tiles de una entrada de la imagen 82AA de p00:5911: 24 por tile, tiles de 3 bits por punto (p00:5949); lo leen p00:5733 (24 bytes)
+F 0xB4E1 24
+D 0xB4F9 0xB636 dialogo_B4F9  el texto de un cuadro de dialogo (p00:576A): letras de 3 x 3 tiles, 0xFE linea nueva, 0xFF acaba; lo leen p00:5746 (317 bytes)
+F 0xB4F9 16
+D 0xB636 0xB773 dialogo_B636  el texto de un cuadro de dialogo (p00:576A): letras de 3 x 3 tiles, 0xFE linea nueva, 0xFF acaba; lo leen p00:570E (317 bytes)
+F 0xB636 16
+D 0xB773 0xB8D5 dialogo_B773  el texto de un cuadro de dialogo (p00:576A): letras de 5 x 2 tiles, 0xFE linea nueva, 0xFF acaba; lo leen p00:5720 (354 bytes)
+F 0xB773 16
+D 0xB8D5 0xBA37 dialogo_B8D5  el texto de un cuadro de dialogo (p00:576A): letras de 5 x 2 tiles, 0xFE linea nueva, 0xFF acaba; lo leen p00:5733 (354 bytes)
+F 0xB8D5 16
+D 0xBA37 0xBC02 bloques_BA37  lista de tiles (p00:58C5): X, Y y bloques (bit 7: n tiles seguidos; si no, un tile repetido n veces), 0xFF acaba; lo leen p00:583A (459 bytes)
+F 0xBA37 16
+D 0xBC02 0xBD32 bloques_BC02  lista de tiles (p00:58C5): X, Y y bloques (bit 7: n tiles seguidos; si no, un tile repetido n veces), 0xFF acaba; lo leen p00:582E (304 bytes)
+F 0xBC02 16
+D 0xBD32 0xBE87 bloques_BD32  lista de tiles (p00:58C5): X, Y y bloques (bit 7: n tiles seguidos; si no, un tile repetido n veces), 0xFF acaba; lo leen p00:5822 (341 bytes)
+F 0xBD32 16
+D 0xBE87 0xBF5E bloques_BE87  lista de tiles (p00:58C5): X, Y y bloques (bit 7: n tiles seguidos; si no, un tile repetido n veces), 0xFF acaba; lo leen p00:5846 (215 bytes)
+F 0xBE87 16
+D 0xBF5E 0xC000 relleno_ff  162 bytes a 0xFF hasta el final del banco: relleno; lo leen nadie (162 bytes)
+F 0xBF5E 16
+# --- fin de los bloques de bloques.py ---

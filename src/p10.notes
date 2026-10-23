@@ -1,0 +1,155 @@
+
+# --- BLOQUES QUE LEE EL CODIGO (seccion que reescribe tools/bloques.py; no editar a mano) ---
+D 0x8000 0x8022 paletas_8000  las 17 palabras que apuntan a las paletas de la imagen 806C (p00:5911: palabra A de la tabla); lo leen p00:56D0 (34 bytes)
+F 0x8000 w8
+D 0x8022 0x8024 paleta_8022  la paleta 0 de la imagen 806C: 2 bytes de colores que se copian a 0xE800 (p00:592F) (ninguna entrada de la lista la pide: su tamano es hasta la siguiente); lo leen p00:56D0 (2 bytes)
+F 0x8022 2
+D 0x8024 0x8028 paleta_8024  la paleta 1 de la imagen 806C: 4 bytes de colores que se copian a 0xE800 (p00:592F) (ninguna entrada de la lista la pide: su tamano es hasta la siguiente); lo leen p00:56D0 (4 bytes)
+F 0x8024 4
+D 0x8028 0x802A paleta_8028  la paleta 2 de la imagen 806C: 2 bytes de colores que se copian a 0xE800 (p00:592F); lo leen p00:56D0 (2 bytes)
+F 0x8028 2
+D 0x802A 0x802E paleta_802A  la paleta 3 de la imagen 806C: 4 bytes de colores que se copian a 0xE800 (p00:592F); lo leen p00:56D0 (4 bytes)
+F 0x802A 4
+D 0x802E 0x8032 paleta_802E  la paleta 4 de la imagen 806C: 4 bytes de colores que se copian a 0xE800 (p00:592F); lo leen p00:56D0 (4 bytes)
+F 0x802E 4
+D 0x8032 0x803A paleta_8032  la paleta 5 de la imagen 806C: 8 bytes de colores que se copian a 0xE800 (p00:592F); lo leen p00:56D0 (8 bytes)
+F 0x8032 8
+D 0x803A 0x803C paleta_803A  la paleta 6 de la imagen 806C: 2 bytes de colores que se copian a 0xE800 (p00:592F); lo leen p00:56D0 (2 bytes)
+F 0x803A 2
+D 0x803C 0x8040 paleta_803C  la paleta 7 de la imagen 806C: 4 bytes de colores que se copian a 0xE800 (p00:592F); lo leen p00:56D0 (4 bytes)
+F 0x803C 4
+D 0x8040 0x8042 paleta_8040  la paleta 8 de la imagen 806C: 2 bytes de colores que se copian a 0xE800 (p00:592F); lo leen p00:56D0 (2 bytes)
+F 0x8040 2
+D 0x8042 0x8046 paleta_8042  la paleta 9 de la imagen 806C: 4 bytes de colores que se copian a 0xE800 (p00:592F); lo leen p00:56D0 (4 bytes)
+F 0x8042 4
+D 0x8046 0x804E paleta_8046  la paleta 10 de la imagen 806C: 8 bytes de colores que se copian a 0xE800 (p00:592F); lo leen p00:56D0 (8 bytes)
+F 0x8046 8
+D 0x804E 0x8052 paleta_804E  la paleta 11 de la imagen 806C: 4 bytes de colores que se copian a 0xE800 (p00:592F); lo leen p00:56D0 (4 bytes)
+F 0x804E 4
+D 0x8052 0x805A paleta_8052  la paleta 12 de la imagen 806C: 8 bytes de colores que se copian a 0xE800 (p00:592F); lo leen p00:56D0 (8 bytes)
+F 0x8052 8
+D 0x805A 0x805E paleta_805A  la paleta 13 de la imagen 806C: 4 bytes de colores que se copian a 0xE800 (p00:592F); lo leen p00:56D0 (4 bytes)
+F 0x805A 4
+D 0x805E 0x8060 paleta_805E  la paleta 14 de la imagen 806C: 2 bytes de colores que se copian a 0xE800 (p00:592F); lo leen p00:56D0 (2 bytes)
+F 0x805E 2
+D 0x8060 0x8064 paleta_8060  la paleta 15 de la imagen 806C: 4 bytes de colores que se copian a 0xE800 (p00:592F); lo leen p00:56D0 (4 bytes)
+F 0x8060 4
+D 0x8064 0x806C paleta_8064  la paleta 16 de la imagen 806C: 8 bytes de colores que se copian a 0xE800 (p00:592F); lo leen p00:56D0 (8 bytes)
+F 0x8064 8
+D 0x806C 0x80D3 imagen_806C  lista de la imagen de p00:5911: entradas de 6 bytes (formato, numero de paleta, tile destino, cuantos tiles, puntero a sus dibujos) y 0xFF; lo leen p00:56D0 (103 bytes)
+F 0x806C 6
+D 0x80D3 0x80DB tiles_80D3  los dibujos de 1 tiles de una entrada de la imagen 806C de p00:5911: 8 por tile, tiles de 1 bits por punto (p00:5949); lo leen p00:56D0 (8 bytes)
+F 0x80D3 8
+D 0x80DB 0x80FB tiles_80DB  los dibujos de 2 tiles de una entrada de la imagen 806C de p00:5911: 16 por tile, tiles de 2 bits por punto (p00:5949); lo leen p00:56D0 (32 bytes)
+F 0x80DB 16
+D 0x80FB 0x815B tiles_80FB  los dibujos de 4 tiles de una entrada de la imagen 806C de p00:5911: 24 por tile, tiles de 3 bits por punto (p00:5949); lo leen p00:56D0 (96 bytes)
+F 0x80FB 24
+D 0x815B 0x8163 tiles_815B  los dibujos de 1 tiles de una entrada de la imagen 806C de p00:5911: 8 por tile, tiles de 1 bits por punto (p00:5949); lo leen p00:56D0 (8 bytes)
+F 0x815B 8
+D 0x8163 0x8173 tiles_8163  los dibujos de 1 tiles de una entrada de la imagen 806C de p00:5911: 16 por tile, tiles de 2 bits por punto (p00:5949); lo leen p00:56D0 (16 bytes)
+F 0x8163 16
+D 0x8173 0x8193 tiles_8173  los dibujos de 2 tiles de una entrada de la imagen 806C de p00:5911: 16 por tile, tiles de 2 bits por punto (p00:5949); lo leen p00:56D0 (32 bytes)
+F 0x8173 16
+D 0x8193 0x81C3 tiles_8193  los dibujos de 2 tiles de una entrada de la imagen 806C de p00:5911: 24 por tile, tiles de 3 bits por punto (p00:5949); lo leen p00:56D0 (48 bytes)
+F 0x8193 24
+D 0x81C3 0x8263 tiles_81C3  los dibujos de 20 tiles de una entrada de la imagen 806C de p00:5911: 8 por tile, tiles de 1 bits por punto (p00:5949); lo leen p00:56D0 (160 bytes)
+F 0x81C3 8
+D 0x8263 0x8453 tiles_8263  los dibujos de 31 tiles de una entrada de la imagen 806C de p00:5911: 16 por tile, tiles de 2 bits por punto (p00:5949); lo leen p00:56D0 (496 bytes)
+F 0x8263 16
+D 0x8453 0x857B tiles_8453  los dibujos de 37 tiles de una entrada de la imagen 806C de p00:5911: 8 por tile, tiles de 1 bits por punto (p00:5949); lo leen p00:56D0 (296 bytes)
+F 0x8453 8
+D 0x857B 0x858B tiles_857B  los dibujos de 1 tiles de una entrada de la imagen 806C de p00:5911: 16 por tile, tiles de 2 bits por punto (p00:5949); lo leen p00:56D0 (16 bytes)
+F 0x857B 16
+D 0x858B 0x864B tiles_858B  los dibujos de 8 tiles de una entrada de la imagen 806C de p00:5911: 24 por tile, tiles de 3 bits por punto (p00:5949); lo leen p00:56D0 (192 bytes)
+F 0x858B 24
+D 0x864B 0x8A4B tiles_864B  los dibujos de 64 tiles de una entrada de la imagen 806C de p00:5911: 16 por tile, tiles de 2 bits por punto (p00:5949); lo leen p00:56D0 (1024 bytes)
+F 0x864B 16
+D 0x8A4B 0x8E4B tiles_8A4B  los dibujos de 64 tiles de una entrada de la imagen 806C de p00:5911: 16 por tile, tiles de 2 bits por punto (p00:5949); lo leen p00:56D0 (1024 bytes)
+F 0x8A4B 16
+D 0x8E4B 0x8EFB tiles_8E4B  los dibujos de 11 tiles de una entrada de la imagen 806C de p00:5911: 16 por tile, tiles de 2 bits por punto (p00:5949); lo leen p00:56D0 (176 bytes)
+F 0x8E4B 16
+D 0x8EFB 0x8F2B tiles_8EFB  los dibujos de 2 tiles de una entrada de la imagen 806C de p00:5911: 24 por tile, tiles de 3 bits por punto (p00:5949); lo leen p00:56D0 (48 bytes)
+F 0x8EFB 24
+D 0x8F2B 0x8F6B tiles_8F2B  los dibujos de 4 tiles de una entrada de la imagen 806C de p00:5911: 16 por tile, tiles de 2 bits por punto (p00:5949); lo leen p00:56D0 (64 bytes)
+F 0x8F2B 16
+D 0x8F6B 0x8F75 paletas_8F6B  las 5 palabras que apuntan a las paletas de la imagen 8F87 (p00:5911: palabra A de la tabla); lo leen p00:56E9 (10 bytes)
+F 0x8F6B w8
+D 0x8F75 0x8F77 paleta_8F75  la paleta 0 de la imagen 8F87: 2 bytes de colores que se copian a 0xE800 (p00:592F); lo leen p00:56E9 (2 bytes)
+F 0x8F75 2
+D 0x8F77 0x8F79 paleta_8F77  la paleta 1 de la imagen 8F87: 2 bytes de colores que se copian a 0xE800 (p00:592F); lo leen p00:56E9 (2 bytes)
+F 0x8F77 2
+D 0x8F79 0x8F7B paleta_8F79  la paleta 2 de la imagen 8F87: 2 bytes de colores que se copian a 0xE800 (p00:592F); lo leen p00:56E9 (2 bytes)
+F 0x8F79 2
+D 0x8F7B 0x8F83 paleta_8F7B  la paleta 3 de la imagen 8F87: 8 bytes de colores que se copian a 0xE800 (p00:592F); lo leen p00:56E9 (8 bytes)
+F 0x8F7B 8
+D 0x8F83 0x8F87 paleta_8F83  la paleta 4 de la imagen 8F87: 4 bytes de colores que se copian a 0xE800 (p00:592F); lo leen p00:56E9 (4 bytes)
+F 0x8F83 4
+D 0x8F87 0x8FB2 imagen_8F87  lista de la imagen de p00:5911: entradas de 6 bytes (formato, numero de paleta, tile destino, cuantos tiles, puntero a sus dibujos) y 0xFF; lo leen p00:56E9 (43 bytes)
+F 0x8F87 6
+D 0x8FB2 0x9072 tiles_8FB2  los dibujos de 8 tiles de una entrada de la imagen 8F87 de p00:5911: 24 por tile, tiles de 3 bits por punto (p00:5949); lo leen p00:56E9 (192 bytes)
+F 0x8FB2 24
+D 0x9072 0x90F2 tiles_9072  los dibujos de 8 tiles de una entrada de la imagen 8F87 de p00:5911: 16 por tile, tiles de 2 bits por punto (p00:5949); lo leen p00:56E9 (128 bytes)
+F 0x9072 16
+D 0x90F2 0x90FA tiles_90F2  los dibujos de 1 tiles de una entrada de la imagen 8F87 de p00:5911: 8 por tile, tiles de 1 bits por punto (p00:5949); lo leen p00:56E9 (8 bytes)
+F 0x90F2 8
+D 0x90FA 0x931A tiles_90FA  los dibujos de 62 tiles de una entrada de la imagen 8F87 de p00:5911: 8 por tile, tiles de 1 bits por punto (p00:5949); se solapan 2 bloques: (tiles_92DA 92DA-931A); lo leen p00:56E9 (544 bytes)
+F 0x90FA 8
+D 0x931A 0x945A tiles_931A  los dibujos de 40 tiles de una entrada de la imagen 8F87 de p00:5911: 8 por tile, tiles de 1 bits por punto (p00:5949); lo leen p00:56E9 (320 bytes)
+F 0x931A 8
+D 0x945A 0x946A tiles_945A  los dibujos de 2 tiles de una entrada de la imagen 8F87 de p00:5911: 8 por tile, tiles de 1 bits por punto (p00:5949); lo leen p00:56E9 (16 bytes)
+F 0x945A 8
+D 0x946A 0x94B2 rle_946A  datos a la VRAM en RLE (p00:4E2D): 0 acaba, n < 0x80 repite el byte de detras, 0x80 y una direccion nueva, 0x81-0xFF copian n & 0x7F bytes; lo leen p00:56D9 (72 bytes)
+F 0x946A 16
+D 0x94B2 0x94CC paletas_94B2  las 13 palabras que apuntan a las paletas de la imagen 9502 (p00:5911: palabra A de la tabla); lo leen p00:5CC2 (26 bytes)
+F 0x94B2 w8
+D 0x94CC 0x94CE paleta_94CC  la paleta 0 de la imagen 9502: 2 bytes de colores que se copian a 0xE800 (p00:592F); lo leen p00:5CC2 (2 bytes)
+F 0x94CC 2
+D 0x94CE 0x94D0 paleta_94CE  la paleta 1 de la imagen 9502: 2 bytes de colores que se copian a 0xE800 (p00:592F); lo leen p00:5CC2 (2 bytes)
+F 0x94CE 2
+D 0x94D0 0x94D4 paleta_94D0  la paleta 2 de la imagen 9502: 4 bytes de colores que se copian a 0xE800 (p00:592F); lo leen p00:5CC2 (4 bytes)
+F 0x94D0 4
+D 0x94D4 0x94D8 paleta_94D4  la paleta 3 de la imagen 9502: 4 bytes de colores que se copian a 0xE800 (p00:592F); lo leen p00:5CC2 (4 bytes)
+F 0x94D4 4
+D 0x94D8 0x94E0 paleta_94D8  la paleta 4 de la imagen 9502: 8 bytes de colores que se copian a 0xE800 (p00:592F); lo leen p00:5CC2 (8 bytes)
+F 0x94D8 8
+D 0x94E0 0x94E4 paleta_94E0  la paleta 5 de la imagen 9502: 4 bytes de colores que se copian a 0xE800 (p00:592F); lo leen p00:5CC2 (4 bytes)
+F 0x94E0 4
+D 0x94E4 0x94E6 paleta_94E4  la paleta 6 de la imagen 9502: 2 bytes de colores que se copian a 0xE800 (p00:592F); lo leen p00:5CC2 (2 bytes)
+F 0x94E4 2
+D 0x94E6 0x94EA paleta_94E6  la paleta 7 de la imagen 9502: 4 bytes de colores que se copian a 0xE800 (p00:592F); lo leen p00:5CC2 (4 bytes)
+F 0x94E6 4
+D 0x94EA 0x94EE paleta_94EA  la paleta 8 de la imagen 9502: 4 bytes de colores que se copian a 0xE800 (p00:592F); lo leen p00:5CC2 (4 bytes)
+F 0x94EA 4
+D 0x94EE 0x94F2 paleta_94EE  la paleta 9 de la imagen 9502: 4 bytes de colores que se copian a 0xE800 (p00:592F); lo leen p00:5CC2 (4 bytes)
+F 0x94EE 4
+D 0x94F2 0x94FA paleta_94F2  la paleta 10 de la imagen 9502: 8 bytes de colores que se copian a 0xE800 (p00:592F); lo leen p00:5CC2 (8 bytes)
+F 0x94F2 8
+D 0x94FA 0x94FE paleta_94FA  la paleta 11 de la imagen 9502: 4 bytes de colores que se copian a 0xE800 (p00:592F); lo leen p00:5CC2 (4 bytes)
+F 0x94FA 4
+D 0x94FE 0x9502 paleta_94FE  la paleta 12 de la imagen 9502: 4 bytes de colores que se copian a 0xE800 (p00:592F); lo leen p00:5CC2 (4 bytes)
+F 0x94FE 4
+D 0x9502 0x9551 imagen_9502  lista de la imagen de p00:5911: entradas de 6 bytes (formato, numero de paleta, tile destino, cuantos tiles, puntero a sus dibujos) y 0xFF; lo leen p00:5CC2 (79 bytes)
+F 0x9502 6
+D 0x9551 0x9571 tiles_9551  los dibujos de 4 tiles de una entrada de la imagen 9502 de p00:5911: 8 por tile, tiles de 1 bits por punto (p00:5949); lo leen p00:5CC2 (32 bytes)
+F 0x9551 8
+D 0x9571 0x95E9 tiles_9571  los dibujos de 15 tiles de una entrada de la imagen 9502 de p00:5911: 8 por tile, tiles de 1 bits por punto (p00:5949); lo leen p00:5CC2 (120 bytes)
+F 0x9571 8
+D 0x95E9 0x98F9 tiles_95E9  los dibujos de 49 tiles de una entrada de la imagen 9502 de p00:5911: 16 por tile, tiles de 2 bits por punto (p00:5949); lo leen p00:5CC2 (784 bytes)
+F 0x95E9 16
+D 0x98F9 0x9D21 tiles_98F9  los dibujos de 57 tiles de una entrada de la imagen 9502 de p00:5911: 16 por tile, tiles de 2 bits por punto (p00:5949); se solapan 2 bloques: (tiles_9B89 9B89-9D21); lo leen p00:5CC2 (1064 bytes)
+F 0x98F9 16
+D 0x9D21 0x9D41 tiles_9D21  los dibujos de 2 tiles de una entrada de la imagen 9502 de p00:5911: 16 por tile, tiles de 2 bits por punto (p00:5949); lo leen p00:5CC2 (32 bytes)
+F 0x9D21 16
+D 0x9D41 0x9D49 tiles_9D41  los dibujos de 1 tiles de una entrada de la imagen 9502 de p00:5911: 8 por tile, tiles de 1 bits por punto (p00:5949); lo leen p00:5CC2 (8 bytes)
+F 0x9D41 8
+D 0x9D49 0x9D99 tiles_9D49  los dibujos de 5 tiles de una entrada de la imagen 9502 de p00:5911: 16 por tile, tiles de 2 bits por punto (p00:5949); lo leen p00:5CC2 (80 bytes)
+F 0x9D49 16
+D 0x9D99 0x9DA9 tiles_9D99  los dibujos de 1 tiles de una entrada de la imagen 9502 de p00:5911: 16 por tile, tiles de 2 bits por punto (p00:5949); lo leen p00:5CC2 (16 bytes)
+F 0x9D99 16
+D 0x9DA9 0x9DB9 tiles_9DA9  los dibujos de 1 tiles de una entrada de la imagen 9502 de p00:5911: 16 por tile, tiles de 2 bits por punto (p00:5949); lo leen p00:5CC2 (16 bytes)
+F 0x9DA9 16
+D 0x9DB9 0x9F39 tiles_9DB9  los dibujos de 16 tiles de una entrada de la imagen 9502 de p00:5911: 24 por tile, tiles de 3 bits por punto (p00:5949); lo leen p00:5CC2 (384 bytes)
+F 0x9DB9 24
+D 0x9F39 0xA000 tiles_9F39  los dibujos de 25 tiles de una entrada de la imagen 9502 de p00:5911: 16 por tile, tiles de 2 bits por punto (p00:5949) (sigue en el banco 11, en 0xA000); lo leen p00:5CC2 (199 bytes)
+F 0x9F39 16
+# --- fin de los bloques de bloques.py ---

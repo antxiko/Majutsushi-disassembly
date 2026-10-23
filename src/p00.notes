@@ -1,0 +1,1317 @@
+
+
+# --- A MANO: comentarios escritos leyendo el codigo ---
+C 0x40C1 busca la ranura del cartucho en la pagina 1 (RSLREG, tabla EXPTBL 0xFCC1) para pasarlo tambien a 0x8000-0xBFFF
+C 0x40CB HL = 0xFCC1 + ranura primaria: la tabla EXPTBL de ranuras expandidas
+C 0x40D0 bit 7 de EXPTBL = la ranura esta expandida; se junta con el numero de ranura en C
+C 0x40D8 lee la ranura secundaria que guarda la BIOS (0xFCC5 + ranura) y la mete en los bits 2-3 de A
+C 0x40DE ENASLT: el cartucho (128 KB, mapper Konami) queda en las paginas 1 y 2
+C 0x40FD pide el sonido 0x01
+C 0x4102 pide el sonido 0x02
+C 0x41AD voz del personaje A: mira su codigo en la tabla 0xC030 y salta a la voz que le toca
+C 0x4207 bancos 1-2-3 en las tres ventanas (lo normal del juego), con sus copias en 0xF0F1-3
+C 0x425D un cuadro del juego: C = estado, B = paso (0xC000/0xC001); el estado elige tabla y el paso elige dentro de ella
+C 0x4271 tabla de estados: 9 rutinas (titulo, menus, partida, ...) que elige 0xC000
+C 0x4283 estado 0: el paso (B) elige por la tabla de 0x4287
+C 0x428F estado 0, paso 0: limpia y prepara la pantalla del titulo
+C 0x42E8 pone el temporizador 0xC004 a A y pasa al paso siguiente
+C 0x42EB paso siguiente: 0xC001 += 1
+C 0x4375 llena de 9 la fila 0xCA00 (16 bytes) y de 2 la 0xCA10
+C 0x4382 llena 16 bytes de HL con A (el primer byte y ldir de 15 a los siguientes)
+C 0x4385 15 bytes mas
+C 0x4396 menu de dos opciones del titulo: lee las teclas (0xC007) y mueve el cursor
+C 0x43AF dibuja el cursor del menu: dos sprites (0xCC00 y 0xCC04) en la tabla de atributos en RAM
+C 0x43BF segundo byte del sprite: la X; escribe el patron A en el sprite de 0xCC00 y en el segundo de 0xCC04 (con el banco alterno)
+C 0x43CC el color/atributos del cursor: 0x38 y 0x3C
+C 0x43D3 se ha elegido: sale del menu y prepara la partida
+C 0x44E0 salta a la rutina guardada en 0xC0C2 (HL)
+C 0x44E4 pasa al estado siguiente y borra la tabla 0xCD00 (256 bytes)
+C 0x450D pone el temporizador a 0x20 y pasa al estado siguiente (paso 0)
+C 0x4516 vuelve al paso 0 del estado
+C 0x4571 dice la voz del jugador al que le toca (por 0xC0B1 elige entre 0xC207 y 0xC20D)
+C 0x45F3 cuenta en B cuantas de las dos fichas son cero (D, E)
+C 0x4698 busca el jugador entre los de 0xC0B7+: si coincide con el que reparte salta a 0x46CF
+C 0x469E si nadie gana, mira si hay un jugador con tres o mas (p01:64E3): si es asi, final de la partida
+C 0x46CF suma uno al contador de manos seguidas (BCD, tope 99)
+C 0x4A17 suma al marcador del jugador 0xC207 el importe C:DE
+C 0x4A1A suma al marcador del jugador A (0-3) el importe con signo: C = signo, DE = magnitud en BCD; HL = su ficha de 3 bytes (0xC0A0 + 3 x A)
+C 0x4A1D HL = el marcador del jugador A (tabla 0x4AED)
+C 0x4A27 mismo signo que el marcador: se suman las magnitudes
+C 0x4A2D estan en el otro byte: compara la parte baja del importe con la del marcador
+C 0x4A31 distinta: a la resta de uno en uno
+C 0x4A34 los marcadores ya son iguales en la parte baja: compara la parte alta
+C 0x4A3D los dos son iguales: el marcador queda a cero (tres bytes)
+C 0x4A45 el importe es mayor: mira si el marcador es cero para poner solo el signo
+C 0x4A4B tambien el segundo byte del marcador es cero: queda con el signo uno y se suma
+C 0x4A50 devuelve HL al signo y pone 1 (el marcador cambia de signo)
+C 0x4A57 si no, compara la parte baja del importe con la del marcador
+C 0x4A66 signo distinto: se resta de uno en uno, DE baja y el marcador sube o baja a la vez
+C 0x4A6F segundo nibble: resta uno a cada nibble del marcador con ajuste decimal
+C 0x4A71 guarda el acarreo y toma el nibble alto del byte bajo del marcador
+C 0x4A79 sigue con el nibble alto: lo resta con el acarreo, ajustando el decimal (suma 9 si se pasa)
+C 0x4A81 junta los dos nibbles y sigue con el byte alto
+C 0x4A83 junta los nibbles del byte bajo
+C 0x4A8D pasa al byte alto del marcador
+C 0x4A98 repite con el byte alto del marcador
+C 0x4A9A guarda el acarreo del nibble bajo
+C 0x4AA2 resta el nibble alto con el acarreo y ajusta
+C 0x4AAA junta nibbles y mira si el marcador ha llegado a cero para cambiarle el signo (0x4AE6)
+C 0x4AAC junta los nibbles del byte alto
+C 0x4AB7 si el byte alto queda a cero mira el bajo
+C 0x4ABF los dos a cero: da la vuelta al signo
+C 0x4ACC no ha acabado: DE - 1 y repite
+C 0x4AD2 mismo signo: suma uno al marcador en BCD con tope 9999
+C 0x4AD3 suma uno al marcador en BCD (dos bytes) con tope 9999
+C 0x4AD9 suma el acarreo al byte alto
+C 0x4ADE si se pasa de 9999 deja 9999
+C 0x4AF5 DE = DE - 1 en BCD (cada cifra con su decimal); Z si ha llegado a cero
+C 0x4AFE resta uno a cada nibble de E (decimal)
+C 0x4B02 mira la parte baja de DE y el nibble alto
+C 0x4B0A resta con el acarreo y ajusta el decimal
+C 0x4B10 junta los nibbles de E
+C 0x4B12 junta los nibbles
+C 0x4B1C nibble bajo de D
+C 0x4B26 y lo mismo con D
+C 0x4B2A nibble alto de D
+C 0x4B38 junta los nibbles de D y deja Z si DE es cero
+C 0x4B3A junta los nibbles de D
+C 0x4B43 deja Z si DE ha llegado a cero
+C 0x4B46 dibuja el marcador de los cuatro jugadores: un panel por jugador con sus puntos (0xC282/0xC28E y 0xC0A2)
+C 0x4C54 escribe en pantalla el numero de 2 bytes BCD de HL (signo en HL-2) en DE
+C 0x4C59 escribe un numero BCD de 2 bytes en DE, con '-' si es negativo
+C 0x4C90 numero BCD de B bytes: si el signo es distinto de cero dibuja el tile 0x40 (el menos) a la izquierda
+C 0x4CD0 dibuja las dos cifras de un byte BCD con 0x4CE1
+C 0x4CD1 primer nibble del byte BCD
+C 0x4CD9 segundo nibble
+C 0x4CF2 dibuja una cifra (A & 0x0F) en D,E como tile y avanza 8 puntos; ceros por la izquierda, en blanco mientras C = 0
+C 0x4D07 HL = la palabra numero A de la tabla que apunta HL
+C 0x4D12 lee BC bytes de la VRAM (desde HL) a DE
+C 0x4D25 cambia HL y DE y pone en A y B la cuenta de la lectura de bloque (BC)
+C 0x4D2D copia BC bytes de la RAM (HL) a la VRAM (DE)
+C 0x4D40 copia BC bytes de la RAM (DE) a la VRAM (HL, el acarreo es el bit 16)
+C 0x4D56 rellena BC bytes de la VRAM con A, desde HL
+C 0x4D66 escribe B x C bytes iguales al puerto de la VRAM
+C 0x4D6F lee un byte de la VRAM en HL
+C 0x4D7B escribe A en la VRAM en HL
+C 0x4D89 direccion de escritura de la VRAM = HL x 2: R14 = bits 14-16, y despues los dos bytes de direccion con el bit 6 puesto
+C 0x4D8A lee el puerto de datos del VDP (0x0007) y lo pone en C como puerto de control (+1)
+C 0x4D93 R#14 = bits 14-16 de la direccion
+C 0x4D9C direccion baja multiplicada por dos
+C 0x4DA1 direccion alta por dos con el bit 6 (escritura)
+C 0x4DAD igual pero para leer (sin el bit 6)
+C 0x4DAE puerto de datos del VDP en C
+C 0x4DB9 sin interrupciones mientras se escribe la direccion
+C 0x4DBC R#14 recibe los tres bits altos de la direccion
+C 0x4DC1 byte bajo por dos para la direccion de la VRAM
+C 0x4DCF lee un byte de la VRAM: direccion de lectura (0x4E09) y lo lee del puerto de datos
+C 0x4DD3 puerto de datos
+C 0x4DE9 direccion de escritura de la VRAM: R14 por los tres bits altos de H (el acarreo es el 16) y despues L y H con el bit 6
+C 0x4DEA puerto de control del VDP en C
+C 0x4DEF R#14 con los tres bits altos de H
+C 0x4DFC direccion baja a la VRAM
+C 0x4DFF direccion alta con el bit 6 puesto (escribir)
+C 0x4E09 igual para leer
+C 0x4E0A puerto de control en C
+C 0x4E0F R#14 con los tres bits altos de H
+C 0x4E1C direccion baja
+C 0x4E1F direccion alta sin el bit 6 (leer)
+C 0x4E27 vuelca a la VRAM una lista: direccion, y despues bloques (n con bit 7 = seguido; 0 acaba, otra direccion si n = 0x80)
+C 0x4E34 siguiente bloque de la lista: 0 acaba, el bit 7 dice si se repite un byte o se copian varios
+C 0x4E35 un byte 0 acaba la lista
+C 0x4E39 los 7 bits bajos son la cuenta
+C 0x4E3E 0x80 solo = otra direccion
+C 0x4E41 copia la cuenta de bytes con otir
+C 0x4E50 apaga la pantalla, limpia la tabla de sprites y borra la VRAM visible
+C 0x4E69 enciende la pantalla (bit 6 del registro 1)
+C 0x4E76 apaga la pantalla (bit 6 del registro 1 a 0)
+C 0x4E83 pone todos los sprites fuera de pantalla (Y = 0xE0) y copia la tabla a la VRAM
+C 0x4EB2 pone el color D,E en la paleta A: registro 16 del VDP y los dos bytes, y los guarda en la copia en 0xF680
+C 0x4EB5 puerto del VDP en C
+C 0x4EBB escribe el numero de paleta en el registro de paleta (R#16)
+C 0x4EC2 dos bytes de color (rojo y azul, verde) por el puerto de paleta
+C 0x4EC9 guarda la copia del color en 0xF680 + numero
+C 0x4EDC aplica una lista de colores de paleta (A, D, E; 0xFF acaba)
+C 0x4EEA espera a que el VDP acabe su comando (estado S#2, bit 0)
+C 0x4EFA lee el registro de estado A del VDP: lo selecciona en R15, lo lee y vuelve a dejar R15 = 0
+C 0x4EFC lee los puertos del VDP de 0x0006 y 0x0007
+C 0x4F01 escribe el numero de registro de estado en R#15
+C 0x4F08 lee el estado
+C 0x4F0C y deja R#15 a cero
+C 0x4F18 LINE: traza una linea: prepara los registros 36-42 (origen X con su bit 8, Y, largo, grosor) y lanza la orden 0x70
+C 0x4F25 al puerto de control: el numero del primer registro que se va a escribir (el valor de R#17)
+C 0x4F29 al puerto de control: selecciona R#17 (registro de indice, con auto-incremento)
+C 0x4F34 al VDP: R#36, DX bajo
+C 0x4F36 al VDP: R#37, DX alto
+C 0x4F39 al VDP: R#38, DY bajo
+C 0x4F3B al VDP: R#39, DY alto
+C 0x4F40 destino: la pagina baja o alta segun el bit 7 del color
+C 0x4F51 al VDP: R#40, NX bajo
+C 0x4F53 al VDP: R#41, NX alto
+C 0x4F56 al VDP: R#42, NY bajo
+C 0x4F58 al VDP: R#43, NY alto
+C 0x4F5A al VDP: R#44, CLR (color o dato)
+C 0x4F5C al VDP: R#45, ARG (direccion y memoria)
+C 0x4F60 al VDP: R#46, CMD (la orden)
+C 0x4F64 LINE en vertical: igual que 0x4F18 con los ejes cambiados
+C 0x4F71 al puerto de control: el numero del primer registro que se va a escribir (el valor de R#17)
+C 0x4F75 al puerto de control: selecciona R#17 (registro de indice, con auto-incremento)
+C 0x4F7F al VDP: R#36, DX bajo
+C 0x4F81 al VDP: R#37, DX alto
+C 0x4F84 al VDP: R#38, DY bajo
+C 0x4F86 al VDP: R#39, DY alto
+C 0x4F89 al VDP: R#40, NX bajo
+C 0x4F90 al VDP: R#41, NX alto
+C 0x4F93 al VDP: R#42, NY bajo
+C 0x4F95 al VDP: R#43, NY alto
+C 0x4F97 al VDP: R#44, CLR (color o dato)
+C 0x4F9A al VDP: R#45, ARG (direccion y memoria)
+C 0x4F9E al VDP: R#46, CMD (la orden)
+C 0x4FA2 contorno: la linea de arriba, de ancho E
+C 0x4FA7 la de abajo
+C 0x4FB8 las de los lados con alto D
+C 0x4FC9 desplaza el origen de la derecha
+C 0x4FCD guarda los registros y traza una linea vertical (0x4F64)
+C 0x4FE5 HMMV: rellena un rectangulo con el color A': espera al VDP, escribe destino y tamano (registros 36-43) y la orden 0xC0
+C 0x4FF2 al puerto de control: el numero del primer registro que se va a escribir (el valor de R#17)
+C 0x4FF4 empieza a escribir desde el registro 36
+C 0x4FF6 al puerto de control: selecciona R#17 (registro de indice, con auto-incremento)
+C 0x4FFE al VDP: R#36, DX bajo
+C 0x5000 al VDP: R#37, DX alto
+C 0x5002 al VDP: R#38, DY bajo
+C 0x5004 al VDP: R#39, DY alto
+C 0x500B al VDP: R#40, NX bajo
+C 0x500D al VDP: R#41, NX alto
+C 0x5010 al VDP: R#42, NY bajo
+C 0x5016 al VDP: R#43, NY alto
+C 0x5019 al VDP: R#44, CLR (color o dato)
+C 0x501C al VDP: R#45, ARG (direccion y memoria)
+C 0x5020 al VDP: R#46, CMD (la orden)
+C 0x5024 HMMM: copia un rectangulo de la VRAM a otro sitio
+C 0x5028 HMMM: copia un rectangulo; escribe origen (reg 32), destino (reg 36), tamano (reg 40), los bits de pagina de A y la orden 0xD0
+C 0x5031 al puerto de control: el numero del primer registro que se va a escribir (el valor de R#17)
+C 0x5035 al puerto de control: selecciona R#17 (registro de indice, con auto-incremento)
+C 0x503D al VDP: R#32, SX bajo
+C 0x503F al VDP: R#33, SX alto
+C 0x5041 al VDP: R#34, SY bajo
+C 0x5047 al VDP: R#35, SY alto
+C 0x504D al VDP: R#36, DX bajo
+C 0x504F al VDP: R#37, DX alto
+C 0x5051 al VDP: R#38, DY bajo
+C 0x5057 al VDP: R#39, DY alto
+C 0x505E al VDP: R#40, NX bajo
+C 0x5060 al VDP: R#41, NX alto
+C 0x5062 al VDP: R#42, NY bajo
+C 0x5065 al VDP: R#43, NY alto
+C 0x5067 al VDP: R#44, CLR (color o dato)
+C 0x506C al VDP: R#45, ARG (direccion y memoria)
+C 0x5070 al VDP: R#46, CMD (la orden)
+C 0x5074 LMMC: manda al VDP un rectangulo punto a punto con la operacion de B y los datos de (HL): orden 0xB0
+C 0x5081 al puerto de control: el numero del primer registro que se va a escribir (el valor de R#17)
+C 0x5085 al puerto de control: selecciona R#17 (registro de indice, con auto-incremento)
+C 0x5091 al VDP: R#36, DX bajo
+C 0x5093 al VDP: R#37, DX alto
+C 0x5095 al VDP: R#38, DY bajo
+C 0x509E al VDP: R#39, DY alto
+C 0x50A8 al VDP: R#40, NX bajo
+C 0x50AB al VDP: R#41, NX alto
+C 0x50AE al VDP: R#42, NY bajo
+C 0x50B4 al VDP: R#43, NY alto
+C 0x50B8 al VDP: R#44, CLR (color o dato)
+C 0x50BB al VDP: R#45, ARG (direccion y memoria)
+C 0x50C2 al VDP: R#46, CMD (la orden)
+C 0x50C8 al puerto de control: otro dato de control
+C 0x50CC al puerto de control: otro dato de control
+C 0x50D0 mientras el VDP pida datos (estado S#2, bit 7), manda el siguiente byte de (HL) al registro 44
+C 0x50DD al VDP: R#47, R#47
+C 0x50E1 LMCM: lee un rectangulo de la VRAM: orden 0xA0; deja en (DE) los puntos que da el VDP
+C 0x50F4 al puerto de control: el numero del primer registro que se va a escribir (el valor de R#17)
+C 0x50F8 al puerto de control: selecciona R#17 (registro de indice, con auto-incremento)
+C 0x5104 al VDP: R#32, SX bajo
+C 0x5106 al VDP: R#33, SX alto
+C 0x5108 al VDP: R#34, SY bajo
+C 0x5111 al VDP: R#35, SY alto
+C 0x5113 al VDP: R#36, DX bajo
+C 0x5115 al VDP: R#37, DX alto
+C 0x5117 al VDP: R#38, DY bajo
+C 0x5119 al VDP: R#39, DY alto
+C 0x5123 al VDP: R#40, NX bajo
+C 0x5125 al VDP: R#41, NX alto
+C 0x5128 al VDP: R#42, NY bajo
+C 0x512E al VDP: R#43, NY alto
+C 0x5131 al VDP: R#44, CLR (color o dato)
+C 0x5133 al VDP: R#45, ARG (direccion y memoria)
+C 0x513A al VDP: R#46, CMD (la orden)
+C 0x513D lee un byte del VDP mientras haya (estado S#2 bit 7) y lo guarda en DE
+C 0x5143 si no hay mas, vuelve
+C 0x5148 lee el dato del registro S#7
+C 0x5151 LMMM: copia un rectangulo con la operacion logica de A: origen, destino, tamano y orden 0x90
+C 0x515E al puerto de control: el numero del primer registro que se va a escribir (el valor de R#17)
+C 0x5162 al puerto de control: selecciona R#17 (registro de indice, con auto-incremento)
+C 0x516F al VDP: R#32, SX bajo
+C 0x5171 al VDP: R#33, SX alto
+C 0x5173 al VDP: R#34, SY bajo
+C 0x517D al VDP: R#35, SY alto
+C 0x5187 al VDP: R#36, DX bajo
+C 0x5189 al VDP: R#37, DX alto
+C 0x518B al VDP: R#38, DY bajo
+C 0x5194 al VDP: R#39, DY alto
+C 0x519B al VDP: R#40, NX bajo
+C 0x519D al VDP: R#41, NX alto
+C 0x51A0 al VDP: R#42, NY bajo
+C 0x51A6 al VDP: R#43, NY alto
+C 0x51A8 al VDP: R#44, CLR (color o dato)
+C 0x51AA al VDP: R#45, ARG (direccion y memoria)
+C 0x51B1 al VDP: R#46, CMD (la orden)
+C 0x51C6 PSET: espera al VDP y escribe R#36 con X (H) y R#38 con Y (L)
+C 0x51D3 selecciona R#17
+C 0x51E4 R#44 (color) en otra escritura con R#17 = 0x2C
+C 0x51EE el color de E
+C 0x51F3 la orden 0x50 (PSET)
+C 0x51F9 espera al VDP y pone los argumentos de la orden
+C 0x5206 R#17 con 0x97 (a partir del registro 23)
+C 0x520D X e Y a cero
+C 0x5217 los argumentos de la orden
+C 0x5221 lanza la orden y espera el fin
+C 0x5225 espera a que acabe la orden (estado S#2) y deja el registro de estado en 0
+C 0x524F un tile de 8 filas: lee el byte de cada fila (los 8 bits son 8 puntos) y los pasa a nibbles con el color de C
+C 0x5256 cada punto con su bit: si esta a uno pone C, si no 0
+C 0x5264 mete el nibble en el buffer (rld) y pasa al siguiente par
+C 0x5269 salta los cuatro bytes del otro plano y sigue con la fila siguiente
+C 0x5274 si A no es cero va a la variante de 2 colores (0x5244); si no, prepara el color C en los dos nibbles
+C 0x527E 8 filas con el color de fondo 0xFF donde el bit vale cero
+C 0x5283 una fila: el byte de origen se despliega en 8 puntos
+C 0x528A cada bit pone el color C o 0xFF
+C 0x5291 guarda el punto y repite con los 8 de la fila
+C 0x5295 pasa a la fila siguiente del origen
+C 0x529C DIBUJA UN TILE DE 8 x 8 en D,E: convierte (0x5274) y lo copia con ocho copias de 8 bytes a la VRAM
+C 0x52AB intercambia X e Y: la direccion de la VRAM sale de D = Y / 2 y E = X
+C 0x52B9 con la bandera 0xFAF6 puesta suma 0x80 (la pagina alta)
+C 0x52C2 copia 8 bytes de una fila del buffer a la VRAM y pasa a la siguiente (0x80 mas)
+C 0x52D4 avanza HL 8 o 16 bytes segun el formato
+C 0x52EB un tile de 4 bits por punto: duplica el nibble de cada byte en los dos lados
+C 0x52F2 el nibble alto, si no es cero, se copia tambien al bajo
+C 0x52FE guarda el nibble alto duplicado
+C 0x5300 el nibble bajo, si no es cero, tambien duplicado
+C 0x530B guarda y avanza a la columna siguiente
+C 0x5311 copia la fila de 8 bytes del buffer a la VRAM
+C 0x531B copia 8 bytes a la VRAM y avanza 0x80
+C 0x5320 baja a la fila siguiente (0x80)
+C 0x532D copia 8 filas de 4 bytes a la VRAM (tile ya en 4 bits)
+C 0x5354 avanza la X del siguiente tile; si pasa de 0x80 baja la fila
+C 0x536D siguiente tile de la lista: 0xFF acaba, 0xFE trae otro X, Y; si C = 0 el tile se pinta 0x33
+C 0x5387 otra lista de tiles igual que la anterior, dibujando con la copia de la pagina 1
+C 0x5398 dibuja el tile A (8x8, de la hoja en la VRAM) en D,E
+C 0x53BC dibuja un tile de 4 x 8 (el medio ancho de las letras de dialogo) con una copia HMMM
+C 0x53CE origen en la hoja de tiles del tile A de 4 puntos de ancho (X = (A & 0x3F) x 4, Y = 0xB0 + (A >> 6) x 8)
+C 0x53CF X en la hoja: (A & 0x3F) x 4
+C 0x53D4 Y en la hoja: 0xB0 + (A & 0xC0) / 8
+C 0x53DE origen en la hoja de tiles del tile A de 8 x 8 (X = (A & 0x1F) x 8, Y = 0xB0 + (A >> 5) x 8)
+C 0x53DF X en la hoja: (A & 0x1F) x 8
+C 0x53E5 Y en la hoja: 0xB0 + (A & 0xE0) / 4
+C 0x53EE D += 8 y, si da la vuelta, E += 8
+C 0x5424 pasa 8 filas de 1 bit por punto (1 byte por fila, HL) a 4 bits por punto, usando la paleta de 2 entradas de 0xE800
+C 0x5430 una fila: 8 puntos de 1 bit -> 4 bytes de 2 puntos (cada punto elige entre las entradas de 0xE800)
+C 0x5432 una fila de 1 bit por punto: pasa cada par de bits a un byte con los colores de la paleta de 2 entradas
+C 0x543A color de la paleta para el primer punto
+C 0x5441 segundo punto de la pareja
+C 0x5449 color de la paleta del segundo punto, junto al primero
+C 0x5451 8 filas de 2 bits por punto (2 bytes por fila, HL) -> 4 bits, y a la VRAM por 0x5347
+C 0x5467 igual que 0x5451, pero a la VRAM por 0x556D (la imagen va hacia la izquierda)
+C 0x547D 8 filas de 2 bits por punto
+C 0x5487 una fila de 2 bits por punto: 8 puntos -> 4 bytes, con la paleta de 4 colores de 0xE800
+C 0x548D una fila de 2 bits por punto: cada par de bits elige uno de los cuatro colores de 0xE800
+C 0x5498 color de la paleta (cuatro) para el primer punto
+C 0x54AA color del segundo punto
+C 0x54B2 8 filas de 3 bits por punto (3 bytes por fila, HL) -> 4 bits, y a la VRAM por 0x5347
+C 0x54B9 repite el tile B veces y vuelca los tiles a la VRAM por 0x5347
+C 0x54C8 igual que 0x54B2, pero por 0x556D
+C 0x54CF igual, pero por 0x556D (hacia la izquierda)
+C 0x54E8 una fila de 3 bits por punto: 8 puntos -> 4 bytes, con la paleta de 8 colores de 0xE800
+C 0x54F0 una fila de 3 bits por punto: cada trio de bits elige uno de los ocho colores de 0xE800
+C 0x54F1 un punto de 3 bits: se desplazan tres bytes (C, D, E) bit a bit hacia A
+C 0x54FA color de la paleta (8 entradas) que elige el trio de bits
+C 0x54FE color de la paleta (ocho) para el primer punto
+C 0x5504 segundo punto del par con otro trio de bits
+C 0x5510 busca su color en 0xE800
+C 0x5513 color del segundo punto
+C 0x5514 junta los dos colores en un byte
+C 0x5518 repite cuatro veces (ocho puntos)
+C 0x551B vuelca a la VRAM (en DE) un tile ya en 4 bits (32 bytes en 0xE000) de derecha a izquierda
+C 0x552A un tile de 4 bits por punto hacia la izquierda: cuatro pares por fila
+C 0x553E dos puntos a la VRAM: con 0xC0B9 = 0 repite el nibble en los dos lados
+C 0x5544 con 0xC0B9 = 0: el nibble bajo del byte, duplicado, al VDP
+C 0x554F el nibble alto duplicado
+C 0x555C con 0xC0B9 distinto de cero solo el nibble alto
+C 0x556D pasa al tile siguiente de una imagen que se pinta hacia la izquierda (E += 2 o 4, con salto de fila a los 0x80)
+C 0x557D avanza la X al tile siguiente (hacia la izquierda: salta a la fila de abajo al llegar a 0x80)
+C 0x558C arranca el sonido (p12:6000), pone SCREEN 7, borra las paginas 0 y 1 y carga seis registros del VDP (tabla 0x55E4)
+C 0x55B0 CHGMOD 7: 512 x 212 puntos, 16 colores
+C 0x55D4 carga seis registros del VDP desde la tabla de 0x55E4 (numero y valor)
+C 0x55F0 lee los mandos y el teclado: mandos (0xC007), pulsaciones nuevas (0xC008) y de repeticion (0xC00D), con retardo (0xC016)
+C 0x5602 flancos de bajada de las teclas: 0xC007 = lo que se acaba de pulsar
+C 0x5605 flancos de una tecla: guarda el estado nuevo y deja en la direccion anterior lo recien pulsado
+C 0x560C teclas y joystick 1 en un byte: bits 0-5 de la palanca y 2 botones (PSG puerto 14, filas 6 y 8 del teclado)
+C 0x5647 lee las teclas de las filas 6 y 7 del teclado (F1-F3, CTRL/SHIFT, RET/ESC...) en 5 bits
+C 0x565F repeticion de las teclas: si se mantiene pulsada se repite despues de 0x2D cuadros, cada 5
+C 0x5678 si la tecla sigue pulsada
+C 0x567D cuenta de la repeticion
+C 0x568A carga el fondo de la pantalla de juego (imagenes de los bancos 7-9) y pone el marco
+C 0x56AC dibuja un rectangulo de tiles de 24 x 6 (HL = tile map)
+C 0x56B2 una fila del rectangulo de tiles: un tile por byte, 8 puntos mas a la derecha
+C 0x56C6 carga una imagen de los bancos 10-11 (HL = lista de tiles, DE = tabla)
+C 0x56DF carga otra imagen de los bancos 10-11
+C 0x56F2 carga una imagen de los bancos 10-11 y su paleta (0xF800)
+C 0x570E carga las tres columnas de texto de dialogo en 0xC0BF/0xC0BE
+C 0x5753 dibuja un bloque de texto (letras de 3 x 3 tiles de 4 puntos)
+C 0x576A dibuja un texto: A = 0 letras grandes (3x3), si no pequenas (5x2); 0xFF acaba y 0xFE hace otra linea
+C 0x5774 siguiente letra de un dialogo: 0xFF acaba, 0xFE baja de linea
+C 0x5780 una letra de 3 x 3 tiles de medio ancho: cada tile con 0x53BC
+C 0x579A salto de linea: X a cero e Y mas 0x12
+C 0x57A4 siguiente letra de un dialogo de 5 x 2 tiles
+C 0x57B0 una letra de 5 x 2 tiles de medio ancho
+C 0x57CA salto de linea del dialogo ancho: X a cero e Y mas 0x0C
+C 0x57D6 carga la lista de HL (bancos 7-9) y la pinta
+C 0x57E3 vuelca una paleta de los bancos 5-6 (DE = lista)
+C 0x584C pinta los cuatro tiles de una esquina del marco
+C 0x586C pone los iconos de los tres rivales (0xC031-3) en el marco
+C 0x58A2 carga la lista de paleta numero B de la tabla 0x58B9 (bancos 5-6)
+C 0x58C5 dibuja una lista de tiles a pantalla: D,E = posicion, n tiles repetidos (bit 7: la secuencia entera que sigue); 0xFF acaba
+C 0x58CB posicion D, E de la lista de tiles
+C 0x58D1 siguiente bloque: 0xFF acaba; el bit 7 trae n tiles distintos y si no uno repetido n veces
+C 0x5909 un tile: C bit 0 = 0 con 0x5398 (tile normal), si no con 0x53AA
+C 0x5911 CARGA UNA IMAGEN: HL = lista de entradas (formato en C, tabla en A de 4D07, posicion, nombre de tile); DE = tabla de paletas; A = 0xC0B9 (tamano de baldosa); acaba en 0xFF
+C 0x5914 siguiente entrada de la imagen: 0xFF acaba; C = formato, el byte siguiente es la paleta
+C 0x591C la paleta de la entrada (2, 4, 8 o 12 bytes) a 0xE800
+C 0x5929 copia la paleta a 0xE800 y calcula el destino del tile (0x5962)
+C 0x5935 direccion de la baldosa en la tabla de tiles de 0xD800
+C 0x5949 el formato dice cual de las seis rutinas se usa
+C 0x595B los formatos 4 y 5 son de 3 bits por punto
+C 0x5962 direccion de la VRAM del tile con el tamano de 0xC0B9 = 0: 0xD800 + (A & 0xE0) x 32 + (A & 0x1F) x 4
+C 0x5969 grupo de la baldosa (bits 5-7)
+C 0x5974 base 0xD800 de las baldosas en la VRAM
+C 0x5979 numero dentro del grupo x 4
+C 0x5982 igual con 0xC0B9 distinto de cero: 0xD800 + (A & 0xC0) x 16 + (A & 0x3F) x 2
+C 0x599A carga una paleta de los bancos 5-6 y la aplica (bancos 5-6)
+C 0x59CD copia la tabla de atributos de sprites de 0xCA00 a la VRAM (0xF400, 640 bytes)
+C 0x5A22 carga la imagen de fondo de la mesa (bancos 7-9): rectangulos de tiles de los bancos 7, 8 y 9 en las filas 0xB0-0xC8 de la VRAM
+C 0x5A3D rellena con 0xFF un cuadro de 8 x 8 en 0x98B8 (pagina 1)
+C 0x5A6E la paleta de 8 colores del bloque en 0xE800 y el tile en 0xE02C
+C 0x5A89 carga dos conjuntos de tiles de los bancos 7-9 (las fichas del mahjong y sus numeros) con 3 y 2 bits por punto
+C 0x5AAA carga la mesa y devuelve el banco 4 en 0xA000
+C 0x5ACD escribe un texto de letras de 16 puntos de alto (C = 0x0E, color) en la VRAM
+C 0x5AD0 guarda el color y pone a cero el ancho del texto (0xCC93)
+C 0x5AE2 siguiente letra del texto: 0xFF acaba; la dibuja con el color de 0xCC90
+C 0x5AEA por cada letra: la dibuja con 0x5B29; las de codigo < 10 miden 8 puntos y las demas 16
+C 0x5B01 avanza la X de la letra segun mida 8 o 16 (los codigos 1 a 10 son estrechos) y suma el ancho a 0xCC93
+C 0x5B0E subraya el texto con un rectangulo del ancho acumulado (0xCC93)
+C 0x5B29 dibuja la letra A de 16 x 16 puntos (de los 64 bytes de su forma en el banco 5, a 0x8000 + 64 x (A - 1)) con el color C
+C 0x5B96 desempaqueta la forma de 1 bit de la letra a 4 bits en 0xE800 (con 0xE900 para la mitad de abajo)
+C 0x5BA1 un bloque de la letra: 4 veces 8 filas, con 8 bytes mas a la derecha cada vez
+C 0x5BC0 guarda el punto en el buffer
+C 0x5BC4 salta al siguiente renglon del buffer (+0x18)
+C 0x5BC8 recupera el origen y avanza a la fila siguiente
+C 0x5BCB repite las ocho filas
+C 0x5BCE lo mismo, pero con pares de puntos por byte (se pinta por 0x5BE7)
+C 0x5BD9 igual para la letra de 4 bits por punto
+C 0x5BED una fila de la letra: lee el byte y lo despliega
+C 0x5C02 rld: mete el nibble
+C 0x5C04 siguiente byte del buffer
+C 0x5C07 pasa a la fila siguiente (0x0C mas)
+C 0x5C0C recupera el origen y avanza una fila
+C 0x5C12 prepara la pantalla del titulo (bancos 5-6: paleta de 0xAF80, imagenes de 0xAFD1, 0xB039 y 0xB0A1)
+C 0x5C24 rellena el rectangulo del titulo con color 0 (pagina 1)
+C 0x5C54 escribe el texto de HL (0xAF90) a partir de 0x4040: letras en tiles, 0xFE = linea nueva
+C 0x5C60 el contador de la animacion del titulo: 0xC200 = 0x3C, 0xC201 = 0x31, 0xC202 = 0
+C 0x5C6F un paso de la animacion del titulo: cada dos cuadros se dibuja otra columna del dibujo; al acabar, 0xC202 = 1
+C 0x5C93 tile del texto: 0xFF acaba, 0xFE baja de linea
+C 0x5C9C sale del texto con 0xFE: X mas el desplazamiento
+C 0x5CB2 prepara la pantalla del menu (bancos 10-11): lista 0x9502, tabla 0x94B2
+C 0x5CE3 el paso (0xC01A) elige la animacion del titulo
+C 0x5D01 barrido del titulo: 0xC01C sube de 2 en 2 hasta 0xD0
+C 0x5D2B animacion de la paleta (colores 2, 8 y 9) del titulo: cada 8 cuadros
+C 0x5D8C ultimo paso de la animacion: paleta 2 y luego 13, a 0xFF en 0xC01A al acabar
+C 0x5DB3 copia un rectangulo de la pagina 0 a si mismo (borra la franja inferior)
+C 0x5DC1 dibuja la lista de tiles de 0x59D9 (el texto del titulo)
+C 0x5DD1 copia un rectangulo de 8 x 16 desde el origen
+C 0x5DD9 con la operacion 0x28
+C 0x5DDD avanza 8 en X y repite
+C 0x5DE5 dibuja los dos tiles 0xB1 y 0xB2 en la esquina de la pantalla
+C 0x5DF5 PREPARA LA PARTIDA: apaga, SCREEN 7, pone a cero los contadores de la mano y dibuja la mesa y los marcadores
+C 0x5E4D HL = la tabla del jugador actual (0xD000 + 0x400 x 0xC207) y la guarda en 0xC0DE
+C 0x5E54 HL = 0xD000 + 0x400 x jugador (0xC207)
+C 0x5E5F pone todos los sprites fuera de pantalla (Y = 0xE0) en 0xCC00
+C 0x5E6D borra 4 KB de 0xD000 (las manos de los cuatro jugadores)
+C 0x5E7B un paso del turno de un jugador: copia sprites, lee el mando y despacha por 0xC217
+C 0x5F45 espera la respuesta del cuadro de pregunta (0x9A5D): si es la opcion buena (0xC213 = 1), cierra el cuadro y sigue
+C 0x5FCC restaura cuatro bloques del fondo (bajo el cuadro de pregunta) en la pagina 1
+# --- fin de lo escrito a mano ---
+# --- A MANO: comentarios, nombres y bloques ---
+B 0x4000 =====  CABECERA AB, INTERRUPCION Y UTILIDADES  =====
+C 0x4010 la interrupcion del cuadro (el INIT la cuelga en H.KEYI, 0xFD9F): todo el juego corre aqui dentro
+C 0x4011 0xCF2D = 1 mientras suena una voz PCM (p12:6280): sin interrupciones de juego mientras tanto
+C 0x4016 0xC006: semaforo del sonido (no se reentra)
+C 0x4020 pone los bancos 12-13-14 (el motor de sonido) en 0x6000/0x8000/0xA000
+C 0x402D motor de sonido: un cuadro de musica (p12:6006)
+C 0x4034 devuelve los bancos de antes, leyendolos de sus copias en RAM 0xF0F1-3
+C 0x4047 0xC005: semaforo del cuadro del juego
+C 0x4050 lee los mandos y el teclado (p00:55F0)
+C 0x4053 un paso de la maquina de estados del juego (p00:425D)
+C 0x405C HL = HL + A
+C 0x4061 DE = DE + A
+C 0x4066 DESPACHADOR: saca la direccion de retorno (HL = tabla que va detras del call), multiplica A por dos y salta a la palabra de esa tabla
+C 0x4070 INIT: interrupciones fuera, modo 1, pila en 0xF0F0
+C 0x4076 pone el cartucho tambien en la pagina 2 (ENASLT) y guarda su ranura
+C 0x407C borra la RAM de 0xC000 a 0xF0EF
+C 0x408C bancos 1-2-3 en 0x6000/0x8000/0xA000, con su copia en 0xF0F1-3
+C 0x409E p00:558C: arranca el sonido, pone SCREEN 7 y limpia la VRAM
+C 0x40A1 p01:618F: prepara el juego (primera vez)
+C 0x40AB p01:64BC
+C 0x40AF H.KEYI = jp 0x4010: desde aqui manda la interrupcion
+C 0x40BF bucle sin fin: de aqui en adelante todo pasa en la interrupcion
+C 0x40C1 busca la ranura del cartucho: lee el registro de ranura primaria de la pagina 1...
+C 0x40DE ...y lo pone en la pagina 2 con ENASLT (el cartucho de 128 KB solo da 0x4000-0xBFFF con el trio de bancos)
+C 0x40E1 guarda en 0xF0F4 el codigo de ranura del cartucho (la de la pagina 1)
+C 0x40F9 0xF0F4 = ranura del cartucho (con la secundaria)
+B 0x40FD =====  Atajos: cada uno pide un sonido  =====
+C 0x40FD pide el sonido 0x01
+C 0x4107 pide el sonido 0x03
+C 0x410C pide el sonido 0x04
+C 0x4111 pide el sonido 0x05
+C 0x4116 pide el sonido 0x06
+C 0x411B pide el sonido 0x07
+C 0x4120 pide el sonido 0x08
+C 0x4125 pide el sonido 0x09
+C 0x412A pide el sonido 0x0A
+C 0x4139 pide el sonido 0x0D
+C 0x413E pide el sonido 0x0E
+C 0x4143 pide el sonido 0x0F
+C 0x4148 pide el sonido 0x10
+C 0x414D antes de pedir el 0x11, dice la voz del personaje de 0xC20D (p00:41AD)
+C 0x4158 igual, con el sonido 0x12
+C 0x4163 igual, con el sonido 0x13
+C 0x416E igual, con el sonido 0x14
+C 0x4179 antes de pedir el 0x15, dice la voz del personaje de 0xC207
+C 0x4184 igual, con el sonido 0x16
+C 0x418F pide la voz 0x83 y despues el sonido 0x17
+C 0x41A3 pide la voz 0x81
+C 0x41AD voz del personaje: HL = 0xC030 + A (la tabla de 3 personajes), y el valor de ahi elige por la tabla de 41B7
+C 0x41C9 voz 0x82
+C 0x41CF voz 0x83
+C 0x41D5 PIDE SONIDO A al motor de p12:6003: guarda todos los registros, pone 12-13-14 y devuelve los bancos de sus copias
+C 0x41EB motor de sonido: arranca el sonido A (A >= 0x80 son voces PCM)
+B 0x4207 =====  Rutinas de banco: ponen bancos y su copia en 0xF0F1-3  =====
+C 0x4208 empieza por el banco 1
+C 0x420A la copia en RAM de cada registro va delante de la escritura al mapper
+C 0x4224 0x4223: solo el banco 4 (en 0xA000)
+C 0x4229 0x4228: bancos 5 y 6 (en 0x8000 y 0xA000)
+C 0x422E 0x422D: bancos 7, 8 y 9
+C 0x4233 0x4232: bancos 10 y 11 (en 0x8000 y 0xA000)
+C 0x424C 0x424B: solo el banco 15 (en 0xA000)
+C 0x4259 0x4258: solo el banco 11 (en 0xA000)
+B 0x425D =====  LA MAQUINA DE ESTADOS DEL JUEGO  =====
+C 0x425D un cuadro del juego: 0xC003 cuenta cuadros
+C 0x4261 C = estado (0xC000), B = paso (0xC001)
+C 0x4266 los estados 0, 1 y 2 vuelven por p00:499E
+C 0x426E salta por la tabla de estados de p00:4271 (A = estado)
+C 0x4284 el paso (B) elige por su tabla de p00:4287
+C 0x428F estado 0, paso 0: limpia la pantalla y la prepara
+C 0x42EB paso siguiente: 0xC001 + 1
+C 0x42E8 pone el temporizador 0xC004 a A
+C 0x4516 vuelve al paso 0 del estado
+D 0x4000 0x4010 cabecera_ab  la cabecera del cartucho (MSX): 'AB', la direccion del INIT (0x4070) y los cuatro punteros STATEMENT, DEVICE, TEXT y MSX-BASIC a cero; la BIOS la lee al arrancar
+F 0x4000 16
+D 0x5892 0x58A2 posiciones_caras  las ocho posiciones (X, Y) de la hoja de caras de los personajes, de 48 x 48 puntos (p00:5884: 0x5890 + 2 x el numero del personaje, de 1 a 8): cuatro filas de dos columnas, X = 0x40 y 0x70, Y = 0, 0x30, 0x60 y 0x90
+F 0x5892 2
+
+
+# --- BLOQUES QUE LEE EL CODIGO (seccion que reescribe tools/bloques.py; no editar a mano) ---
+D 0x41B7 0x41C9 tabla_41B7  9 destinos del despachador p00:4066 (call en p00:41B4, el indice en A): 41C9, 41C9, 41CE, 41CF, 41CF, 41C9, 41C9, 41CE, 41CF; lo leen p00:41B4 (18 bytes)
+F 0x41B7 w8
+D 0x4271 0x4283 tabla_4271  9 destinos del despachador p00:4066 (call en p00:426E, el indice en A): 4283, 42D1, 42DC, 430A, 44CA, 451B, 4531, 476A, 48C6; lo leen p00:426E (18 bytes)
+F 0x4271 w8
+D 0x4287 0x428F tabla_4287  4 destinos del despachador p00:4066 (call en p00:4284, el indice en A): 428F, 4297, 42A5, 42C5; lo leen p00:4284 (8 bytes)
+F 0x4287 w4
+D 0x4313 0x4323 tabla_4313  8 destinos del despachador p00:4066 (call en p00:4310, el indice en A): 4323, 4396, 441B, 4433, 444E, 445C, 4488, 4496; lo leen p00:4310 (16 bytes)
+F 0x4313 w8
+D 0x44C0 0x44CA tabla_44C0  5 destinos del despachador p00:4066 (call en p00:44BD, el indice en A): AFE7, AD9B, A803, 63D4, 44B3; lo leen p00:44BD (10 bytes)
+F 0x44C0 w5
+D 0x44CE 0x44D2 tabla_44CE  2 destinos del despachador p00:4066 (call en p00:44CB, el indice en A): 44D2, 44E4; lo leen p00:44CB (4 bytes)
+F 0x44CE w2
+D 0x453A 0x4548 tabla_453A  7 destinos del despachador p00:4066 (call en p00:4537, el indice en A): 4548, 459A, 45A5, 45B1, 4619, 4677, 4738; lo leen p00:4537 (14 bytes)
+F 0x453A w7
+D 0x4773 0x4781 tabla_4773  7 destinos del despachador p00:4066 (call en p00:4770, el indice en A): 4781, 47A7, 47DD, 4824, 4892, 489B, 48B7; lo leen p00:4770 (14 bytes)
+F 0x4773 w7
+D 0x48CA 0x48D2 tabla_48CA  4 destinos del despachador p00:4066 (call en p00:48C7, el indice en A): 48D2, 490C, 4944, 4955; lo leen p00:48C7 (8 bytes)
+F 0x48CA w4
+D 0x59D9 0x59EA tiles_59D9  lista de tiles (p00:5363): X, Y y los tiles, 0xFE trae otro X, Y y 0xFF acaba; lo leen p00:5DC4 (17 bytes)
+F 0x59D9 16
+D 0x5CE9 0x5CF5 tabla_5CE9  6 destinos del despachador p00:4066 (call en p00:5CE6, el indice en A): 5CF5, 5D01, 5D2B, 5D51, 5D6B, 5D8C; lo leen p00:5CE6 (12 bytes)
+F 0x5CE9 w6
+D 0x5EA5 0x5EAD tabla_5EA5  4 destinos del despachador p00:4066 (call en p00:5EA2, el indice en A): 5EAD, 5F45, 5F90, 5FA0; lo leen p00:5EA2 (8 bytes)
+F 0x5EA5 w4
+D 0x5FFF 0x6000 partida_5FFF  los 1 primeros bytes de una instruccion de 2 (3E 02) que sigue en el banco 1: el trazador de un solo banco no puede verla entera (tools/bancos.py); lo leen p00:5FFF (1 bytes)
+F 0x5FFF 1
+D 0x412F 0x4139 resto_412F  lo apuntan con el banco puesto p01:616D (0x412F), p00:44A4 (0x4134), p01:6168 (0x4134); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p01:616D, p00:44A4, p01:6168 (10 bytes)
+F 0x412F 16
+D 0x438C 0x4396 resto_438C  lo apuntan con el banco puesto p00:4357 (0x438C), p00:4360 (0x4391); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p00:4357, p00:4360 (10 bytes)
+F 0x438C 16
+D 0x4611 0x4619 resto_4611  lo apuntan con el banco puesto p00:45E3 (0x4611); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p00:45E3 (8 bytes)
+F 0x4611 16
+D 0x4765 0x476A resto_4765  lo apuntan con el banco puesto p00:4757 (0x4765); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p00:4757 (5 bytes)
+F 0x4765 16
+D 0x481E 0x4824 resto_481E  lo apuntan con el banco puesto p00:4802 (0x481E), p00:480B (0x4821); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p00:4802, p00:480B (6 bytes)
+F 0x481E 16
+D 0x4AED 0x4AF5 resto_4AED  lo apuntan con el banco puesto p00:4A1A (0x4AED); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p00:4A1A (8 bytes)
+F 0x4AED 16
+D 0x55E4 0x55F0 resto_55E4  lo apuntan con el banco puesto p00:55D1 (0x55E4); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p00:55D1 (12 bytes)
+F 0x55E4 16
+D 0x58B9 0x58C5 resto_58B9  lo apuntan con el banco puesto p00:58A7 (0x58B9); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p00:58A7 (12 bytes)
+F 0x58B9 16
+D 0x59EA 0x5A22 resto_59EA  lo apuntan con el banco puesto p03:B39E (0x59EA), p03:B3FC (0x59F5), p03:BBE4 (0x5A17); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p03:B39E, p03:B3FC, p03:BBE4 (56 bytes)
+F 0x59EA 16
+# --- fin de los bloques de bloques.py ---
+
+# --- ANOTACIONES AUTOMATICAS (seccion que reescribe tools/anota.py; no editar a mano) ---
+L 0x4010 interrupcion el gancho H.KEYI: sonido (bancos 12-13-14) y el cuadro del juego
+L 0x405C suma_a_hl HL = HL + A
+L 0x4061 suma_a_de DE = DE + A
+L 0x4066 despacha salta a la palabra A de la tabla que va detras del call
+L 0x4070 init el arranque del cartucho (INIT)
+L 0x40C1 cartucho_en_8000 pone el cartucho tambien en 0x8000-0xBFFF (ENASLT)
+L 0x40E1 ranura_del_cartucho la ranura del cartucho, en 0xF0F4
+L 0x40FD pide_sonido_01 pide el sonido 0x01 al motor de sonido (p12:6003)
+L 0x4102 pide_sonido_02 pide el sonido 0x02
+L 0x4107 pide_sonido_03 pide el sonido 0x03
+L 0x410C pide_sonido_04 pide el sonido 0x04
+L 0x4111 pide_sonido_05 pide el sonido 0x05
+L 0x4116 pide_sonido_06 pide el sonido 0x06 (el del cursor)
+L 0x411B pide_sonido_07 pide el sonido 0x07 (el del boton)
+L 0x4120 pide_sonido_08 pide el sonido 0x08
+L 0x4125 pide_sonido_09 pide el sonido 0x09
+L 0x412A pide_sonido_0A pide el sonido 0x0A
+L 0x4139 pide_sonido_0D pide el sonido 0x0D
+L 0x413E pide_sonido_0E pide el sonido 0x0E
+L 0x4143 pide_sonido_0F pide el sonido 0x0F
+L 0x4148 pide_sonido_10 pide el sonido 0x10
+L 0x414D voz_pon dice PON: la voz 0x11 con el tono del personaje de 0xC20D
+L 0x4158 voz_chi dice CHI: la voz 0x12 con el tono del personaje de 0xC20D
+L 0x4163 voz_kan dice KAN: la voz 0x13 con el tono del personaje de 0xC20D
+L 0x416E voz_ron dice RON: la voz 0x14 con el tono del personaje de 0xC20D
+L 0x4179 voz_riichi dice RIICHI: la voz 0x15 con el tono del personaje de 0xC207
+L 0x4184 voz_tsumo dice TSUMO: la voz 0x16 con el tono del personaje de 0xC207
+L 0x418F voz_17 la voz 0x17 (con el tono 0x83)
+L 0x4199 pide_sonido_18 pide la voz 0x18
+L 0x419E pide_orden_80 pide la orden 0x80 del motor de sonido (parar)
+L 0x41A3 pide_orden_81 pide la orden 0x81 del motor de sonido (ritmo)
+L 0x41A8 pide_orden_84 pide la orden 0x84 del motor de sonido (fundido)
+L 0x41AD tono_de_la_voz pone el tono de voz del personaje A (tabla 0xC030)
+L 0x41D5 pide_sonido pide al motor de sonido (p12:6003) el sonido A; pone los bancos 12-13-14 y devuelve los de antes
+L 0x4207 bancos_1_2_3 pone los bancos 1-2-3 (y sus copias en 0xF0F1-3)
+L 0x4223 bancos_4 pone el 4 (y sus copias en 0xF0F1-3)
+L 0x4228 bancos_5_6 pone los bancos 5-6 (y sus copias en 0xF0F1-3)
+L 0x422D bancos_7_8_9 pone los bancos 7-8-9 (y sus copias en 0xF0F1-3)
+L 0x4232 bancos_10_11 pone los bancos 10-11 (y sus copias en 0xF0F1-3)
+L 0x424B bancos_15 pone el 15 (y sus copias en 0xF0F1-3)
+L 0x4258 bancos_11 pone el 11 (y sus copias en 0xF0F1-3)
+L 0x425D cuadro_del_juego un cuadro de la maquina de estados del juego (0xC000, 0xC001)
+L 0x4A17 suma_puntos_actual suma al marcador del jugador 0xC207 el importe C (signo) y DE (BCD)
+L 0x4A1A suma_puntos suma al marcador del jugador A (3 bytes en 0xC0A0 + 3 x A) el importe C (signo) y DE (BCD)
+L 0x4AF5 resta_uno_bcd_de DE = DE - 1 en BCD; Z si acaba en cero
+L 0x4B46 dibuja_marcadores dibuja los cuatro paneles de puntos de los jugadores
+L 0x4C54 numero_2_bytes escribe el numero BCD de 2 bytes de HL en DE
+L 0x4C59 numero_con_signo escribe el numero BCD de HL en DE con '-' si es negativo
+L 0x4CC9 numero_sin_ceros escribe B bytes BCD de HL en DE sin ceros por la izquierda
+L 0x4D07 palabra_de_tabla HL = la palabra numero A de la tabla que apunta HL
+L 0x4D12 lee_vram lee BC bytes de la VRAM (desde HL) a DE
+L 0x4D2D copia_a_vram_hl copia BC bytes de HL a la VRAM en DE
+L 0x4D40 copia_a_vram copia BC bytes de la RAM (DE) a la VRAM en HL
+L 0x4D56 rellena_vram rellena BC bytes de la VRAM con A desde HL
+L 0x4DAD direccion_lectura_vram_x2 direccion de lectura de la VRAM = HL x 2
+L 0x4DE9 direccion_escritura_vram direccion de escritura de la VRAM = HL (el acarreo es el bit 16)
+L 0x4E27 vuelca_lista_vram vuelca a la VRAM una lista de bloques (direccion, n, datos; 0 acaba)
+L 0x4E50 limpia_pantalla apaga la pantalla, quita los sprites y borra la VRAM visible
+L 0x4E69 pantalla_on enciende la pantalla
+L 0x4E76 pantalla_off apaga la pantalla
+L 0x4E83 quita_sprites pone todos los sprites fuera de pantalla
+L 0x4EB2 pon_color escribe el color D,E en la paleta A
+L 0x4EDC pon_colores aplica una lista de colores (A, D, E; 0xFF acaba)
+L 0x4EEA espera_vdp espera a que el VDP acabe la orden en marcha
+L 0x4F18 vdp_linea LINE: traza una linea (HL = origen, B = largo, C = grosor, A = color)
+L 0x4FE5 vdp_hmmv_2 HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+L 0x5024 vdp_copia HMMM: copia un rectangulo de la VRAM (origen HL, destino DE, tamano BC, A = paginas)
+L 0x5074 vdp_lmmc LMMC: manda al VDP un rectangulo con puntos de HL
+L 0x50E1 vdp_lmcm LMCM: lee un rectangulo de la VRAM a DE
+L 0x5151 vdp_lmmm LMMM: copia un rectangulo con operacion logica (A)
+L 0x5363 dibuja_lista_tiles dibuja una lista de tiles de HL (x, y, tiles; 0xFF acaba)
+L 0x5398 dibuja_tile dibuja el tile A de 8 x 8 en D,E
+L 0x53AA dibuja_tile_pagina1 dibuja el tile A en D,E con la copia de la pagina 1
+L 0x53DE origen_tile HL = el origen en la hoja de tiles del tile A
+L 0x53EE avanza_tile D += 8 (y E += 8 si D da la vuelta)
+L 0x558C arranca_pantalla arranca el sonido, pone SCREEN 7 y limpia la VRAM
+L 0x55F0 lee_mandos lee los mandos y el teclado
+L 0x568A carga_fondo_mesa carga el fondo de la mesa (bancos 7-9)
+L 0x5911 carga_imagen carga y dibuja una imagen de tiles (HL = lista, DE = tabla de paletas)
+L 0x59CD copia_sprites copia la tabla de colores de los sprites a la VRAM
+L 0x5A22 dibuja_mesa carga las fichas y el tapete de los bancos 7-9
+L 0x5ACD escribe_texto escribe un texto de letras de 16 puntos de alto en D,E
+L 0x5B29 dibuja_letra dibuja la letra A de 16 x 16 con el color C
+L 0x5DF5 prepara_partida prepara la pantalla de la partida
+L 0x5E4D mano_del_actual HL = la mano del jugador 0xC207 y la guarda en 0xC0DE
+L 0x5E54 mano_de_jugador HL = 0xD000 + 0x400 x 0xC207
+L 0x5E5F sprites_fuera pone los 32 sprites fuera de pantalla
+L 0x5E6D borra_manos borra 4 KB de 0xD000 (las manos)
+L 0x5E7B turno_humano un paso de las respuestas del humano
+C 0x4022 el mapper: pone en 0x6000 el banco de A
+C 0x4026 el mapper: pone en 0x8000 el banco de A
+C 0x402A el mapper: pone en 0xA000 el banco de A
+C 0x4031 guarda el semaforo del sonido
+C 0x4035 lee la copia del banco en 0x6000
+C 0x4038 el mapper: pone en 0x6000 el banco de A
+C 0x403B lee la copia del banco en 0x8000
+C 0x403E el mapper: pone en 0x8000 el banco de A
+C 0x4041 lee la copia del banco en 0xA000
+C 0x4044 el mapper: pone en 0xA000 el banco de A
+C 0x4057 guarda el semaforo del cuadro del juego
+C 0x4068 suma_a_hl: HL = HL + A
+C 0x4079 ranura_del_cartucho: la ranura del cartucho, en 0xF0F4
+C 0x407F apunta a el paso dentro del estado
+C 0x4089 apunta a la copia del banco en 0x6000
+C 0x408E el mapper: pone en 0x6000 el banco de A
+C 0x4093 el mapper: pone en 0x8000 el banco de A
+C 0x4099 el mapper: pone en 0xA000 el banco de A
+C 0x40A7 guarda el ajuste horizontal de la imagen (registro 18 del VDP) y el byte siguiente (16 bits)
+C 0x40FF pide_sonido: pide al motor de sonido (p12:6003) el sonido A; pone los bancos 12-13-14 y devuelve los de antes
+C 0x4104 pide_sonido: pide al motor de sonido (p12:6003) el sonido A; pone los bancos 12-13-14 y devuelve los de antes
+C 0x4109 pide_sonido: pide al motor de sonido (p12:6003) el sonido A; pone los bancos 12-13-14 y devuelve los de antes
+C 0x410E pide_sonido: pide al motor de sonido (p12:6003) el sonido A; pone los bancos 12-13-14 y devuelve los de antes
+C 0x4113 pide_sonido: pide al motor de sonido (p12:6003) el sonido A; pone los bancos 12-13-14 y devuelve los de antes
+C 0x4118 pide_sonido: pide al motor de sonido (p12:6003) el sonido A; pone los bancos 12-13-14 y devuelve los de antes
+C 0x411D pide_sonido: pide al motor de sonido (p12:6003) el sonido A; pone los bancos 12-13-14 y devuelve los de antes
+C 0x4122 pide_sonido: pide al motor de sonido (p12:6003) el sonido A; pone los bancos 12-13-14 y devuelve los de antes
+C 0x4127 pide_sonido: pide al motor de sonido (p12:6003) el sonido A; pone los bancos 12-13-14 y devuelve los de antes
+C 0x412C pide_sonido: pide al motor de sonido (p12:6003) el sonido A; pone los bancos 12-13-14 y devuelve los de antes
+C 0x413B pide_sonido: pide al motor de sonido (p12:6003) el sonido A; pone los bancos 12-13-14 y devuelve los de antes
+C 0x4140 pide_sonido: pide al motor de sonido (p12:6003) el sonido A; pone los bancos 12-13-14 y devuelve los de antes
+C 0x4145 pide_sonido: pide al motor de sonido (p12:6003) el sonido A; pone los bancos 12-13-14 y devuelve los de antes
+C 0x414A pide_sonido: pide al motor de sonido (p12:6003) el sonido A; pone los bancos 12-13-14 y devuelve los de antes
+C 0x4150 tono_de_la_voz: pone el tono de voz del personaje A (tabla 0xC030)
+C 0x4155 pide_sonido: pide al motor de sonido (p12:6003) el sonido A; pone los bancos 12-13-14 y devuelve los de antes
+C 0x415B tono_de_la_voz: pone el tono de voz del personaje A (tabla 0xC030)
+C 0x4160 pide_sonido: pide al motor de sonido (p12:6003) el sonido A; pone los bancos 12-13-14 y devuelve los de antes
+C 0x4166 tono_de_la_voz: pone el tono de voz del personaje A (tabla 0xC030)
+C 0x416B pide_sonido: pide al motor de sonido (p12:6003) el sonido A; pone los bancos 12-13-14 y devuelve los de antes
+C 0x4171 tono_de_la_voz: pone el tono de voz del personaje A (tabla 0xC030)
+C 0x4176 pide_sonido: pide al motor de sonido (p12:6003) el sonido A; pone los bancos 12-13-14 y devuelve los de antes
+C 0x417C tono_de_la_voz: pone el tono de voz del personaje A (tabla 0xC030)
+C 0x4181 pide_sonido: pide al motor de sonido (p12:6003) el sonido A; pone los bancos 12-13-14 y devuelve los de antes
+C 0x4187 tono_de_la_voz: pone el tono de voz del personaje A (tabla 0xC030)
+C 0x418C pide_sonido: pide al motor de sonido (p12:6003) el sonido A; pone los bancos 12-13-14 y devuelve los de antes
+C 0x4191 pide_sonido: pide al motor de sonido (p12:6003) el sonido A; pone los bancos 12-13-14 y devuelve los de antes
+C 0x4196 pide_sonido: pide al motor de sonido (p12:6003) el sonido A; pone los bancos 12-13-14 y devuelve los de antes
+C 0x419B pide_sonido: pide al motor de sonido (p12:6003) el sonido A; pone los bancos 12-13-14 y devuelve los de antes
+C 0x41A0 pide_sonido: pide al motor de sonido (p12:6003) el sonido A; pone los bancos 12-13-14 y devuelve los de antes
+C 0x41A5 pide_sonido: pide al motor de sonido (p12:6003) el sonido A; pone los bancos 12-13-14 y devuelve los de antes
+C 0x41AA pide_sonido: pide al motor de sonido (p12:6003) el sonido A; pone los bancos 12-13-14 y devuelve los de antes
+C 0x41B0 suma_a_hl: HL = HL + A
+C 0x41B4 despacha: salta a la palabra A de la tabla que va detras del call
+C 0x41CB pide_sonido: pide al motor de sonido (p12:6003) el sonido A; pone los bancos 12-13-14 y devuelve los de antes
+C 0x41D1 pide_sonido: pide al motor de sonido (p12:6003) el sonido A; pone los bancos 12-13-14 y devuelve los de antes
+C 0x41DE el mapper: pone en 0x6000 el banco de A
+C 0x41E2 el mapper: pone en 0x8000 el banco de A
+C 0x41E6 el mapper: pone en 0xA000 el banco de A
+C 0x41EE apunta a la copia del banco en 0x6000
+C 0x41F2 el mapper: pone en 0x6000 el banco de A
+C 0x41F7 el mapper: pone en 0x8000 el banco de A
+C 0x41FC el mapper: pone en 0xA000 el banco de A
+C 0x420C apunta a la copia del banco en 0x6000
+C 0x4210 el mapper: pone en 0x6000 el banco de A
+C 0x4216 el mapper: pone en 0x8000 el banco de A
+C 0x421C el mapper: pone en 0xA000 el banco de A
+C 0x4236 guarda la copia del banco en 0x8000
+C 0x4239 el mapper: pone en 0x8000 el banco de A
+C 0x423D guarda la copia del banco en 0xA000
+C 0x4240 el mapper: pone en 0xA000 el banco de A
+C 0x424F guarda la copia del banco en 0xA000
+C 0x4252 el mapper: pone en 0xA000 el banco de A
+C 0x4292 prepara la pantalla del titulo (bancos 5-6: paleta de 0xAF80, imagenes de 0xAFD1, 0xB039 y 0xB0A1)
+C 0x4297 un paso de la animacion del titulo: cada dos cuadros se dibuja otra columna del dibujo; al acabar, 0xC202 = 1
+C 0x429A lee la Y de la ficha en la hoja de tiles
+C 0x429F dibuja_mesa: carga las fichas y el tapete de los bancos 7-9
+C 0x42A5 apunta a el temporizador de espera entre pasos
+C 0x42AA limpia_pantalla: apaga la pantalla, quita los sprites y borra la VRAM visible
+C 0x42AD pantalla_off: apaga la pantalla
+C 0x42B0 prepara la pantalla del menu (bancos 10-11): lista 0x9502, tabla 0x94B2
+C 0x42B6 pantalla_on: enciende la pantalla
+C 0x42BA guarda el paso de la animacion del titulo
+C 0x42BD pide_sonido_09: pide el sonido 0x09
+C 0x42C5 el paso (0xC01A) elige la animacion del titulo
+C 0x42C8 lee el paso de la animacion del titulo
+C 0x42D1 apunta a el temporizador de espera entre pasos
+C 0x42D6 limpia_pantalla: apaga la pantalla, quita los sprites y borra la VRAM visible
+C 0x42E0 limpia_pantalla: apaga la pantalla, quita los sprites y borra la VRAM visible
+C 0x42E3 prepara_inicio: prepara el fondo de la partida
+C 0x42F0 bancos_4: pone el 4 (y sus copias en 0xF0F1-3)
+C 0x42F3 efecto_final_mano: el efecto de fondo del final de la mano
+C 0x42F6 bancos_1_2_3: pone los bancos 1-2-3 (y sus copias en 0xF0F1-3)
+C 0x42F9 lee 1 cuando la partida esta lista
+C 0x42FF guarda el estado de la maquina de estados del juego (0-8)
+C 0x4304 guarda el temporizador de espera entre pasos
+C 0x430B copia_sprites: copia la tabla de colores de los sprites a la VRAM
+C 0x4310 despacha: salta a la palabra A de la tabla que va detras del call
+C 0x4323 limpia_pantalla: apaga la pantalla, quita los sprites y borra la VRAM visible
+C 0x432F pantalla_off: apaga la pantalla
+C 0x4335 carga dos conjuntos de tiles de los bancos 7-9 (las fichas del mahjong y sus numeros) con 3 y 2 bits por punto
+C 0x4338 espera_vdp: espera a que el VDP acabe la orden en marcha
+C 0x433B vuelca una paleta de los bancos 5-6 (DE = lista)
+C 0x4348 vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0x435A escribe_texto: escribe un texto de letras de 16 puntos de alto en D,E
+C 0x4363 escribe_texto: escribe un texto de letras de 16 puntos de alto en D,E
+C 0x4366 pantalla_on: enciende la pantalla
+C 0x436C llena de 9 la fila 0xCA00 (16 bytes) y de 2 la 0xCA10
+C 0x436F dibuja el cursor del menu: dos sprites (0xCC00 y 0xCC04) en la tabla de atributos en RAM
+C 0x437A llena 16 bytes de HL con A (el primer byte y ldir de 15 a los siguientes)
+C 0x439E apunta a la opcion elegida en el menu del titulo (0 o 1)
+C 0x43AC pide_sonido_06: pide el sonido 0x06 (el del cursor)
+C 0x43D6 limpia_pantalla: apaga la pantalla, quita los sprites y borra la VRAM visible
+C 0x43DA guarda la opcion elegida en la pantalla de dos opciones (+1)
+C 0x43DD guarda la opcion elegida en la pantalla de cinco opciones (+1)
+C 0x43E3 bancos_15: pone el 15 (y sus copias en 0xF0F1-3)
+C 0x43E6 copia_estilos_rivales: copia a 0xC040 la tabla de estilos de los ocho rivales
+C 0x43E9 opciones_por_defecto: pone las diez opciones de reglas por defecto
+C 0x43EC bancos_1_2_3: pone los bancos 1-2-3 (y sus copias en 0xF0F1-3)
+C 0x43F2 lee la ranura del otro cartucho (la memoria de partidas)
+C 0x43F8 lee la opcion elegida en el menu del titulo (0 o 1)
+C 0x43FF carga_fondo_mesa: carga el fondo de la mesa (bancos 7-9)
+C 0x4402 carga dos conjuntos de tiles de los bancos 7-9 (las fichas del mahjong y sus numeros) con 3 y 2 bits por punto
+C 0x4407 guarda el paso dentro del estado
+C 0x440D guarda el personaje que juega de rival 1
+C 0x4412 guarda el personaje que juega de rival 2
+C 0x4417 guarda el personaje que juega de rival 3
+C 0x441B PANTALLA DE DOS OPCIONES (grabar, cargar): 0xC02C elige el paso por la tabla de 0xB377 (p03:B373)
+C 0x441E lee la opcion elegida en la pantalla de dos opciones (+1)
+C 0x442D apunta a el paso dentro del estado
+C 0x4436 lee 1 cuando la pantalla de menu ha acabado
+C 0x443F limpia_pantalla: apaga la pantalla, quita los sprites y borra la VRAM visible
+C 0x4445 carga_fondo_mesa: carga el fondo de la mesa (bancos 7-9)
+C 0x4448 carga dos conjuntos de tiles de los bancos 7-9 (las fichas del mahjong y sus numeros) con 3 y 2 bits por punto
+C 0x444E PANTALLA DE CINCO OPCIONES: 0xC02C elige el paso por la tabla de 0xB3D5 (p03:B3D1)
+C 0x4451 lee la opcion elegida en la pantalla de cinco opciones (+1)
+C 0x445F lee 1 cuando la pantalla de menu ha acabado
+C 0x446A limpia_pantalla: apaga la pantalla, quita los sprites y borra la VRAM visible
+C 0x4470 carga dos conjuntos de tiles de los bancos 7-9 (las fichas del mahjong y sus numeros) con 3 y 2 bits por punto
+C 0x447A guarda la opcion elegida en la pantalla de cinco opciones (+1)
+C 0x447D guarda la opcion elegida en la pantalla de dos opciones (+1)
+C 0x4480 limpia_pantalla: apaga la pantalla, quita los sprites y borra la VRAM visible
+C 0x4483 apunta a el paso dentro del estado
+C 0x4488 PANTALLA DE ELEGIR RIVALES: 0xC02C elige el paso por la tabla de 0xAA19 (p03:AA15)
+C 0x448B lee 1 cuando la pantalla de menu ha acabado
+C 0x4496 estado de la pantalla de la ronda inicial (0xC02C): elige por la tabla de 0x8EDD (p02:8ED9)
+C 0x4499 lee 1 cuando la pantalla de menu ha acabado
+C 0x44A1 pone los iconos de los tres rivales (0xC031-3) en el marco
+C 0x44AC lee la opcion elegida en la pantalla de dos opciones (+1)
+C 0x44B5 guarda 1 cuando la pantalla de menu ha acabado
+C 0x44B9 lee la opcion elegida en la pantalla de cinco opciones (+1)
+C 0x44BD despacha: salta a la palabra A de la tabla que va detras del call
+C 0x44CB despacha: salta a la palabra A de la tabla que va detras del call
+C 0x44D2 salta a la rutina guardada en 0xC0C2 (HL)
+C 0x44D5 prepara_partida: prepara la pantalla de la partida
+C 0x44DA guarda el paso del reparto
+C 0x44E7 lee el paso del reparto
+C 0x44EE mano_del_actual: HL = la mano del jugador 0xC207 y la guarda en 0xC0DE
+C 0x44F1 apunta a 1 si la mano es de limite
+C 0x44F4 apunta a 1 si algun jugador ha bajado grupos
+C 0x44FE bancos_15: pone el 15 (y sus copias en 0xF0F1-3)
+C 0x4501 estilos_a_manos: pone a cada rival elegido su estilo en +0x90 de su mano
+C 0x4504 prepara_ia: prepara la partida de los tres rivales de la maquina
+C 0x4507 pone a cero 0xC510 (13 bytes) (p15:A072)
+C 0x450A bancos_1_2_3: pone los bancos 1-2-3 (y sus copias en 0xF0F1-3)
+C 0x450F guarda el temporizador de espera entre pasos
+C 0x4512 apunta a el estado de la maquina de estados del juego (0-8)
+C 0x4517 guarda el paso dentro del estado
+C 0x451B turno_humano: un paso de las respuestas del humano
+C 0x451E lee el final de la ronda: 1 sin fichas, 2 hay ganador o aborto
+C 0x4527 lee como se gana la mano: 1 por robo, 2 por la ficha tirada
+C 0x452C dice la voz del jugador al que le toca (por 0xC0B1 elige entre 0xC207 y 0xC20D)
+C 0x4532 copia_sprites: copia la tabla de colores de los sprites a la VRAM
+C 0x4537 despacha: salta a la palabra A de la tabla que va detras del call
+C 0x4548 lee el tiempo que queda de la cara que habla
+C 0x454C cuenta_atras_cuadro: cuenta atras del cuadro de la voz
+C 0x454F cuenta cuantos jugadores tienen los bits 3-4 puestos (0xC0BA) y guarda quienes son (0xC0BB..) (p01:6559)
+C 0x4552 por cada jugador (0xC207 o los cuatro) con los bits 3-4 puestos en +0x60 de su mano, hace la jugada de la IA (0x8CF5 y 0x8B8C) (p01:6509)
+C 0x4555 recorre los jugadores que dijeron algo (0xC0BA: cuantos, 0xC0BB..): para el primero con +0x34 a cero sigue en 0x9F09 (p02:9EE5)
+C 0x4558 lee cuantos jugadores responden a la ficha tirada
+C 0x456D pone el temporizador 0xC004 a A
+C 0x4575 lee el jugador al que le toca (0 = el humano)
+C 0x457A lee el jugador que responde a la ficha tirada
+C 0x4585 guarda como se gana la mano: 1 por robo, 2 por la ficha tirada
+C 0x4589 guarda 1 si se anula porque tres jugadores dicen ron
+C 0x458D guarda el final de la ronda: 1 sin fichas, 2 hay ganador o aborto
+C 0x4592 guarda el temporizador de espera entre pasos
+C 0x459A apunta a el temporizador de espera entre pasos
+C 0x459F muestra_puntuacion: muestra los yaku y los puntos de la mano ganadora
+C 0x45A5 bancos_4: pone el 4 (y sus copias en 0xF0F1-3)
+C 0x45A8 puntua_mano: puntua la mano ganadora y paga
+C 0x45AB bancos_1_2_3: pone los bancos 1-2-3 (y sus copias en 0xF0F1-3)
+C 0x45B1 lee las teclas y los mandos pulsados ahora (flancos de subida)
+C 0x45B8 lee las teclas y los mandos pulsados ahora (flancos de subida)
+C 0x45BE apunta a el paso dentro del estado
+C 0x45C8 guarda el temporizador de espera entre pasos
+C 0x45D7 lee el jugador al que le toca (0 = el humano)
+C 0x45E0 guarda el jugador al que le toca (0 = el humano)
+C 0x45E6 palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0x4601 suma_puntos_actual: suma al marcador del jugador 0xC207 el importe C (signo) y DE (BCD)
+C 0x4607 dibuja_marcadores: dibuja los cuatro paneles de puntos de los jugadores
+C 0x460B guarda el jugador al que le toca (0 = el humano)
+C 0x4619 lee las teclas y los mandos pulsados ahora (flancos de subida)
+C 0x461F lee como se gana la mano: 1 por robo, 2 por la ficha tirada
+C 0x4623 lee el jugador al que le toca (0 = el humano)
+C 0x4628 lee el jugador que responde a la ficha tirada
+C 0x4637 guarda las barras de riichi sobre la mesa (BCD)
+C 0x463A lee la regla del ron doble (ダブルロン; de serie si)
+C 0x4648 apunta a cuantos jugadores responden a la ficha tirada
+C 0x4652 guarda la linea de la lista de yaku que se escribe
+C 0x4668 guarda el jugador que responde a la ficha tirada
+C 0x466B analiza_mano_actual: analiza la mano del jugador al que le toca
+C 0x4673 guarda el paso dentro del estado
+C 0x4677 adapta_estilo: adapta el estilo de los rivales a la mano ganadora
+C 0x467D apunta a las barras de honba (BCD)
+C 0x4680 lee 1 si el humano ha decidido ganar
+C 0x4691 apunta a cuantos jugadores responden a la ficha tirada
+C 0x4695 lee el jugador que reparte (0-3)
+C 0x469F mira si hay algun jugador con mas de 2 de 0xC0B3: devuelve acarreo (p01:64E3)
+C 0x46A6 apunta a el numero de la mano dentro del viento (0-3)
+C 0x46C2 guarda las manos seguidas del que reparte
+C 0x46C5 apunta a el jugador que reparte (0-3)
+C 0x46D8 apunta a las manos seguidas del que reparte
+C 0x46DD guarda como se gana la mano: 1 por robo, 2 por la ficha tirada
+C 0x46E3 lee las barras de riichi sobre la mesa (BCD)
+C 0x4701 lee como se gana la mano: 1 por robo, 2 por la ficha tirada
+C 0x4705 lee el jugador al que le toca (0 = el humano)
+C 0x470A lee el jugador que responde a la ficha tirada
+C 0x4714 suma_a_hl: HL = HL + A
+C 0x4718 lee las barras de riichi sobre la mesa (BCD)
+C 0x472F suma_puntos: suma al marcador del jugador A (3 bytes en 0xC0A0 + 3 x A) el importe C (signo) y DE (BCD)
+C 0x4732 dibuja_marcadores: dibuja los cuatro paneles de puntos de los jugadores
+C 0x4738 lee las teclas y los mandos pulsados ahora (flancos de subida)
+C 0x4748 vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0x475A escribe_texto: escribe un texto de letras de 16 puntos de alto en D,E
+C 0x475D pide_sonido_10: pide el sonido 0x10
+C 0x476B copia_sprites: copia la tabla de colores de los sprites a la VRAM
+C 0x4770 despacha: salta a la palabra A de la tabla que va detras del call
+C 0x4781 apunta a el temporizador de espera entre pasos
+C 0x4786 limpia_pantalla: apaga la pantalla, quita los sprites y borra la VRAM visible
+C 0x4789 carga_fondo_mesa: carga el fondo de la mesa (bancos 7-9)
+C 0x478C dibuja_mesa: carga las fichas y el tapete de los bancos 7-9
+C 0x478F resultados_finales: pantalla de los resultados finales
+C 0x4792 carga una imagen de los bancos 10-11 y su paleta (0xF800)
+C 0x4795 bancos_4: pone el 4 (y sus copias en 0xF0F1-3)
+C 0x4798 inicia las caras de los rivales: pone a cero 0xC300, 0xC301 y 0xC25D (34 bytes), y pone los sprites fuera de pantalla (p04:B695)
+C 0x479B bancos_1_2_3: pone los bancos 1-2-3 (y sus copias en 0xF0F1-3)
+C 0x479E espera_vdp: espera a que el VDP acabe la orden en marcha
+C 0x47A7 bancos_4: pone el 4 (y sus copias en 0xF0F1-3)
+C 0x47AA anima_rivales: anima las caras de los tres rivales
+C 0x47AD bancos_1_2_3: pone los bancos 1-2-3 (y sus copias en 0xF0F1-3)
+C 0x47B0 lee las teclas y los mandos pulsados ahora (flancos de subida)
+C 0x47BC limpia_pantalla: apaga la pantalla, quita los sprites y borra la VRAM visible
+C 0x47BF pantalla_off: apaga la pantalla
+C 0x47C2 vuelca una paleta de los bancos 5-6 (DE = lista)
+C 0x47CE dibuja_mesa: carga las fichas y el tapete de los bancos 7-9
+C 0x47D1 PANTALLA DE LOS RESULTADOS POR RIVAL: dibuja la lista 0xBD33 y los nueve marcadores de 0xC082..0xC09A y las nueve cuentas de 0xC034..0xC03C (p03:BC66)
+C 0x47DA pantalla_on: enciende la pantalla
+C 0x47DD lee las teclas y los mandos pulsados ahora (flancos de subida)
+C 0x47E3 limpia_pantalla: apaga la pantalla, quita los sprites y borra la VRAM visible
+C 0x47E6 pantalla_off: apaga la pantalla
+C 0x47F3 vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0x4805 escribe_texto: escribe un texto de letras de 16 puntos de alto en D,E
+C 0x480E escribe_texto: escribe un texto de letras de 16 puntos de alto en D,E
+C 0x4811 llena de 9 la fila 0xCA00 (16 bytes) y de 2 la 0xCA10
+C 0x4814 pantalla_on: enciende la pantalla
+C 0x4818 guarda la opcion elegida en el segundo menu del titulo
+C 0x4824 lee las teclas y los mandos pulsados ahora (flancos de subida)
+C 0x482F apunta a la opcion elegida en el segundo menu del titulo
+C 0x483E lee la ranura del otro cartucho (la memoria de partidas)
+C 0x4844 lee la opcion elegida en el menu del titulo (0 o 1)
+C 0x484B pide_orden_81: pide la orden 0x81 del motor de sonido (ritmo)
+C 0x484E lee la opcion elegida en el segundo menu del titulo
+C 0x4856 guarda el temporizador de espera entre pasos
+C 0x485B guarda el paso dentro del estado
+C 0x485F limpia_pantalla: apaga la pantalla, quita los sprites y borra la VRAM visible
+C 0x4862 carga_fondo_mesa: carga el fondo de la mesa (bancos 7-9)
+C 0x4868 dibuja_mesa: carga las fichas y el tapete de los bancos 7-9
+C 0x4882 guarda la opcion elegida en la pantalla de dos opciones (+1)
+C 0x4885 guarda la opcion elegida en la pantalla de cinco opciones (+1)
+C 0x488E guarda el estado de la maquina de estados del juego (0-8) y el byte siguiente (16 bits)
+C 0x4892 limpia_pantalla: apaga la pantalla, quita los sprites y borra la VRAM visible
+C 0x489B PANTALLA DE GRABAR: si no hay otro cartucho (0xF0F5 = 0xFF) espera y sale; si no dibuja la ventana con la lista 0x5A17 (p03:BBA0)
+C 0x489E lee 1 cuando la pantalla de menu ha acabado
+C 0x48A8 pide_orden_81: pide la orden 0x81 del motor de sonido (ritmo)
+C 0x48AB lee la opcion elegida en el segundo menu del titulo
+C 0x48B7 apunta a el temporizador de espera entre pasos
+C 0x48BC pide_sonido_01: pide el sonido 0x01 al motor de sonido (p12:6003)
+C 0x48C2 guarda el estado de la maquina de estados del juego (0-8) y el byte siguiente (16 bits)
+C 0x48C7 despacha: salta a la palabra A de la tabla que va detras del call
+C 0x48D2 lee el final de la ronda: 1 sin fichas, 2 hay ganador o aborto
+C 0x48DD mira si algun jugador tiene una mano que no vale (con 0xC023) (p01:7083)
+C 0x48E2 dice la voz del jugador al que le toca (por 0xC0B1 elige entre 0xC207 y 0xC20D)
+C 0x48E6 guarda el final de la ronda: 1 sin fichas, 2 hay ganador o aborto
+C 0x48EF guarda el estado de la maquina de estados del juego (0-8) y el byte siguiente (16 bits)
+C 0x48F6 fin_de_ronda: fin de la ronda: elige el aviso y quien reparte
+C 0x48FF guarda el jugador al que le toca (0 = el humano)
+C 0x4904 guarda como se gana la mano: 1 por robo, 2 por la ficha tirada
+C 0x490C lee las teclas y los mandos pulsados ahora (flancos de subida)
+C 0x4912 lee el contador de cuadros
+C 0x4917 apunta a el temporizador de espera entre pasos
+C 0x491D guarda las manos seguidas del que reparte
+C 0x4920 apunta a las barras de honba (BCD)
+C 0x4933 apunta a el paso dentro del estado
+C 0x4939 cuenta cuantos jugadores tienen +0x81 (en espera al acabar la ronda) en 0xC22F (p03:B580)
+C 0x493C paga_esperas: paga las esperas de una ronda sin ganador
+C 0x4944 lee las teclas y los mandos pulsados ahora (flancos de subida)
+C 0x494A apunta a el temporizador de espera entre pasos
+C 0x494F ajusta el estilo de los tres rivales (+0x90..+0x96) segun lo que ha pasado en la ronda (p03:BF09)
+C 0x4955 lee las teclas y los mandos pulsados ahora (flancos de subida)
+C 0x495A salta a la rutina guardada en 0xC0C2 (HL)
+C 0x495D limpia_pantalla: apaga la pantalla, quita los sprites y borra la VRAM visible
+C 0x4960 pantalla_off: apaga la pantalla
+C 0x4966 dibuja_mesa: carga las fichas y el tapete de los bancos 7-9
+C 0x4969 lee el jugador al que le toca (0 = el humano)
+C 0x496D dibuja las fichas del muro muertas: un rectangulo de 122 x 74 y siete fichas (p02:9636)
+C 0x4971 guarda el jugador al que le toca (0 = el humano)
+C 0x4974 dibuja_rivales: dibuja las tres fichas de los rivales
+C 0x4977 pantalla_on: enciende la pantalla
+C 0x497A carga las tres columnas de texto de dialogo en 0xC0BF/0xC0BE
+C 0x497D dibuja_mesa: carga las fichas y el tapete de los bancos 7-9
+C 0x4980 copia_estilos: copia los estilos de los tres rivales a sus manos
+C 0x4983 borra_manos: borra 4 KB de 0xD000 (las manos)
+C 0x4986 borra_temporales: borra 0xC200-0xC3FF
+C 0x4989 posicion_descartes: pone la posicion inicial de los descartes de los cuatro
+C 0x498D guarda 1 si las manos se ven boca arriba
+C 0x4991 guarda el paso del reparto
+C 0x4994 borra_cuadros: borra los cuadros del fondo
+C 0x499A guarda el estado de la maquina de estados del juego (0-8) y el byte siguiente (16 bits)
+C 0x499E lee el estado de la maquina de estados del juego (0-8)
+C 0x49A4 teclas y joystick 1 en un byte: bits 0-5 de la palanca y 2 botones (PSG puerto 14, filas 6 y 8 del teclado)
+C 0x49AA flancos de una tecla: guarda el estado nuevo y deja en la direccion anterior lo recien pulsado
+C 0x49AF apunta a el temporizador de espera entre pasos
+C 0x49C6 pide_sonido_01: pide el sonido 0x01 al motor de sonido (p12:6003)
+C 0x49C9 pide_sonido_18: pide la voz 0x18
+C 0x49CC apunta a el estado de la maquina de estados del juego (0-8)
+C 0x49D7 pide_sonido_09: pide el sonido 0x09
+C 0x49DD guarda el estado de la maquina de estados del juego (0-8) y el byte siguiente (16 bits)
+C 0x49E0 limpia_pantalla: apaga la pantalla, quita los sprites y borra la VRAM visible
+C 0x49E3 pantalla_off: apaga la pantalla
+C 0x49E6 prepara la pantalla del menu (bancos 10-11): lista 0x9502, tabla 0x94B2
+C 0x49EF copia un rectangulo de la pagina 0 a si mismo (borra la franja inferior)
+C 0x49F5 dibuja la lista de tiles de 0x59D9 (el texto del titulo)
+C 0x49F8 pantalla_on: enciende la pantalla
+C 0x49FB apunta a 1 cuando la pantalla de menu ha acabado
+C 0x49FE apunta a variable de los pasos de las pantallas de menu
+C 0x4A09 apunta a la regla 'comer 断幺' (tanyao con la mano abierta; de serie si)
+C 0x4AE7 resta_uno_bcd_de: DE = DE - 1 en BCD; Z si acaba en cero
+C 0x4B50 vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0x4B62 numero_2_bytes: escribe el numero BCD de 2 bytes de HL en DE
+C 0x4B6B numero_2_bytes: escribe el numero BCD de 2 bytes de HL en DE
+C 0x4B75 vdp_linea: LINE: traza una linea (HL = origen, B = largo, C = grosor, A = color)
+C 0x4B7E numero_2_bytes: escribe el numero BCD de 2 bytes de HL en DE
+C 0x4B8B vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0x4B9D numero_2_bytes: escribe el numero BCD de 2 bytes de HL en DE
+C 0x4BA6 numero_2_bytes: escribe el numero BCD de 2 bytes de HL en DE
+C 0x4BB0 vdp_linea: LINE: traza una linea (HL = origen, B = largo, C = grosor, A = color)
+C 0x4BB9 numero_2_bytes: escribe el numero BCD de 2 bytes de HL en DE
+C 0x4BC6 vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0x4BD8 numero_2_bytes: escribe el numero BCD de 2 bytes de HL en DE
+C 0x4BE1 numero_2_bytes: escribe el numero BCD de 2 bytes de HL en DE
+C 0x4BEB vdp_linea: LINE: traza una linea (HL = origen, B = largo, C = grosor, A = color)
+C 0x4BF4 numero_2_bytes: escribe el numero BCD de 2 bytes de HL en DE
+C 0x4C01 vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0x4C13 numero_2_bytes: escribe el numero BCD de 2 bytes de HL en DE
+C 0x4C1C numero_2_bytes: escribe el numero BCD de 2 bytes de HL en DE
+C 0x4C26 vdp_linea: LINE: traza una linea (HL = origen, B = largo, C = grosor, A = color)
+C 0x4C2F numero_2_bytes: escribe el numero BCD de 2 bytes de HL en DE
+C 0x4C39 numero_2_bytes: escribe el numero BCD de 2 bytes de HL en DE
+C 0x4C42 numero_2_bytes: escribe el numero BCD de 2 bytes de HL en DE
+C 0x4C4B numero_2_bytes: escribe el numero BCD de 2 bytes de HL en DE
+C 0x4C67 dibuja_tile: dibuja el tile A de 8 x 8 en D,E
+C 0x4C7D dibuja una cifra (A & 0x0F) en D,E como tile y avanza 8 puntos; ceros por la izquierda, en blanco mientras C = 0
+C 0x4C81 dibuja una cifra (A & 0x0F) en D,E como tile y avanza 8 puntos; ceros por la izquierda, en blanco mientras C = 0
+C 0x4C8C dibuja una cifra (A & 0x0F) en D,E como tile y avanza 8 puntos; ceros por la izquierda, en blanco mientras C = 0
+C 0x4C9E dibuja_tile: dibuja el tile A de 8 x 8 en D,E
+C 0x4CB4 dibuja una cifra (A & 0x0F) en D,E como tile y avanza 8 puntos; ceros por la izquierda, en blanco mientras C = 0
+C 0x4CB8 dibuja una cifra (A & 0x0F) en D,E como tile y avanza 8 puntos; ceros por la izquierda, en blanco mientras C = 0
+C 0x4CC1 dibuja una cifra (A & 0x0F) en D,E como tile y avanza 8 puntos; ceros por la izquierda, en blanco mientras C = 0
+C 0x4CC5 dibuja una cifra (A & 0x0F) en D,E como tile y avanza 8 puntos; ceros por la izquierda, en blanco mientras C = 0
+C 0x4CEA dibuja_tile: dibuja el tile A de 8 x 8 en D,E
+C 0x4CFE dibuja_tile: dibuja el tile A de 8 x 8 en D,E
+C 0x4D15 cambia HL y DE y pone en A y B la cuenta de la lectura de bloque (BC)
+C 0x4D2E direccion de escritura de la VRAM = HL x 2: R14 = bits 14-16, y despues los dos bytes de direccion con el bit 6 puesto
+C 0x4D31 cambia HL y DE y pone en A y B la cuenta de la lectura de bloque (BC)
+C 0x4D43 direccion_escritura_vram: direccion de escritura de la VRAM = HL (el acarreo es el bit 16)
+C 0x4D47 cambia HL y DE y pone en A y B la cuenta de la lectura de bloque (BC)
+C 0x4D58 direccion de escritura de la VRAM = HL x 2: R14 = bits 14-16, y despues los dos bytes de direccion con el bit 6 puesto
+C 0x4D70 direccion_lectura_vram_x2: direccion de lectura de la VRAM = HL x 2
+C 0x4D7D direccion de escritura de la VRAM = HL x 2: R14 = bits 14-16, y despues los dos bytes de direccion con el bit 6 puesto
+C 0x4DDD direccion_escritura_vram: direccion de escritura de la VRAM = HL (el acarreo es el bit 16)
+C 0x4E2D direccion_escritura_vram: direccion de escritura de la VRAM = HL (el acarreo es el bit 16)
+C 0x4E53 pantalla_off: apaga la pantalla
+C 0x4E5F vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0x4E93 apunta a la tabla de atributos de los sprites (32 de 4 bytes)
+C 0x4E99 copia_a_vram: copia BC bytes de la RAM (DE) a la VRAM en HL
+C 0x4ECF direccion_escritura_vram: direccion de escritura de la VRAM = HL (el acarreo es el bit 16)
+C 0x4EE5 pon_color: escribe el color D,E en la paleta A
+C 0x4EF0 espera_vdp: espera a que el VDP acabe la orden en marcha
+C 0x4EF5 lee el registro de estado A del VDP: lo selecciona en R15, lo lee y vuelve a dejar R15 = 0
+C 0x4F19 espera_vdp: espera a que el VDP acabe la orden en marcha
+C 0x4F65 espera_vdp: espera a que el VDP acabe la orden en marcha
+C 0x4FA4 guarda los registros y traza una linea vertical (0x4F64)
+C 0x4FD1 LINE en vertical: igual que 0x4F18 con los ejes cambiados
+C 0x4FDD vdp_linea: LINE: traza una linea (HL = origen, B = largo, C = grosor, A = color)
+C 0x4FE6 espera_vdp: espera a que el VDP acabe la orden en marcha
+C 0x5025 espera_vdp: espera a que el VDP acabe la orden en marcha
+C 0x5075 espera_vdp: espera a que el VDP acabe la orden en marcha
+C 0x50E2 espera_vdp: espera a que el VDP acabe la orden en marcha
+C 0x5152 espera_vdp: espera a que el VDP acabe la orden en marcha
+C 0x5227 lee el registro de estado A del VDP: lo selecciona en R15, lo lee y vuelve a dejar R15 = 0
+C 0x522F lee el registro de estado A del VDP: lo selecciona en R15, lo lee y vuelve a dejar R15 = 0
+C 0x523A DIBUJA UN TILE DE 8 x 8 en D,E: convierte (0x5274) y lo copia con ocho copias de 8 bytes a la VRAM
+C 0x523D avanza_tile: D += 8 (y E += 8 si D da la vuelta)
+C 0x52A8 si A no es cero va a la variante de 2 colores (0x5244); si no, prepara el color C en los dos nibbles
+C 0x52C6 copia_a_vram_hl: copia BC bytes de HL a la VRAM en DE
+C 0x52E1 lee el tamano de las baldosas de la imagen que se carga
+C 0x5331 copia_a_vram_hl: copia BC bytes de HL a la VRAM en DE
+C 0x5344 guarda el tamano de las baldosas de la imagen que se carga
+C 0x534B lee el tamano de las baldosas de la imagen que se carga
+C 0x537A dibuja_tile: dibuja el tile A de 8 x 8 en D,E
+C 0x538F dibuja_tile_pagina1: dibuja el tile A en D,E con la copia de la pagina 1
+C 0x539B origen_tile: HL = el origen en la hoja de tiles del tile A
+C 0x53A3 vdp_lmmm: LMMM: copia un rectangulo con operacion logica (A)
+C 0x53AD origen_tile: HL = el origen en la hoja de tiles del tile A
+C 0x53B5 vdp_copia: HMMM: copia un rectangulo de la VRAM (origen HL, destino DE, tamano BC, A = paginas)
+C 0x53BF origen en la hoja de tiles del tile A de 4 puntos de ancho (X = (A & 0x3F) x 4, Y = 0xB0 + (A >> 6) x 8)
+C 0x53C7 vdp_copia: HMMM: copia un rectangulo de la VRAM (origen HL, destino DE, tamano BC, A = paginas)
+C 0x5400 pasa 8 filas de 1 bit por punto (1 byte por fila, HL) a 4 bits por punto, usando la paleta de 2 entradas de 0xE800
+C 0x5416 pasa 8 filas de 1 bit por punto (1 byte por fila, HL) a 4 bits por punto, usando la paleta de 2 entradas de 0xE800
+C 0x5429 una fila: 8 puntos de 1 bit -> 4 bytes de 2 puntos (cada punto elige entre las entradas de 0xE800)
+C 0x5459 8 filas de 2 bits por punto
+C 0x546F 8 filas de 2 bits por punto
+C 0x5480 una fila de 2 bits por punto: 8 puntos -> 4 bytes, con la paleta de 4 colores de 0xE800
+C 0x54E1 una fila de 3 bits por punto: 8 puntos -> 4 bytes, con la paleta de 8 colores de 0xE800
+C 0x5524 direccion de escritura de la VRAM = HL x 2: R14 = bits 14-16, y despues los dos bytes de direccion con el bit 6 puesto
+C 0x552B dos puntos a la VRAM: con 0xC0B9 = 0 repite el nibble en los dos lados
+C 0x556A guarda el tamano de las baldosas de la imagen que se carga
+C 0x5571 vuelca a la VRAM (en DE) un tile ya en 4 bits (32 bytes en 0xE000) de derecha a izquierda
+C 0x5574 lee el tamano de las baldosas de la imagen que se carga
+C 0x558E el mapper: pone en 0x6000 el banco de A
+C 0x5592 el mapper: pone en 0x8000 el banco de A
+C 0x5596 el mapper: pone en 0xA000 el banco de A
+C 0x5599 sonido_init: inicia el sonido
+C 0x559C lee la copia del banco en 0x6000
+C 0x559F el mapper: pone en 0x6000 el banco de A
+C 0x55A2 lee la copia del banco en 0x8000
+C 0x55A5 el mapper: pone en 0x8000 el banco de A
+C 0x55A8 lee la copia del banco en 0xA000
+C 0x55AB el mapper: pone en 0xA000 el banco de A
+C 0x55BF vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0x55C9 vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0x55CC espera_vdp: espera a que el VDP acabe la orden en marcha
+C 0x55F3 flancos de bajada de las teclas: 0xC007 = lo que se acaba de pulsar
+C 0x55F6 lee las teclas de las filas 6 y 7 del teclado (F1-F3, CTRL/SHIFT, RET/ESC...) en 5 bits
+C 0x55F9 apunta a el estado anterior de las teclas de las filas 6 y 7
+C 0x55FC flancos de una tecla: guarda el estado nuevo y deja en la direccion anterior lo recien pulsado
+C 0x5662 apunta a las teclas y los mandos pulsados ahora (flancos de subida)
+C 0x5665 apunta a el estado anterior de las teclas del mando
+C 0x5694 carga_imagen: carga y dibuja una imagen de tiles (HL = lista, DE = tabla de paletas)
+C 0x569D dibuja un rectangulo de tiles de 24 x 6 (HL = tile map)
+C 0x56A6 dibuja un rectangulo de tiles de 24 x 6 (HL = tile map)
+C 0x56A9 bancos_1_2_3: pone los bancos 1-2-3 (y sus copias en 0xF0F1-3)
+C 0x56B3 dibuja_tile_pagina1: dibuja el tile A en D,E con la copia de la pagina 1
+C 0x56D0 carga_imagen: carga y dibuja una imagen de tiles (HL = lista, DE = tabla de paletas)
+C 0x56DC bancos_1_2_3: pone los bancos 1-2-3 (y sus copias en 0xF0F1-3)
+C 0x56E9 carga_imagen: carga y dibuja una imagen de tiles (HL = lista, DE = tabla de paletas)
+C 0x56EC bancos_1_2_3: pone los bancos 1-2-3 (y sus copias en 0xF0F1-3)
+C 0x56EF bancos_4: pone el 4 (y sus copias en 0xF0F1-3)
+C 0x56FC carga_imagen: carga y dibuja una imagen de tiles (HL = lista, DE = tabla de paletas)
+C 0x5708 bancos_1_2_3: pone los bancos 1-2-3 (y sus copias en 0xF0F1-3)
+C 0x571D dibuja un bloque de texto (letras de 3 x 3 tiles de 4 puntos)
+C 0x5730 dibuja un bloque de texto (letras de 3 x 3 tiles de 4 puntos)
+C 0x5756 bancos_7_8_9: pone los bancos 7-8-9 (y sus copias en 0xF0F1-3)
+C 0x575C carga_imagen: carga y dibuja una imagen de tiles (HL = lista, DE = tabla de paletas)
+C 0x5764 dibuja un texto: A = 0 letras grandes (3x3), si no pequenas (5x2); 0xFF acaba y 0xFE hace otra linea
+C 0x5767 bancos_1_2_3: pone los bancos 1-2-3 (y sus copias en 0xF0F1-3)
+C 0x5781 dibuja un tile de 4 x 8 (el medio ancho de las letras de dialogo) con una copia HMMM
+C 0x57B1 dibuja un tile de 4 x 8 (el medio ancho de las letras de dialogo) con una copia HMMM
+C 0x57DD carga_imagen: carga y dibuja una imagen de tiles (HL = lista, DE = tabla de paletas)
+C 0x57E0 bancos_1_2_3: pone los bancos 1-2-3 (y sus copias en 0xF0F1-3)
+C 0x57EF bancos_1_2_3: pone los bancos 1-2-3 (y sus copias en 0xF0F1-3)
+C 0x57F2 bancos_10_11: pone los bancos 10-11 (y sus copias en 0xF0F1-3)
+C 0x57FE bancos_1_2_3: pone los bancos 1-2-3 (y sus copias en 0xF0F1-3)
+C 0x5810 bancos_15: pone el 15 (y sus copias en 0xF0F1-3)
+C 0x5816 dibuja una lista de tiles a pantalla: D,E = posicion, n tiles repetidos (bit 7: la secuencia entera que sigue); 0xFF acaba
+C 0x5819 bancos_4: pone el 4 (y sus copias en 0xF0F1-3)
+C 0x581C bancos_7_8_9: pone los bancos 7-8-9 (y sus copias en 0xF0F1-3)
+C 0x5822 dibuja una lista de tiles a pantalla: D,E = posicion, n tiles repetidos (bit 7: la secuencia entera que sigue); 0xFF acaba
+C 0x5825 bancos_1_2_3: pone los bancos 1-2-3 (y sus copias en 0xF0F1-3)
+C 0x5828 bancos_7_8_9: pone los bancos 7-8-9 (y sus copias en 0xF0F1-3)
+C 0x582E dibuja una lista de tiles a pantalla: D,E = posicion, n tiles repetidos (bit 7: la secuencia entera que sigue); 0xFF acaba
+C 0x5831 bancos_1_2_3: pone los bancos 1-2-3 (y sus copias en 0xF0F1-3)
+C 0x5834 bancos_7_8_9: pone los bancos 7-8-9 (y sus copias en 0xF0F1-3)
+C 0x583A dibuja una lista de tiles a pantalla: D,E = posicion, n tiles repetidos (bit 7: la secuencia entera que sigue); 0xFF acaba
+C 0x583D bancos_1_2_3: pone los bancos 1-2-3 (y sus copias en 0xF0F1-3)
+C 0x5840 bancos_7_8_9: pone los bancos 7-8-9 (y sus copias en 0xF0F1-3)
+C 0x5846 dibuja una lista de tiles a pantalla: D,E = posicion, n tiles repetidos (bit 7: la secuencia entera que sigue); 0xFF acaba
+C 0x5849 bancos_1_2_3: pone los bancos 1-2-3 (y sus copias en 0xF0F1-3)
+C 0x5851 dibuja_tile: dibuja el tile A de 8 x 8 en D,E
+C 0x5859 dibuja_tile: dibuja el tile A de 8 x 8 en D,E
+C 0x5861 dibuja_tile: dibuja el tile A de 8 x 8 en D,E
+C 0x5869 dibuja_tile: dibuja el tile A de 8 x 8 en D,E
+C 0x5875 lee el personaje que juega de rival 2
+C 0x587E lee el personaje que juega de rival 3
+C 0x5887 palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0x588F vdp_copia: HMMM: copia un rectangulo de la VRAM (origen HL, destino DE, tamano BC, A = paginas)
+C 0x58A3 bancos_5_6: pone los bancos 5-6 (y sus copias en 0xF0F1-3)
+C 0x58AA palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0x58B4 bancos_1_2_3: pone los bancos 1-2-3 (y sus copias en 0xF0F1-3)
+C 0x58E2 un tile: C bit 0 = 0 con 0x5398 (tile normal), si no con 0x53AA
+C 0x58E6 avanza_tile: D += 8 (y E += 8 si D da la vuelta)
+C 0x58F9 un tile: C bit 0 = 0 con 0x5398 (tile normal), si no con 0x53AA
+C 0x58FD avanza_tile: D += 8 (y E += 8 si D da la vuelta)
+C 0x590B dibuja_tile: dibuja el tile A de 8 x 8 en D,E
+C 0x590E dibuja_tile_pagina1: dibuja el tile A en D,E con la copia de la pagina 1
+C 0x5941 el formato dice cual de las seis rutinas se usa
+C 0x597D suma_a_hl: HL = HL + A
+C 0x5995 suma_a_hl: HL = HL + A
+C 0x59A6 bancos_1_2_3: pone los bancos 1-2-3 (y sus copias en 0xF0F1-3)
+C 0x59A9 bancos_5_6: pone los bancos 5-6 (y sus copias en 0xF0F1-3)
+C 0x59AF pon_colores: aplica una lista de colores (A, D, E; 0xFF acaba)
+C 0x59B2 bancos_1_2_3: pone los bancos 1-2-3 (y sus copias en 0xF0F1-3)
+C 0x59B5 bancos_5_6: pone los bancos 5-6 (y sus copias en 0xF0F1-3)
+C 0x59BB pon_colores: aplica una lista de colores (A, D, E; 0xFF acaba)
+C 0x59BE bancos_1_2_3: pone los bancos 1-2-3 (y sus copias en 0xF0F1-3)
+C 0x59C1 bancos_5_6: pone los bancos 5-6 (y sus copias en 0xF0F1-3)
+C 0x59C7 pon_colores: aplica una lista de colores (A, D, E; 0xFF acaba)
+C 0x59CA bancos_1_2_3: pone los bancos 1-2-3 (y sus copias en 0xF0F1-3)
+C 0x59D6 copia_a_vram: copia BC bytes de la RAM (DE) a la VRAM en HL
+C 0x5A47 vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0x5A7B guarda el tamano de las baldosas de la imagen que se carga
+C 0x5A86 8 filas de 3 bits por punto (3 bytes por fila, HL) -> 4 bits, y a la VRAM por 0x5347
+C 0x5A98 guarda el tamano de las baldosas de la imagen que se carga
+C 0x5AA3 8 filas de 3 bits por punto (3 bytes por fila, HL) -> 4 bits, y a la VRAM por 0x5347
+C 0x5AA6 bancos_1_2_3: pone los bancos 1-2-3 (y sus copias en 0xF0F1-3)
+C 0x5AAD bancos_4: pone el 4 (y sus copias en 0xF0F1-3)
+C 0x5AB1 escribe_texto: escribe un texto de letras de 16 puntos de alto en D,E
+C 0x5AB4 bancos_4: pone el 4 (y sus copias en 0xF0F1-3)
+C 0x5ABB bancos_4: pone el 4 (y sus copias en 0xF0F1-3)
+C 0x5AC2 bancos_4: pone el 4 (y sus copias en 0xF0F1-3)
+C 0x5AC9 bancos_4: pone el 4 (y sus copias en 0xF0F1-3)
+C 0x5AD7 espera_vdp: espera a que el VDP acabe la orden en marcha
+C 0x5AF2 dibuja_letra: dibuja la letra A de 16 x 16 con el color C
+C 0x5B1E vdp_lmmm: LMMM: copia un rectangulo con operacion logica (A)
+C 0x5B36 espera_vdp: espera a que el VDP acabe la orden en marcha
+C 0x5B3D bancos_5_6: pone los bancos 5-6 (y sus copias en 0xF0F1-3)
+C 0x5B55 desempaqueta la forma de 1 bit de la letra a 4 bits en 0xE800 (con 0xE900 para la mitad de abajo)
+C 0x5B59 bancos_1_2_3: pone los bancos 1-2-3 (y sus copias en 0xF0F1-3)
+C 0x5B64 vdp_lmmc: LMMC: manda al VDP un rectangulo con puntos de HL
+C 0x5B6C bancos_1_2_3: pone los bancos 1-2-3 (y sus copias en 0xF0F1-3)
+C 0x5B7F copia_a_vram_hl: copia BC bytes de HL a la VRAM en DE
+C 0x5B92 vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0x5C15 pantalla_off: apaga la pantalla
+C 0x5C1B pon_colores: aplica una lista de colores (A, D, E; 0xFF acaba)
+C 0x5C2D vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0x5C5D pantalla_on: enciende la pantalla
+C 0x5C6B bancos_1_2_3: pone los bancos 1-2-3 (y sus copias en 0xF0F1-3)
+C 0x5C7D guarda la Y de la ficha en la hoja de tiles
+C 0x5C8F vdp_copia: HMMM: copia un rectangulo de la VRAM (origen HL, destino DE, tamano BC, A = paginas)
+C 0x5CA8 dibuja_tile_pagina1: dibuja el tile A en D,E con la copia de la pagina 1
+C 0x5CAB avanza_tile: D += 8 (y E += 8 si D da la vuelta)
+C 0x5CB8 bancos_10_11: pone los bancos 10-11 (y sus copias en 0xF0F1-3)
+C 0x5CC2 carga_imagen: carga y dibuja una imagen de tiles (HL = lista, DE = tabla de paletas)
+C 0x5CC5 bancos_1_2_3: pone los bancos 1-2-3 (y sus copias en 0xF0F1-3)
+C 0x5CCB bancos_10_11: pone los bancos 10-11 (y sus copias en 0xF0F1-3)
+C 0x5CD4 bancos_1_2_3: pone los bancos 1-2-3 (y sus copias en 0xF0F1-3)
+C 0x5CD7 bancos_10_11: pone los bancos 10-11 (y sus copias en 0xF0F1-3)
+C 0x5CDD dibuja una lista de tiles a pantalla: D,E = posicion, n tiles repetidos (bit 7: la secuencia entera que sigue); 0xFF acaba
+C 0x5CE0 bancos_1_2_3: pone los bancos 1-2-3 (y sus copias en 0xF0F1-3)
+C 0x5CE6 despacha: salta a la palabra A de la tabla que va detras del call
+C 0x5CF5 dibuja los dos tiles 0xB1 y 0xB2 en la esquina de la pantalla
+C 0x5CFC apunta a el paso de la animacion del titulo
+C 0x5D13 vdp_lmmm: LMMM: copia un rectangulo con operacion logica (A)
+C 0x5D1D copia un rectangulo de la pagina 0 a si mismo (borra la franja inferior)
+C 0x5D3E pon_color: escribe el color D,E en la paleta A
+C 0x5D43 pon_color: escribe el color D,E en la paleta A
+C 0x5D48 pon_color: escribe el color D,E en la paleta A
+C 0x5D63 pon_color: escribe el color D,E en la paleta A
+C 0x5D68 pon_color: escribe el color D,E en la paleta A
+C 0x5D84 pon_color: escribe el color D,E en la paleta A
+C 0x5D89 pon_color: escribe el color D,E en la paleta A
+C 0x5D9F pon_color: escribe el color D,E en la paleta A
+C 0x5DA7 pon_color: escribe el color D,E en la paleta A
+C 0x5DAA dibuja la lista de tiles de 0x59D9 (el texto del titulo)
+C 0x5DAF guarda el paso de la animacion del titulo
+C 0x5DB9 apunta a la tabla de estilo de los ocho rivales (8 bytes cada uno)
+C 0x5DBE vdp_lmmm: LMMM: copia un rectangulo con operacion logica (A)
+C 0x5DC4 dibuja_lista_tiles: dibuja una lista de tiles de HL (x, y, tiles; 0xFF acaba)
+C 0x5DC7 dibuja los dos tiles 0xB1 y 0xB2 en la esquina de la pantalla
+C 0x5DEA dibuja_tile_pagina1: dibuja el tile A en D,E con la copia de la pagina 1
+C 0x5DF2 dibuja_tile_pagina1: dibuja el tile A en D,E con la copia de la pagina 1
+C 0x5DFE lee quien reparte en la primera mano
+C 0x5E01 guarda el jugador que reparte (0-3)
+C 0x5E05 guarda el viento de la ronda (0 este)
+C 0x5E0B guarda el numero de la mano dentro del viento (0-3)
+C 0x5E0E guarda las barras de honba (BCD)
+C 0x5E11 guarda las barras de riichi sobre la mesa (BCD)
+C 0x5E14 vuelca una paleta de los bancos 5-6 (DE = lista)
+C 0x5E17 pantalla_off: apaga la pantalla
+C 0x5E1A dibuja_mesa: carga las fichas y el tapete de los bancos 7-9
+C 0x5E23 pantalla_on: enciende la pantalla
+C 0x5E26 carga las tres columnas de texto de dialogo en 0xC0BF/0xC0BE
+C 0x5E29 dibuja_mesa: carga las fichas y el tapete de los bancos 7-9
+C 0x5E2C sprites_fuera: pone los 32 sprites fuera de pantalla
+C 0x5E2F borra_manos: borra 4 KB de 0xD000 (las manos)
+C 0x5E41 lee quien reparte en la primera mano
+C 0x5E44 guarda el jugador al que le toca (0 = el humano)
+C 0x5E50 guarda la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0x5E57 lee el jugador al que le toca (0 = el humano)
+C 0x5E7E teclas_a_sonidos: pide el sonido que dicen las teclas de funcion
+C 0x5E81 lee el paso de las respuestas del humano
+C 0x5E88 lee 1 si el cuadro de respuestas esta abierto
+C 0x5E8E lee las teclas y los mandos pulsados ahora (flancos de subida)
+C 0x5E95 turno_jugador: un paso del turno del jugador 0xC207
+C 0x5E99 lee el jugador al que le toca (0 = el humano)
+C 0x5E9F lee el paso de las respuestas del humano
+C 0x5EA2 despacha: salta a la palabra A de la tabla que va detras del call
+C 0x5EAD lee el tiempo que queda de la cara que habla
+C 0x5EB9 guarda el paso de las respuestas del humano
+C 0x5EBC pide_sonido_03: pide el sonido 0x03
+C 0x5EBF lee la opcion elegida en el menu del titulo (0 o 1)
+C 0x5ED0 vdp_copia: HMMM: copia un rectangulo de la VRAM (origen HL, destino DE, tamano BC, A = paginas)
+C 0x5EDD vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0x5EE9 lee 1 si las manos se ven boca arriba
+C 0x5EF8 dibuja_lista_tiles: dibuja una lista de tiles de HL (x, y, tiles; 0xFF acaba)
+C 0x5EFC guarda la opcion elegida en el cuadro
+C 0x5F01 guarda la ultima opcion del cuadro
+C 0x5F10 vdp_copia: HMMM: copia un rectangulo de la VRAM (origen HL, destino DE, tamano BC, A = paginas)
+C 0x5F1D vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0x5F29 lee 1 si las manos se ven boca arriba
+C 0x5F38 dibuja_lista_tiles: dibuja una lista de tiles de HL (x, y, tiles; 0xFF acaba)
+C 0x5F3C guarda la opcion elegida en el cuadro
+C 0x5F41 guarda la ultima opcion del cuadro
+C 0x5F49 lee la opcion elegida en el cuadro
+C 0x5F52 lee la opcion elegida en el menu del titulo (0 o 1)
+C 0x5F63 vdp_copia: HMMM: copia un rectangulo de la VRAM (origen HL, destino DE, tamano BC, A = paginas)
+C 0x5F74 vdp_copia: HMMM: copia un rectangulo de la VRAM (origen HL, destino DE, tamano BC, A = paginas)
+C 0x5F77 restaura cuatro bloques del fondo (bajo el cuadro de pregunta) en la pagina 1
+C 0x5F7A cuadro_fichas_que_quedan: dibuja el cuadro de las fichas que quedan
+C 0x5F7F guarda la tabla de atributos de los sprites (32 de 4 bytes)
+C 0x5F85 apunta a el paso de las respuestas del humano
+C 0x5F8A apunta a el paso de las respuestas del humano
+C 0x5F90 lee las teclas y los mandos pulsados ahora (flancos de subida)
+C 0x5F95 devuelve_fondo: devuelve a la pagina 0 los cuatro fondos guardados
+C 0x5F9C guarda el paso de las respuestas del humano
+C 0x5FA0 lee la opcion elegida en el menu del titulo (0 o 1)
+C 0x5FB1 vdp_copia: HMMM: copia un rectangulo de la VRAM (origen HL, destino DE, tamano BC, A = paginas)
+C 0x5FB5 guarda el paso de las respuestas del humano
+C 0x5FC4 vdp_copia: HMMM: copia un rectangulo de la VRAM (origen HL, destino DE, tamano BC, A = paginas)
+C 0x5FC8 guarda el paso de las respuestas del humano
+C 0x5FD7 vdp_copia: HMMM: copia un rectangulo de la VRAM (origen HL, destino DE, tamano BC, A = paginas)
+C 0x5FE5 vdp_copia: HMMM: copia un rectangulo de la VRAM (origen HL, destino DE, tamano BC, A = paginas)
+C 0x5FF3 vdp_copia: HMMM: copia un rectangulo de la VRAM (origen HL, destino DE, tamano BC, A = paginas)
+# --- fin de las anotaciones de anota.py ---

@@ -1,0 +1,368 @@
+
+
+# --- A MANO: comentarios escritos leyendo el codigo ---
+C 0x6000 ENTRADA 0: inicia el sonido: el mezclador del PSG (registro 7) a 0xBF, todo en silencio
+C 0x6003 ENTRADA 1: pide el sonido A (0x01-0x10 y 0x80-0x84: musica y efectos del PSG, 0x11-0x18: voces digitales)
+C 0x6006 ENTRADA 2: un cuadro del sonido (la llama la interrupcion)
+C 0x6013 A >= 0x80: es una orden del PSG (parar, silencio, ritmo...)
+C 0x6017 A < 0x11: musica o efecto de cinco canales
+C 0x6019 A = 0x11-0x18: una voz digital: 0xCF26 = el sonido
+C 0x601E el 0x17 y el 0x18 paran antes los canales del PSG (0x6059)
+C 0x602B busca la voz en la tabla de 0x6065 (8 punteros): direccion de la primera muestra
+C 0x6039 el primer byte de la muestra es la marca del final (0xCF29); 0xCF27 = puntero a los datos
+C 0x6041 0xCF2C = 1: hay una voz pendiente; 0xCF2F += 3 (retardo entre muestras)
+C 0x604C si el PSG esta parado por la voz, el banco 14 se vuelve a poner en 0xA000
+C 0x6059 para el PSG mientras suene la voz: 0xCF08 bit 1 y el banco 15 en 0xA000
+C 0x6075 ordenes del PSG: 0x80 = para y quita el ritmo, 0x81 = pone el tono, 0x82 y 0x83 cambian el retardo (0xCF2F), 0x84 = silencio con el ritmo
+C 0x6095 0xCF09 = el sonido; HL = su fila de la tabla de 0x61B0 (12 bytes) que se copia a 0xCF0A
+C 0x60AE recorre los cinco canales (0xCF0C): el bit 7, 6, 5, 4 y 3 de la fila dicen cuales se ponen, y el siguiente byte es su prioridad
+C 0x6102 si el canal 3 (efecto en el canal B) esta pedido (bit 3 de 0xCF0A) y su contador es cero, ya no hace falta y lo anula
+C 0x6108 prioridad del canal 4 en 0xCE84
+C 0x6111 si no, pone la prioridad en el canal 4 (0xCEB1)
+C 0x6120 compara la prioridad A con la del canal HL: si es menor, no pone el sonido
+C 0x6123 pone la prioridad y el numero del sonido en el canal
+C 0x612D copia el puntero de musica del canal (IX) y limpia el resto con los 40 bytes de 0x6140
+C 0x6168 para todo el PSG
+C 0x6170 inicia el ritmo (0xCF16 = 0x0E, 0xCF17 = 7)
+C 0x6181 pone a cero el contador del ritmo
+C 0x6189 fundido de salida: periodo del fundido 0x10 y bit 5 de 0xCF08
+C 0x6195 pone a cero el contador y pone el limite en 4
+C 0x619E 0xCF2F = 7 (retardo corto de las voces)
+C 0x61A4 0xCF2F = 0x12 (retardo largo de las voces)
+C 0x6254 UN CUADRO DE SONIDO: si hay una voz pendiente (0xCF2C), pone el DAC en reposo (0x80) y sale
+C 0x6265 si suena una voz digital (0xCF26): reproduce su muestra (el cartucho tiene un DAC en 0x5000); si no, 0x62FE
+C 0x627F sin interrupciones mientras suena; 0xCF2D = 1 (la interrupcion del cuadro no hace nada)
+C 0x628B recorre la muestra: dos nibbles por byte; cada uno es un salto que se suma al valor del DAC (tabla 0x62D1 de 16 pasos con signo) y se escribe en 0x5000
+C 0x62A8 escribe el valor en el DAC del cartucho (0x5000)
+C 0x62AB espera un bucle de 0xCF2F veces para fijar la velocidad de reproduccion
+C 0x62AF espera (djnz) para dar la velocidad de la voz
+C 0x62B1 el nibble bajo de la muestra
+C 0x62BD suma el salto del nibble al valor del DAC y lo guarda en 0xCF2A
+C 0x62C5 lo escribe en el DAC del cartucho
+C 0x62E1 fin de la muestra (el primer byte repetido = 0xCF29): vuelve a poner el banco 14 y a cero todo
+C 0x62EF fin de la voz: pone a cero la voz, la marca, el retardo y el semaforo, e interrupciones otra vez
+C 0x62FE CUADRO DE MUSICA: manda el mezclador, avanza el ritmo y el fundido, y recorre los cinco canales (0xCE00, 0xCE2C, 0xCE58, 0xCE84, 0xCEB0; 44 bytes cada uno; 0xCF1B = su mascara 1, 2, 4, 8, 0x10)
+C 0x6350 al final vuelca los registros al PSG (0x6C12)
+C 0x6354 un canal: si (ix+0) no es cero, 0x635C
+C 0x635C un paso del canal: baja su contador (ix+4); si no llega a cero, solo el efecto de cada cuadro (0x65B5)
+C 0x6362 lee el siguiente byte de la musica (HL = (ix+2)): 0xFF = fin del canal; de 0xD0 en adelante es una orden (0x694D); si no, es una nota
+C 0x637A nota: segun los bits 0, 1 y 2-5 de (ix+9) (tipo de canal) la nota se trata como tono (0x6391), segundo modo (0x6404) o ritmo (0x647E)
+C 0x6391 tono: el nibble bajo es la duracion (multiplicada por (ix+0x14), el tempo) y el alto la nota (0-0xB)
+C 0x639F guarda la duracion en (ix+4)
+C 0x63A3 el nibble alto es la nota
+C 0x63B1 con la nota < 0x0C: periodo del PSG = tabla 0x63F8 (12 notas) multiplicada por dos por la octava ((ix+0x16)); si no, silencio
+C 0x63B3 las notas desde 0x0C son silencio
+C 0x63B6 periodo base de la nota
+C 0x63C0 octava: duplica el periodo
+C 0x6404 tono de dos bytes: segun el tipo del canal
+C 0x6411 el byte de la nota
+C 0x6420 el nibble alto es el periodo bajo
+C 0x643C el periodo viene en nibbles
+C 0x6444 nibble bajo, byte alto del periodo
+C 0x647E nota de ritmo: busca su patron (0x64B5) en la tabla segun el tipo y lo toca (0x6494)
+C 0x6494 toca el patron de ritmo: marca el canal y ejecuta sus ordenes
+C 0x649B termina el patron
+C 0x64A3 recarga el contador de tempo
+C 0x64AA guarda la posicion de la musica
+C 0x64B5 elige la direccion del patron de ritmo por el tipo de canal (tablas 0x6DA3, 0x6E17, 0x6F20, 0x6D5B, 0x6D73, 0x6D8B)
+C 0x6511 empieza una nota: periodo en (ix+0x0A) y volumen en (ix+0x0C), con la envolvente a cero (0x1D-0x20)
+C 0x6523 mira si el ritmo ha acabado
+C 0x652A marca el canal
+C 0x653D empieza la nota: borra la envolvente
+C 0x6549 pone a cero los contadores del vibrato y la envolvente
+C 0x655A volumen de la nota
+C 0x6564 le resta el volumen base
+C 0x656B guarda el volumen
+C 0x6573 mira si el canal sigue con envolvente
+C 0x6583 mira el ritmo
+C 0x65B5 efectos de cada cuadro de una nota: ritmo (0x669B), deslizamiento (0x65F6), vibrato (0x66E1) y envolvente de volumen (0x6736)
+C 0x65D1 si el ritmo esta en marcha (0xCF08 bit 0) baja un nivel el volumen cada 11 cuadros
+C 0x65F6 deslizamiento del tono: sube o baja el periodo de (ix+0x27) cada cuadro, (ix+0x28) veces
+C 0x6623 deslizamiento hacia abajo: resta la velocidad del periodo
+C 0x662D si se pasa del cero, queda en uno
+C 0x663A guarda el periodo
+C 0x6640 cuenta atras del deslizamiento
+C 0x6673 deslizamiento hacia arriba: suma la velocidad
+C 0x667F guarda el periodo
+C 0x6685 cuenta atras
+C 0x669B canal de ritmo: baja (ix+0x19) y, al llegar a cero, sigue con la siguiente nota del patron (0x6494)
+C 0x66B3 fin del patron: apaga el canal
+C 0x66C4 pone el periodo de la nota en (ix+0x0A): el de (ix+0x10) mas el desplazamiento de (ix+0x26) si hay
+C 0x66E1 vibrato: cuenta cuadros
+C 0x66F4 con el vibrato en espera compara con el retardo
+C 0x66F8 y empieza
+C 0x6707 vibrato: alterna el periodo mas y menos la amplitud
+C 0x670A periodo actual
+C 0x670D amplitud
+C 0x6710 invierte el signo del vibrato
+C 0x6725 resta la amplitud al periodo
+C 0x6736 envolvente de volumen (ataque, caida, sostenido y relajacion con los tiempos de (ix+0x21)-(ix+0x24))
+C 0x6742 envolvente del volumen
+C 0x6745 cuenta de cuadros
+C 0x674B mira si ya acaba la nota
+C 0x6754 segun la fase: ataque, caida, sostenido o relajacion
+C 0x6769 ataque: sube el volumen hasta el maximo
+C 0x677C caida: baja el volumen hasta el sostenido
+C 0x678E mira si acaba la caida
+C 0x679C sostenido
+C 0x67A8 baja el volumen
+C 0x67B3 cuenta las bajadas
+C 0x67CB relajacion
+C 0x67DD y acaba
+C 0x67F1 baja el volumen de la envolvente
+C 0x6807 avanza el puntero de la musica del canal (HL + 1)
+C 0x680F cuenta atras del ritmo (0xCF16, 0xCF17): al llegar a cero para el ritmo y pone a cero los cinco canales
+C 0x6875 pone a cero los campos del canal
+C 0x6882 el periodo
+C 0x689B resta el fundido (0xCF19) al volumen E (no baja de cero)
+C 0x68B0 fundido de salida del PSG: cuenta cuadros
+C 0x68BB cuando llega baja el nivel
+C 0x68CB fin de un canal: si era el 0x0D pide el sonido 0x18
+C 0x68D3 pone a cero los campos
+C 0x68F8 revisa la pareja de canales
+C 0x6913 vuelve a conectar la pareja de canales del PSG
+C 0x6916 elige la pareja segun el canal que acaba
+C 0x6919 el canal 5 (0x10)
+C 0x691E el canal 4 (0x08)
+C 0x6923 el canal 3 (0x04)
+C 0x6928 el canal 2 (0x02)
+C 0x6941 pide el sonido 0x18 cuando acaba un canal de efecto
+C 0x694D decide la tabla de la orden
+C 0x6952 de 0xE0 a 0xFF por la tabla de 0x6962
+C 0x69A0 orden 0xE0/0xE2: tipo de canal (ix+0x0D) y su tempo (ix+0x13)
+C 0x69A1 orden de tipo de canal
+C 0x69A5 el tipo en los dos bits bajos
+C 0x69AD y el tempo en el byte siguiente
+C 0x69B6 orden 0xE1/0xE3: lo mismo conectando el ritmo (0xCF1E)
+C 0x69D6 orden de ruido
+C 0x69D8 el periodo en los 5 bits bajos
+C 0x69E5 canal 3: ruido en 0xCF1C
+C 0x69F3 canal 4: ruido en 0xCF1D
+C 0x6A01 orden 0xE5: envolvente del PSG (R13) en 0xCF1F, y las dos siguientes (R12, R11)
+C 0x6A15 orden 0xE6: periodo de la envolvente (R12) en 0xCF21
+C 0x6A16 orden de envolvente: periodo
+C 0x6A1B pone el bit 6 de 0xCF1E
+C 0x6A25 orden 0xE7: periodo de la envolvente (R11) en 0xCF20
+C 0x6A26 orden de envolvente: segundo periodo
+C 0x6A37 orden 0xE8: apaga el ruido y el ritmo del canal
+C 0x6A48 orden 0xE9: tempo del canal (ix+0x14)
+C 0x6A4F orden 0xEA: volumen base del canal (ix+0x15)
+C 0x6A56 envolvente: nibble alto del primer byte
+C 0x6A64 si es menor de 8 pone el bit 2
+C 0x6A76 guarda la duracion del ataque
+C 0x6A79 nibble bajo
+C 0x6A82 si es menor de 8 limpia el bit 4
+C 0x6A89 guarda la caida
+C 0x6A90 el segundo byte: sostenido y relajacion
+C 0x6A97 guarda el sostenido
+C 0x6A9D guarda la relajacion
+C 0x6AA5 orden 0xEC: sin envolvente
+C 0x6AAF orden 0xED: volumen de sostenido (ix+0x25)
+C 0x6AB6 orden 0xEE: transposicion (ix+0x26)
+C 0x6AC1 orden 0xEF: sin transposicion
+C 0x6AC7 orden 0xF0: sin vibrato ni transposicion
+C 0x6AD1 vibrato: pone los bits 2 y 4 de (ix+0x0E)
+C 0x6ADB amplitud en el nibble bajo
+C 0x6AE2 retardo en el alto
+C 0x6AEC orden 0xF2: vibrato con el retardo de (ix+0x1A)
+C 0x6AFB orden 0xF3/0xF4: el siguiente tono va por un byte (bit 6 de (ix+0x0E))
+C 0x6B01 orden 0xF5: el siguiente tono va por nibbles (bit 5)
+C 0x6B07 orden 0xF6: quita los dos modos
+C 0x6B11 orden 0xF7/0xF8: octava (ix+0x01)
+C 0x6B18 orden 0xF9: llamada a una subrutina de musica: guarda la posicion (ix+7, ix+8) y salta a la direccion que sigue
+C 0x6B23 orden 0xFA: vuelve de la subrutina a la posicion guardada
+C 0x6B2B orden 0xFB: bucle con contador (ix+5): cuenta, y salta a la direccion mientras no llegue
+C 0x6B38 lee la direccion de salto que sigue a la orden y apunta HL a su byte anterior
+C 0x6B46 orden 0xFC: igual con otro contador (ix+6)
+C 0x6B5D orden 0xFD: salto a una direccion
+C 0x6B61 orden de tipo de nota
+C 0x6B67 con tipo menor de 4 limpia el bit 0 de (ix+0x0E)
+C 0x6B6C con tipo mayor lo pone y limpia el resto
+C 0x6B84 comando D0-DF
+C 0x6B8A indice por dos en la tabla de 0x6B94
+C 0x6BB4 orden 0xD0-0xD5: instrumento (ix+0x16)
+C 0x6BBC deslizamiento hacia arriba: pone los bits 4 y 6 de (ix+0x0D)
+C 0x6BC9 velocidad y duracion
+C 0x6BD7 deslizamiento hacia abajo
+C 0x6BE0 velocidad y duracion
+C 0x6BEE orden 0xD8: sin deslizamiento
+C 0x6BF8 ordenes sin efecto (0xD9, 0xDC, 0xDD)
+C 0x6BFA orden 0xDB: volumen minimo (ix+0x2A)
+C 0x6C01 orden 0xDC: sin volumen minimo
+C 0x6C07 orden 0xDF: nivel de volumen
+C 0x6C12 VUELCA AL PSG: decide a que registros va cada pareja de canales segun el volumen (0xCF22) y los escribe
+C 0x6C24 compara los volumenes de los canales 1 y 4 para elegir el del PSG
+C 0x6C31 si gana el canal 4 pone el bit 2
+C 0x6C40 escribe los tres tonos (R0-R5) y los volumenes (R8-R10)
+C 0x6C6D elige el canal de la pareja C del PSG
+C 0x6C7A el canal 4 con el aviso pone el volumen 6
+C 0x6C8F escribe en el PSG el periodo (dos registros) y el volumen del canal HL
+C 0x6CAD el ruido (R6)
+C 0x6CC3 el ruido: segun los bits de 0xCF1E
+C 0x6CC9 escribe el periodo del ruido
+C 0x6CD0 de 0xCF1D
+C 0x6CD7 la envolvente (R11, R12, R13)
+C 0x6D05 mezclador (R7): une los bits de cada canal (tablas 0x6D4F, 0x6D53, 0x6D57)
+C 0x6D48 HL += A & 3
+# --- fin de lo escrito a mano ---
+
+# --- A MANO: comentarios, nombres y bloques ---
+D 0x6065 0x6075 voces  las 8 voces digitales (sonidos 0x11-0x18): el puntero a cada muestra, en 0x8000-0xBFFF con los bancos 13-14 puestos (las dos ultimas, en el banco 15, que el motor pone en 0xA000 con p12:6059); las lee p12:602E
+F 0x6065 w8
+D 0x6140 0x6168 canal_inicial  el bloque de 40 bytes que se copia a un canal al darle un sonido (p12:613A: ldir de 0x28 bytes): el primer byte es 1 y el resto cero
+F 0x6140 16
+D 0x61B2 0x61D2 tabla_sonidos  los 16 punteros a las filas de los sonidos 0x01-0x10 (p12:60A1: 0x61B0 + 2 x A); cada fila lleva un byte de canales (un bit por canal: 7, 6 y 5 son los tres de musica, 4 y 3 los de efectos), la prioridad y un puntero por canal
+F 0x61B2 w8
+D 0x61D2 0x61E2 tabla_voces  ocho palabras 0x6254 que ocupan en la tabla de 0x61B0 las casillas de los sonidos 0x11-0x18 (las voces no la usan: van por p12:6019)
+F 0x61D2 w8
+D 0x61E2 0x6254 filas_de_sonidos  las 16 filas de los sonidos 0x01-0x10 (byte de canales, prioridad y un puntero por canal): la 1 y la 2 paran los cinco canales (flujos 0x6F72 y 0x6F73), de la 3 a la 8 son efectos de uno o dos canales y de la 9 a la 16 melodias de tres canales
+F 0x61E2 16
+D 0x62D1 0x62E1 deltas_de_la_voz  los 16 saltos que dice cada nibble de una muestra de voz: se suman al valor que lleva el DAC (p12:629C y p12:62BD): 0, 1, 2, 4, 8, 16, 32, 64, -128, -64, -32, -16, -8, -4, -2 y -1
+F 0x62D1 16
+D 0x63F8 0x6404 periodos_base  los 12 periodos del PSG (byte bajo) de las doce notas de la octava mas baja; cada octava los dobla (p12:63B6)
+F 0x63F8 12
+D 0x6962 0x69A0 tabla_ordenes_E0  los 31 punteros a las rutinas de las ordenes 0xE0-0xFE de la musica (p12:694D)
+F 0x6962 w8
+D 0x6B94 0x6BB4 tabla_ordenes_D0  los 16 punteros a las rutinas de las ordenes 0xD0-0xDF de la musica (p12:6B84)
+F 0x6B94 w8
+D 0x6D4F 0x6D5B tablas_mezclador  tres tablas de 4 bytes con los bits del mezclador del PSG (R7) de cada pareja de canales (p12:6D0C, 6D22 y 6D38)
+F 0x6D4F 4
+D 0x6D5B 0x6D73 ritmo_tabla_6D5B  12 palabras (una por nota 0x0-0xB) que apuntan a los patrones de ritmo del tipo 0x04 (p12:64D9)
+F 0x6D5B w8
+D 0x6D73 0x6D8B ritmo_tabla_6D73  12 palabras (una por nota) con los patrones de ritmo de otro tipo (p12:64F9)
+F 0x6D73 w8
+D 0x6D8B 0x6DA3 ritmo_tabla_6D8B  12 palabras (una por nota) con los patrones de ritmo de otros tipos (p12:64ED, 64FD, 650D)
+F 0x6D8B w8
+D 0x6DA3 0x6DB7 ritmo_tabla_6DA3  10 palabras con los patrones de ritmo del tipo 0x04 de la octava 1 (p12:64D9)
+F 0x6DA3 w8
+D 0x6DB7 0x6E17 ritmo_patrones_6DB7  cinco patrones de ritmo (flujos de ordenes y notas, p12:6368) a los que apuntan las tablas de arriba
+F 0x6DB7 16
+D 0x6E17 0x6E2B ritmo_tabla_6E17  10 palabras con los patrones de ritmo de las notas 0-9 del tipo 0x08 (p12:64DD)
+F 0x6E17 w8
+D 0x6E2B 0x6F20 ritmo_patrones_6E2B  los patrones de ritmo del tipo 0x08: flujos de ordenes y notas que acaban en 0xFF
+F 0x6E2B 16
+D 0x6F20 0x6F38 ritmo_tabla_6F20  12 palabras (una por nota) con los patrones del tipo 0x03 (p12:64E9)
+F 0x6F20 w8
+D 0x6F38 0x6F72 ritmo_patrones_6F38  un flujo vacio (0xFF) y tres patrones de ritmo con la nota repetida (0x6F39, 0x6F4C, 0x6F5F)
+F 0x6F38 16
+D 0x6F72 0x6F73 sonido01_canaltodos  el flujo de silencio del sonido 1: un 0xFF que para los cinco canales (el motor lo recorre con p12:6362)
+F 0x6F72 16
+D 0x6F73 0x6F74 sonido02_canaltodos  el flujo de silencio del sonido 2: un 0xFF que para los cinco canales (el motor lo recorre con p12:6362)
+F 0x6F73 16
+D 0x6F74 0x6F81 sonido09_canal0  el flujo de ordenes y notas del canal 0 (musica) del sonido 9: lo recorre el motor de p12:6362 nota a nota (de 0x00 a 0xCF, el nibble alto es la nota y el bajo la duracion; de 0xD0 a 0xFE, ordenes)
+F 0x6F74 16
+D 0x6F81 0x6FE2 subflujo_6F81  un trozo de musica al que se salta con una llamada (orden 0xF9) o es la continuacion del flujo anterior: flujo de ordenes y notas que acaba en 0xFF, 0xFA (vuelve) o 0xFD (salta)
+F 0x6F81 16
+D 0x6FE2 0x720B subflujo_6FE2  un trozo de musica al que se salta con una llamada (orden 0xF9) o es la continuacion del flujo anterior: flujo de ordenes y notas que acaba en 0xFF, 0xFA (vuelve) o 0xFD (salta)
+F 0x6FE2 16
+D 0x720B 0x7218 sonido09_canal1  el flujo de ordenes y notas del canal 1 (musica) del sonido 9: lo recorre el motor de p12:6362 nota a nota (de 0x00 a 0xCF, el nibble alto es la nota y el bajo la duracion; de 0xD0 a 0xFE, ordenes)
+F 0x720B 16
+D 0x7218 0x726E subflujo_7218  un trozo de musica al que se salta con una llamada (orden 0xF9) o es la continuacion del flujo anterior: flujo de ordenes y notas que acaba en 0xFF, 0xFA (vuelve) o 0xFD (salta)
+F 0x7218 16
+D 0x726E 0x73F8 subflujo_726E  un trozo de musica al que se salta con una llamada (orden 0xF9) o es la continuacion del flujo anterior: flujo de ordenes y notas que acaba en 0xFF, 0xFA (vuelve) o 0xFD (salta)
+F 0x726E 16
+D 0x73F8 0x7405 sonido09_canal2  el flujo de ordenes y notas del canal 2 (musica) del sonido 9: lo recorre el motor de p12:6362 nota a nota (de 0x00 a 0xCF, el nibble alto es la nota y el bajo la duracion; de 0xD0 a 0xFE, ordenes)
+F 0x73F8 16
+D 0x7405 0x7465 subflujo_7405  un trozo de musica al que se salta con una llamada (orden 0xF9) o es la continuacion del flujo anterior: flujo de ordenes y notas que acaba en 0xFF, 0xFA (vuelve) o 0xFD (salta)
+F 0x7405 16
+D 0x7465 0x7666 subflujo_7465  un trozo de musica al que se salta con una llamada (orden 0xF9) o es la continuacion del flujo anterior: flujo de ordenes y notas que acaba en 0xFF, 0xFA (vuelve) o 0xFD (salta)
+F 0x7465 16
+D 0x7666 0x76A8 sonido10_canal0  el flujo de ordenes y notas del canal 0 (musica) del sonido 10: lo recorre el motor de p12:6362 nota a nota (de 0x00 a 0xCF, el nibble alto es la nota y el bajo la duracion; de 0xD0 a 0xFE, ordenes)
+F 0x7666 16
+D 0x76A8 0x783E subflujo_76A8  un trozo de musica al que se salta con una llamada (orden 0xF9) o es la continuacion del flujo anterior: flujo de ordenes y notas que acaba en 0xFF, 0xFA (vuelve) o 0xFD (salta)
+F 0x76A8 16
+D 0x783E 0x7877 subflujo_783E  un trozo de musica al que se salta con una llamada (orden 0xF9) o es la continuacion del flujo anterior: flujo de ordenes y notas que acaba en 0xFF, 0xFA (vuelve) o 0xFD (salta)
+F 0x783E 16
+D 0x7877 0x78BF sonido10_canal1  el flujo de ordenes y notas del canal 1 (musica) del sonido 10: lo recorre el motor de p12:6362 nota a nota (de 0x00 a 0xCF, el nibble alto es la nota y el bajo la duracion; de 0xD0 a 0xFE, ordenes)
+F 0x7877 16
+D 0x78BF 0x79D2 subflujo_78BF  un trozo de musica al que se salta con una llamada (orden 0xF9) o es la continuacion del flujo anterior: flujo de ordenes y notas que acaba en 0xFF, 0xFA (vuelve) o 0xFD (salta)
+F 0x78BF 16
+D 0x79D2 0x7B36 subflujo_79D2  un trozo de musica al que se salta con una llamada (orden 0xF9) o es la continuacion del flujo anterior: flujo de ordenes y notas que acaba en 0xFF, 0xFA (vuelve) o 0xFD (salta)
+F 0x79D2 16
+D 0x7B36 0x7B78 sonido10_canal2  el flujo de ordenes y notas del canal 2 (musica) del sonido 10: lo recorre el motor de p12:6362 nota a nota (de 0x00 a 0xCF, el nibble alto es la nota y el bajo la duracion; de 0xD0 a 0xFE, ordenes)
+F 0x7B36 16
+D 0x7B78 0x7D44 subflujo_7B78  un trozo de musica al que se salta con una llamada (orden 0xF9) o es la continuacion del flujo anterior: flujo de ordenes y notas que acaba en 0xFF, 0xFA (vuelve) o 0xFD (salta)
+F 0x7B78 16
+D 0x7D44 0x7D7D subflujo_7D44  un trozo de musica al que se salta con una llamada (orden 0xF9) o es la continuacion del flujo anterior: flujo de ordenes y notas que acaba en 0xFF, 0xFA (vuelve) o 0xFD (salta)
+F 0x7D44 16
+D 0x7D7D 0x7D9F sonido11_canal0  el flujo de ordenes y notas del canal 0 (musica) del sonido 11: lo recorre el motor de p12:6362 nota a nota (de 0x00 a 0xCF, el nibble alto es la nota y el bajo la duracion; de 0xD0 a 0xFE, ordenes)
+F 0x7D7D 16
+D 0x7D9F 0x7DDE subflujo_7D9F  un trozo de musica al que se salta con una llamada (orden 0xF9) o es la continuacion del flujo anterior: flujo de ordenes y notas que acaba en 0xFF, 0xFA (vuelve) o 0xFD (salta)
+F 0x7D9F 16
+D 0x7DDE 0x7E11 subflujo_7DDE  un trozo de musica al que se salta con una llamada (orden 0xF9) o es la continuacion del flujo anterior: flujo de ordenes y notas que acaba en 0xFF, 0xFA (vuelve) o 0xFD (salta)
+F 0x7DDE 16
+D 0x7E11 0x7E45 subflujo_7E11  un trozo de musica al que se salta con una llamada (orden 0xF9) o es la continuacion del flujo anterior: flujo de ordenes y notas que acaba en 0xFF, 0xFA (vuelve) o 0xFD (salta)
+F 0x7E11 16
+D 0x7E45 0x7E81 subflujo_7E45  un trozo de musica al que se salta con una llamada (orden 0xF9) o es la continuacion del flujo anterior: flujo de ordenes y notas que acaba en 0xFF, 0xFA (vuelve) o 0xFD (salta)
+F 0x7E45 16
+D 0x7E81 0x7ED5 subflujo_7E81  un trozo de musica al que se salta con una llamada (orden 0xF9) o es la continuacion del flujo anterior: flujo de ordenes y notas que acaba en 0xFF, 0xFA (vuelve) o 0xFD (salta)
+F 0x7E81 16
+D 0x7ED5 0x7F27 subflujo_7ED5  un trozo de musica al que se salta con una llamada (orden 0xF9) o es la continuacion del flujo anterior: flujo de ordenes y notas que acaba en 0xFF, 0xFA (vuelve) o 0xFD (salta)
+F 0x7ED5 16
+D 0x7F27 0x7F4F sonido11_canal1  el flujo de ordenes y notas del canal 1 (musica) del sonido 11: lo recorre el motor de p12:6362 nota a nota (de 0x00 a 0xCF, el nibble alto es la nota y el bajo la duracion; de 0xD0 a 0xFE, ordenes)
+F 0x7F27 16
+D 0x7F4F 0x7F8E subflujo_7F4F  un trozo de musica al que se salta con una llamada (orden 0xF9) o es la continuacion del flujo anterior: flujo de ordenes y notas que acaba en 0xFF, 0xFA (vuelve) o 0xFD (salta)
+F 0x7F4F 16
+D 0x7F8E 0x7FF7 subflujo_7F8E  un trozo de musica al que se salta con una llamada (orden 0xF9) o es la continuacion del flujo anterior: flujo de ordenes y notas que acaba en 0xFF, 0xFA (vuelve) o 0xFD (salta)
+F 0x7F8E 16
+D 0x7FF7 0x8000 subflujo_7FF7  un trozo de musica al que se salta con una llamada (orden 0xF9) o es la continuacion del flujo anterior: flujo de ordenes y notas que acaba en 0xFF, 0xFA (vuelve) o 0xFD (salta)
+F 0x7FF7 16
+
+
+# --- BLOQUES QUE LEE EL CODIGO (seccion que reescribe tools/bloques.py; no editar a mano) ---
+# --- fin de los bloques de bloques.py ---
+
+# --- ANOTACIONES AUTOMATICAS (seccion que reescribe tools/anota.py; no editar a mano) ---
+L 0x6000 sonido_init inicia el sonido
+L 0x6003 sonido_pide pide el sonido A
+L 0x6006 sonido_cuadro un cuadro de sonido
+L 0x6C12 vuelca_psg vuelca los canales al PSG
+C 0x6023 para el PSG mientras suene la voz: 0xCF08 bit 1 y el banco 15 en 0xA000
+C 0x6092 para todo el PSG
+C 0x60BF compara la prioridad A con la del canal HL: si es menor, no pone el sonido
+C 0x60D3 compara la prioridad A con la del canal HL: si es menor, no pone el sonido
+C 0x60E7 compara la prioridad A con la del canal HL: si es menor, no pone el sonido
+C 0x60FB compara la prioridad A con la del canal HL: si es menor, no pone el sonido
+C 0x6309 cuenta atras del ritmo (0xCF16, 0xCF17): al llegar a cero para el ritmo y pone a cero los cinco canales
+C 0x6311 fundido de salida del PSG: cuenta cuadros
+C 0x631D un canal: si (ix+0) no es cero, 0x635C
+C 0x6329 un canal: si (ix+0) no es cero, 0x635C
+C 0x6335 un canal: si (ix+0) no es cero, 0x635C
+C 0x6341 un canal: si (ix+0) no es cero, 0x635C
+C 0x634D un canal: si (ix+0) no es cero, 0x635C
+C 0x6358 un paso del canal: baja su contador (ix+4); si no llega a cero, solo el efecto de cada cuadro (0x65B5)
+C 0x6373 decide la tabla de la orden
+C 0x63A9 avanza el puntero de la musica del canal (HL + 1)
+C 0x63D9 resta el fundido (0xCF19) al volumen E (no baja de cero)
+C 0x63EB empieza una nota: periodo en (ix+0x0A) y volumen en (ix+0x0C), con la envolvente a cero (0x1D-0x20)
+C 0x6466 resta el fundido (0xCF19) al volumen E (no baja de cero)
+C 0x646C empieza una nota: periodo en (ix+0x0A) y volumen en (ix+0x0C), con la envolvente a cero (0x1D-0x20)
+C 0x6474 avanza el puntero de la musica del canal (HL + 1)
+C 0x6482 tono: el nibble bajo es la duracion (multiplicada por (ix+0x14), el tempo) y el alto la nota (0-0xB)
+C 0x6486 elige la direccion del patron de ritmo por el tipo de canal (tablas 0x6DA3, 0x6E17, 0x6F20, 0x6D5B, 0x6D73, 0x6D8B)
+C 0x65C0 deslizamiento del tono: sube o baja el periodo de (ix+0x27) cada cuadro, (ix+0x28) veces
+C 0x65C7 vibrato: cuenta cuadros
+C 0x65CE envolvente de volumen (ataque, caida, sostenido y relajacion con los tiempos de (ix+0x21)-(ix+0x24))
+C 0x6691 pone el periodo de la nota en (ix+0x0A): el de (ix+0x10) mas el desplazamiento de (ix+0x26) si hay
+C 0x66AF toca el patron de ritmo: marca el canal y ejecuta sus ordenes
+C 0x673B envolvente del volumen
+C 0x6846 fin de un canal: si era el 0x0D pide el sonido 0x18
+C 0x684B fin de un canal: si era el 0x0D pide el sonido 0x18
+C 0x6850 fin de un canal: si era el 0x0D pide el sonido 0x18
+C 0x6855 fin de un canal: si era el 0x0D pide el sonido 0x18
+C 0x685A fin de un canal: si era el 0x0D pide el sonido 0x18
+C 0x68D0 pide el sonido 0x18 cuando acaba un canal de efecto
+C 0x6B19 lee la direccion de salto que sigue a la orden y apunta HL a su byte anterior
+C 0x6C33 escribe los tres tonos (R0-R5) y los volumenes (R8-R10)
+C 0x6C36 el ruido (R6)
+C 0x6C39 la envolvente (R11, R12, R13)
+C 0x6C3C mezclador (R7): une los bits de cada canal (tablas 0x6D4F, 0x6D53, 0x6D57)
+C 0x6C47 escribe en el PSG el periodo (dos registros) y el volumen del canal HL
+C 0x6C61 escribe en el PSG el periodo (dos registros) y el volumen del canal HL
+C 0x6C6A escribe en el PSG el periodo (dos registros) y el volumen del canal HL
+C 0x6C84 escribe en el PSG el periodo (dos registros) y el volumen del canal HL
+C 0x6C8B escribe en el PSG el periodo (dos registros) y el volumen del canal HL
+C 0x6D0C HL += A & 3
+C 0x6D22 HL += A & 3
+C 0x6D38 HL += A & 3
+# --- fin de las anotaciones de anota.py ---

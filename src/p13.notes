@@ -1,0 +1,93 @@
+
+# --- A MANO: comentarios, nombres y bloques ---
+D 0x8000 0x805C subflujo_7FF7_cola  un trozo de musica al que se salta con una llamada (orden 0xF9) o es la continuacion del flujo anterior: flujo de ordenes y notas que acaba en 0xFF, 0xFA (vuelve) o 0xFD (salta)
+F 0x8000 16
+D 0x805C 0x80C5 subflujo_805C  un trozo de musica al que se salta con una llamada (orden 0xF9) o es la continuacion del flujo anterior: flujo de ordenes y notas que acaba en 0xFF, 0xFA (vuelve) o 0xFD (salta)
+F 0x805C 16
+D 0x80C5 0x8158 subflujo_80C5  un trozo de musica al que se salta con una llamada (orden 0xF9) o es la continuacion del flujo anterior: flujo de ordenes y notas que acaba en 0xFF, 0xFA (vuelve) o 0xFD (salta)
+F 0x80C5 16
+D 0x8158 0x8182 subflujo_8158  un trozo de musica al que se salta con una llamada (orden 0xF9) o es la continuacion del flujo anterior: flujo de ordenes y notas que acaba en 0xFF, 0xFA (vuelve) o 0xFD (salta)
+F 0x8158 16
+D 0x8182 0x8216 subflujo_8182  un trozo de musica al que se salta con una llamada (orden 0xF9) o es la continuacion del flujo anterior: flujo de ordenes y notas que acaba en 0xFF, 0xFA (vuelve) o 0xFD (salta)
+F 0x8182 16
+D 0x8216 0x8253 subflujo_8216  un trozo de musica al que se salta con una llamada (orden 0xF9) o es la continuacion del flujo anterior: flujo de ordenes y notas que acaba en 0xFF, 0xFA (vuelve) o 0xFD (salta)
+F 0x8216 16
+D 0x8253 0x8275 sonido11_canal2  el flujo de ordenes y notas del canal 2 (musica) del sonido 11: lo recorre el motor de p12:6362 nota a nota (de 0x00 a 0xCF, el nibble alto es la nota y el bajo la duracion; de 0xD0 a 0xFE, ordenes)
+F 0x8253 16
+D 0x8275 0x82B3 subflujo_8275  un trozo de musica al que se salta con una llamada (orden 0xF9) o es la continuacion del flujo anterior: flujo de ordenes y notas que acaba en 0xFF, 0xFA (vuelve) o 0xFD (salta)
+F 0x8275 16
+D 0x82B3 0x82DD subflujo_82B3  un trozo de musica al que se salta con una llamada (orden 0xF9) o es la continuacion del flujo anterior: flujo de ordenes y notas que acaba en 0xFF, 0xFA (vuelve) o 0xFD (salta)
+F 0x82B3 16
+D 0x82DD 0x830F subflujo_82DD  un trozo de musica al que se salta con una llamada (orden 0xF9) o es la continuacion del flujo anterior: flujo de ordenes y notas que acaba en 0xFF, 0xFA (vuelve) o 0xFD (salta)
+F 0x82DD 16
+D 0x830F 0x833D subflujo_830F  un trozo de musica al que se salta con una llamada (orden 0xF9) o es la continuacion del flujo anterior: flujo de ordenes y notas que acaba en 0xFF, 0xFA (vuelve) o 0xFD (salta)
+F 0x830F 16
+D 0x833D 0x83A0 subflujo_833D  un trozo de musica al que se salta con una llamada (orden 0xF9) o es la continuacion del flujo anterior: flujo de ordenes y notas que acaba en 0xFF, 0xFA (vuelve) o 0xFD (salta)
+F 0x833D 16
+D 0x83A0 0x83EF subflujo_83A0  un trozo de musica al que se salta con una llamada (orden 0xF9) o es la continuacion del flujo anterior: flujo de ordenes y notas que acaba en 0xFF, 0xFA (vuelve) o 0xFD (salta)
+F 0x83A0 16
+D 0x83EF 0x8438 sonido12_canal0  el flujo de ordenes y notas del canal 0 (musica) del sonido 12: lo recorre el motor de p12:6362 nota a nota (de 0x00 a 0xCF, el nibble alto es la nota y el bajo la duracion; de 0xD0 a 0xFE, ordenes)
+F 0x83EF 16
+D 0x8438 0x85C1 subflujo_8438  un trozo de musica al que se salta con una llamada (orden 0xF9) o es la continuacion del flujo anterior: flujo de ordenes y notas que acaba en 0xFF, 0xFA (vuelve) o 0xFD (salta)
+F 0x8438 16
+D 0x85C1 0x871F sonido12_canal1  el flujo de ordenes y notas del canal 1 (musica) del sonido 12: lo recorre el motor de p12:6362 nota a nota (de 0x00 a 0xCF, el nibble alto es la nota y el bajo la duracion; de 0xD0 a 0xFE, ordenes)
+F 0x85C1 16
+D 0x871F 0x8763 sonido12_canal2  el flujo de ordenes y notas del canal 2 (musica) del sonido 12: lo recorre el motor de p12:6362 nota a nota (de 0x00 a 0xCF, el nibble alto es la nota y el bajo la duracion; de 0xD0 a 0xFE, ordenes)
+F 0x871F 16
+D 0x8763 0x88F9 subflujo_8763  un trozo de musica al que se salta con una llamada (orden 0xF9) o es la continuacion del flujo anterior: flujo de ordenes y notas que acaba en 0xFF, 0xFA (vuelve) o 0xFD (salta)
+F 0x8763 16
+D 0x88F9 0x8925 sonido13_canal0  el flujo de ordenes y notas del canal 0 (musica) del sonido 13: lo recorre el motor de p12:6362 nota a nota (de 0x00 a 0xCF, el nibble alto es la nota y el bajo la duracion; de 0xD0 a 0xFE, ordenes)
+F 0x88F9 16
+D 0x8925 0x8956 sonido13_canal1  el flujo de ordenes y notas del canal 1 (musica) del sonido 13: lo recorre el motor de p12:6362 nota a nota (de 0x00 a 0xCF, el nibble alto es la nota y el bajo la duracion; de 0xD0 a 0xFE, ordenes)
+F 0x8925 16
+D 0x8956 0x8982 sonido13_canal2  el flujo de ordenes y notas del canal 2 (musica) del sonido 13: lo recorre el motor de p12:6362 nota a nota (de 0x00 a 0xCF, el nibble alto es la nota y el bajo la duracion; de 0xD0 a 0xFE, ordenes)
+F 0x8956 16
+D 0x8982 0x89CD sonido14_canal0  el flujo de ordenes y notas del canal 0 (musica) del sonido 14: lo recorre el motor de p12:6362 nota a nota (de 0x00 a 0xCF, el nibble alto es la nota y el bajo la duracion; de 0xD0 a 0xFE, ordenes)
+F 0x8982 16
+D 0x89CD 0x8A1A sonido14_canal1  el flujo de ordenes y notas del canal 1 (musica) del sonido 14: lo recorre el motor de p12:6362 nota a nota (de 0x00 a 0xCF, el nibble alto es la nota y el bajo la duracion; de 0xD0 a 0xFE, ordenes)
+F 0x89CD 16
+D 0x8A1A 0x8A4A sonido14_canal2  el flujo de ordenes y notas del canal 2 (musica) del sonido 14: lo recorre el motor de p12:6362 nota a nota (de 0x00 a 0xCF, el nibble alto es la nota y el bajo la duracion; de 0xD0 a 0xFE, ordenes)
+F 0x8A1A 16
+D 0x8A4A 0x8ABB sonido15_canal0  el flujo de ordenes y notas del canal 0 (musica) del sonido 15: lo recorre el motor de p12:6362 nota a nota (de 0x00 a 0xCF, el nibble alto es la nota y el bajo la duracion; de 0xD0 a 0xFE, ordenes)
+F 0x8A4A 16
+D 0x8ABB 0x8B22 sonido15_canal1  el flujo de ordenes y notas del canal 1 (musica) del sonido 15: lo recorre el motor de p12:6362 nota a nota (de 0x00 a 0xCF, el nibble alto es la nota y el bajo la duracion; de 0xD0 a 0xFE, ordenes)
+F 0x8ABB 16
+D 0x8B22 0x8B7A sonido15_canal2  el flujo de ordenes y notas del canal 2 (musica) del sonido 15: lo recorre el motor de p12:6362 nota a nota (de 0x00 a 0xCF, el nibble alto es la nota y el bajo la duracion; de 0xD0 a 0xFE, ordenes)
+F 0x8B22 16
+D 0x8B7A 0x8BDD sonido16_canal0  el flujo de ordenes y notas del canal 0 (musica) del sonido 16: lo recorre el motor de p12:6362 nota a nota (de 0x00 a 0xCF, el nibble alto es la nota y el bajo la duracion; de 0xD0 a 0xFE, ordenes)
+F 0x8B7A 16
+D 0x8BDD 0x8C9B subflujo_8BDD  un trozo de musica al que se salta con una llamada (orden 0xF9) o es la continuacion del flujo anterior: flujo de ordenes y notas que acaba en 0xFF, 0xFA (vuelve) o 0xFD (salta)
+F 0x8BDD 16
+D 0x8C9B 0x8D01 sonido16_canal1  el flujo de ordenes y notas del canal 1 (musica) del sonido 16: lo recorre el motor de p12:6362 nota a nota (de 0x00 a 0xCF, el nibble alto es la nota y el bajo la duracion; de 0xD0 a 0xFE, ordenes)
+F 0x8C9B 16
+D 0x8D01 0x8D82 subflujo_8D01  un trozo de musica al que se salta con una llamada (orden 0xF9) o es la continuacion del flujo anterior: flujo de ordenes y notas que acaba en 0xFF, 0xFA (vuelve) o 0xFD (salta)
+F 0x8D01 16
+D 0x8D82 0x8DC4 sonido16_canal2  el flujo de ordenes y notas del canal 2 (musica) del sonido 16: lo recorre el motor de p12:6362 nota a nota (de 0x00 a 0xCF, el nibble alto es la nota y el bajo la duracion; de 0xD0 a 0xFE, ordenes)
+F 0x8D82 16
+D 0x8DC4 0x8E39 subflujo_8DC4  un trozo de musica al que se salta con una llamada (orden 0xF9) o es la continuacion del flujo anterior: flujo de ordenes y notas que acaba en 0xFF, 0xFA (vuelve) o 0xFD (salta)
+F 0x8DC4 16
+D 0x8E39 0x8E77 subflujo_8E39  un trozo de musica al que se salta con una llamada (orden 0xF9) o es la continuacion del flujo anterior: flujo de ordenes y notas que acaba en 0xFF, 0xFA (vuelve) o 0xFD (salta)
+F 0x8E39 16
+D 0x8E77 0x8E9A sonido03_canal3  el flujo de ordenes y notas del canal 3 (efecto) del sonido 3: lo recorre el motor de p12:6362 nota a nota (de 0x00 a 0xCF, el nibble alto es la nota y el bajo la duracion; de 0xD0 a 0xFE, ordenes)
+F 0x8E77 16
+D 0x8E9A 0x8EBD sonido03_canal4  el flujo de ordenes y notas del canal 4 (efecto) del sonido 3: lo recorre el motor de p12:6362 nota a nota (de 0x00 a 0xCF, el nibble alto es la nota y el bajo la duracion; de 0xD0 a 0xFE, ordenes)
+F 0x8E9A 16
+D 0x8EBD 0x8ED0 sonido04_canal4  el flujo de ordenes y notas del canal 4 (efecto) del sonido 4: lo recorre el motor de p12:6362 nota a nota (de 0x00 a 0xCF, el nibble alto es la nota y el bajo la duracion; de 0xD0 a 0xFE, ordenes)
+F 0x8EBD 16
+D 0x8ED0 0x8FD8 sonido05_canal4  el flujo de ordenes y notas del canal 4 (efecto) del sonido 5: lo recorre el motor de p12:6362 nota a nota (de 0x00 a 0xCF, el nibble alto es la nota y el bajo la duracion; de 0xD0 a 0xFE, ordenes)
+F 0x8ED0 16
+D 0x8FD8 0x8FF9 sonido06_canal4  el flujo de ordenes y notas del canal 4 (efecto) del sonido 6: lo recorre el motor de p12:6362 nota a nota (de 0x00 a 0xCF, el nibble alto es la nota y el bajo la duracion; de 0xD0 a 0xFE, ordenes)
+F 0x8FD8 16
+D 0x8FF9 0x9026 sonido07_canal4  el flujo de ordenes y notas del canal 4 (efecto) del sonido 7: lo recorre el motor de p12:6362 nota a nota (de 0x00 a 0xCF, el nibble alto es la nota y el bajo la duracion; de 0xD0 a 0xFE, ordenes)
+F 0x8FF9 16
+D 0x9026 0x9040 sonido08_canal4  el flujo de ordenes y notas del canal 4 (efecto) del sonido 8: lo recorre el motor de p12:6362 nota a nota (de 0x00 a 0xCF, el nibble alto es la nota y el bajo la duracion; de 0xD0 a 0xFE, ordenes)
+F 0x9026 16
+D 0x9040 0x94C4 voz_0x11  la voz digital 0x11 (el primer byte, 0xAD, es la marca del final): dos nibbles de salto por byte (p12:6292), hasta que un byte repite esa marca
+F 0x9040 16
+D 0x94C4 0x9DA6 voz_0x12  la voz digital 0x12 (la marca del final es 0x84)
+F 0x94C4 16
+D 0x9DA6 0xA000 voz_0x13  la voz digital 0x13 (la marca del final es 0xAF); sigue en el banco 14
+F 0x9DA6 16
+
+# --- BLOQUES QUE LEE EL CODIGO (seccion que reescribe tools/bloques.py; no editar a mano) ---
+# --- fin de los bloques de bloques.py ---

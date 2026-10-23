@@ -1,0 +1,39 @@
+
+# --- BLOQUES QUE LEE EL CODIGO (seccion que reescribe tools/bloques.py; no editar a mano) ---
+D 0xAF80 0xAF90 colores_AF80  lista de colores de la paleta (p00:4EDC): numero de registro y dos bytes, y 0xFF; lo leen p00:5C1B (16 bytes)
+F 0xAF80 3
+D 0xAF90 0xAFD1 texto_tiles_AF90  texto de tiles (p00:5C92): un tile por byte, 0xFE y un desplazamiento, 0xFF acaba; lo leen p00:5C5A (65 bytes)
+F 0xAF90 16
+D 0xAFD1 0xB039 dibujos_AFD1  los dibujos del titulo (p00:5C39): 13 tiles de 1 bit por punto; lo leen p00:5C39 (104 bytes)
+F 0xAFD1 8
+D 0xB039 0xB0A1 dibujos_B039  los dibujos del titulo (p00:5C45): 13 tiles de 1 bit por punto; lo leen p00:5C45 (104 bytes)
+F 0xB039 8
+D 0xB0A1 0xB171 dibujos_B0A1  los dibujos del titulo (p00:5C51): 26 tiles de 1 bit por punto; lo leen p00:5C51 (208 bytes)
+F 0xB0A1 8
+D 0xB171 0xB46F rle_B171  datos a la VRAM en RLE (p00:4E2D): 0 acaba, n < 0x80 repite el byte de detras, 0x80 y una direccion nueva, 0x81-0xFF copian n & 0x7F bytes; lo leen p00:59A3 (766 bytes)
+F 0xB171 16
+D 0xB46F 0xB557 rle_B46F  datos a la VRAM en RLE (p00:4E2D): 0 acaba, n < 0x80 repite el byte de detras, 0x80 y una direccion nueva, 0x81-0xFF copian n & 0x7F bytes; lo leen p00:57EC (232 bytes)
+F 0xB46F 16
+D 0xB557 0xB709 rle_cara_4  el RLE de los sprites de la cara numero 4 de la tabla de p00:58B9 (se vuelca a la VRAM 0xFE00 con p00:4E2D): 0 acaba, n < 0x80 repite, 0x80 y una direccion, 0x81-0xFF copian n & 0x7F bytes; lo leen p00:58A2 (434 bytes)
+F 0xB557 16
+D 0xB709 0xB850 rle_cara_1  el RLE de los sprites de la cara numero 1 de la tabla de p00:58B9 (se vuelca a la VRAM 0xFE00 con p00:4E2D): 0 acaba, n < 0x80 repite, 0x80 y una direccion, 0x81-0xFF copian n & 0x7F bytes; lo leen p00:58A2 (327 bytes)
+F 0xB709 16
+D 0xB850 0xB9F3 rle_cara_0  el RLE de los sprites de la cara numero 0 de la tabla de p00:58B9 (se vuelca a la VRAM 0xFE00 con p00:4E2D): 0 acaba, n < 0x80 repite, 0x80 y una direccion, 0x81-0xFF copian n & 0x7F bytes; lo leen p00:58A2 (419 bytes)
+F 0xB850 16
+D 0xB9F3 0xBB9F rle_cara_2  el RLE de los sprites de la cara numero 2 de la tabla de p00:58B9 (se vuelca a la VRAM 0xFE00 con p00:4E2D): 0 acaba, n < 0x80 repite, 0x80 y una direccion, 0x81-0xFF copian n & 0x7F bytes; lo leen p00:58A2 (428 bytes)
+F 0xB9F3 16
+D 0xBB9F 0xBD37 rle_cara_3  el RLE de los sprites de la cara numero 3 de la tabla de p00:58B9 (se vuelca a la VRAM 0xFE00 con p00:4E2D): 0 acaba, n < 0x80 repite, 0x80 y una direccion, 0x81-0xFF copian n & 0x7F bytes; lo leen p00:58A2 (408 bytes)
+F 0xBB9F 16
+D 0xBD37 0xBEC2 rle_cara_5  el RLE de los sprites de la cara numero 5 de la tabla de p00:58B9 (se vuelca a la VRAM 0xFE00 con p00:4E2D): 0 acaba, n < 0x80 repite, 0x80 y una direccion, 0x81-0xFF copian n & 0x7F bytes; lo leen p00:58A2 (395 bytes)
+F 0xBD37 16
+D 0xBEC2 0xBEF3 colores_BEC2  lista de colores de la paleta (p00:4EDC): numero de registro y dos bytes, y 0xFF; lo leen p00:59AF (49 bytes)
+F 0xBEC2 3
+D 0xBEF3 0xBF24 colores_BEF3  lista de colores de la paleta (p00:4EDC): numero de registro y dos bytes, y 0xFF; lo leen p00:59BB (49 bytes)
+F 0xBEF3 3
+D 0xBF24 0xBF31 colores_BF24  lista de colores de la paleta (p00:4EDC): numero de registro y dos bytes, y 0xFF; lo leen p00:59C7 (13 bytes)
+F 0xBF24 3
+D 0xBF31 0xC000 relleno_ff  207 bytes a 0xFF hasta el final del banco: relleno; lo leen nadie (207 bytes)
+F 0xBF31 16
+D 0xA000 0xAF80 resto_A000  lo apuntan con el banco puesto p00:5C27 (0xA848); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p00:5C27 (3968 bytes)
+F 0xA000 16
+# --- fin de los bloques de bloques.py ---

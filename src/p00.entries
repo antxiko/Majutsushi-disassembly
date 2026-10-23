@@ -1,0 +1,150 @@
+# Puntos de entrada del banco 0 (se ejecuta en 0x4000).
+#
+# Cada uno lleva la instruccion que lo justifica. Los que ponen "pNN:XXXX"
+# vienen de OTRO banco: el trazador de una sola pagina no puede seguirlos,
+# porque en esa direccion -segun lo que haya en el registro del mapper- puede
+# estar cualquiera de seis bancos. Los que ponen "tabla" salen de una tabla
+# del despachador (cartucho.DESPACHADOR), que va pegada detras de su `call` y esta declarada
+# como datos en el .nocode: el trazador tampoco puede seguirla.
+#
+# Los saltos y llamadas DENTRO del propio banco no se ponen aqui: los
+# encuentra tools/z80trace.py solo, siguiendo el flujo.
+#
+# Este fichero lo regenera `make semillas` (tools/bancos.py escribe).
+0x4010   # gancho de interrupcion H.KEYI: INIT escribe 0xC3 en 0xFD9F y esta direccion en 0xFDA0 (p00:40AF-p00:40B7)
+0x4061   # p03:BFF5 call
+0x4067   # p01:6EC1 call
+0x4070   # cabecera AB: INIT
+0x4102   # codigo huerfano: 5 bytes que acaban en un salto; el trazado no entra y ninguna instruccion salta, llama o carga 0x4102
+0x4107   # p02:97AE call
+0x410C   # p02:8D49 call
+0x4111   # p02:8F53 jp
+0x4116   # p03:B555 call
+0x411B   # p03:B532 call
+0x4120   # p02:8AED call
+0x414D   # p02:973B call
+0x4158   # p02:9747 call
+0x4163   # p02:9729 call
+0x416E   # p02:9766 call
+0x4179   # p03:A48E jp
+0x4184   # p03:A16C call
+0x418F   # p03:A5D5 call
+0x4199   # codigo huerfano: 5 bytes que acaban en un salto; el trazado no entra y ninguna instruccion salta, llama o carga 0x4199
+0x419E   # codigo huerfano: 5 bytes que acaban en un salto; el trazado no entra y ninguna instruccion salta, llama o carga 0x419E
+0x41A8   # codigo huerfano: 5 bytes que acaban en un salto; el trazado no entra y ninguna instruccion salta, llama o carga 0x41A8
+0x41C9   # p00:41B4 entrada 0 de la tabla de 0x41B7 (call 0x4066 en 0x41B4)
+0x41CE   # p00:41B4 entrada 2 de la tabla de 0x41B7 (call 0x4066 en 0x41B4)
+0x41CF   # p00:41B4 entrada 3 de la tabla de 0x41B7 (call 0x4066 en 0x41B4)
+0x4207   # p01:6CFF jp
+0x4223   # p01:6CED call
+0x4246   # codigo huerfano: 5 bytes que acaban en un salto; el trazado no entra y ninguna instruccion salta, llama o carga 0x4246
+0x424B   # p01:6C86 call
+0x4258   # p02:8F78 call
+0x4283   # p00:426E entrada 0 de la tabla de 0x4271 (call 0x4066 en 0x426E)
+0x428F   # p00:4284 entrada 0 de la tabla de 0x4287 (call 0x4066 en 0x4284)
+0x4297   # p00:4284 entrada 1 de la tabla de 0x4287 (call 0x4066 en 0x4284)
+0x42A5   # p00:4284 entrada 2 de la tabla de 0x4287 (call 0x4066 en 0x4284)
+0x42C5   # p00:4284 entrada 3 de la tabla de 0x4287 (call 0x4066 en 0x4284)
+0x42D1   # p00:426E entrada 1 de la tabla de 0x4271 (call 0x4066 en 0x426E)
+0x42DC   # p00:426E entrada 2 de la tabla de 0x4271 (call 0x4066 en 0x426E)
+0x430A   # p00:426E entrada 3 de la tabla de 0x4271 (call 0x4066 en 0x426E)
+0x4323   # p00:4310 entrada 0 de la tabla de 0x4313 (call 0x4066 en 0x4310)
+0x4396   # p00:4310 entrada 1 de la tabla de 0x4313 (call 0x4066 en 0x4310)
+0x441B   # p00:4310 entrada 2 de la tabla de 0x4313 (call 0x4066 en 0x4310)
+0x4433   # p00:4310 entrada 3 de la tabla de 0x4313 (call 0x4066 en 0x4310)
+0x444E   # p00:4310 entrada 4 de la tabla de 0x4313 (call 0x4066 en 0x4310)
+0x445C   # p00:4310 entrada 5 de la tabla de 0x4313 (call 0x4066 en 0x4310)
+0x4488   # p00:4310 entrada 6 de la tabla de 0x4313 (call 0x4066 en 0x4310)
+0x4496   # p00:4310 entrada 7 de la tabla de 0x4313 (call 0x4066 en 0x4310)
+0x44B3   # p00:44BD entrada 4 de la tabla de 0x44C0 (call 0x4066 en 0x44BD)
+0x44CA   # p00:426E entrada 4 de la tabla de 0x4271 (call 0x4066 en 0x426E)
+0x44D2   # p00:44CB entrada 0 de la tabla de 0x44CE (call 0x4066 en 0x44CB)
+0x44E4   # p00:44CB entrada 1 de la tabla de 0x44CE (call 0x4066 en 0x44CB)
+0x451B   # p00:426E entrada 5 de la tabla de 0x4271 (call 0x4066 en 0x426E)
+0x4531   # p00:426E entrada 6 de la tabla de 0x4271 (call 0x4066 en 0x426E)
+0x4548   # p00:4537 entrada 0 de la tabla de 0x453A (call 0x4066 en 0x4537)
+0x459A   # p00:4537 entrada 1 de la tabla de 0x453A (call 0x4066 en 0x4537)
+0x45A5   # p00:4537 entrada 2 de la tabla de 0x453A (call 0x4066 en 0x4537)
+0x45B1   # p00:4537 entrada 3 de la tabla de 0x453A (call 0x4066 en 0x4537)
+0x4619   # p00:4537 entrada 4 de la tabla de 0x453A (call 0x4066 en 0x4537)
+0x4677   # p00:4537 entrada 5 de la tabla de 0x453A (call 0x4066 en 0x4537)
+0x4738   # p00:4537 entrada 6 de la tabla de 0x453A (call 0x4066 en 0x4537)
+0x476A   # p00:426E entrada 7 de la tabla de 0x4271 (call 0x4066 en 0x426E)
+0x4781   # p00:4770 entrada 0 de la tabla de 0x4773 (call 0x4066 en 0x4770)
+0x47A7   # p00:4770 entrada 1 de la tabla de 0x4773 (call 0x4066 en 0x4770)
+0x47DD   # p00:4770 entrada 2 de la tabla de 0x4773 (call 0x4066 en 0x4770)
+0x4824   # p00:4770 entrada 3 de la tabla de 0x4773 (call 0x4066 en 0x4770)
+0x4892   # p00:4770 entrada 4 de la tabla de 0x4773 (call 0x4066 en 0x4770)
+0x489B   # p00:4770 entrada 5 de la tabla de 0x4773 (call 0x4066 en 0x4770)
+0x48B7   # p00:4770 entrada 6 de la tabla de 0x4773 (call 0x4066 en 0x4770)
+0x48C6   # p00:426E entrada 8 de la tabla de 0x4271 (call 0x4066 en 0x426E)
+0x48D2   # p00:48C7 entrada 0 de la tabla de 0x48CA (call 0x4066 en 0x48C7)
+0x490C   # p00:48C7 entrada 1 de la tabla de 0x48CA (call 0x4066 en 0x48C7)
+0x4944   # p00:48C7 entrada 2 de la tabla de 0x48CA (call 0x4066 en 0x48C7)
+0x4955   # p00:48C7 entrada 3 de la tabla de 0x48CA (call 0x4066 en 0x48C7)
+0x499E   # estado 0-2 de la maquina de estados: el despachador de 0x4271 deja 0x499E como retorno (push hl en p00:426D)
+0x4A17   # p03:B62E call
+0x4A20   # p03:BB93 call
+0x4B46   # p03:B5BB call
+0x4C33   # p03:B5C6 call
+0x4C59   # p03:BC74 call
+0x4CC9   # p03:A6AF call
+0x4D12   # codigo huerfano: 19 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x4D12
+0x4D56   # codigo huerfano: 25 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x4D56
+0x4D6F   # codigo huerfano: 12 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x4D6F
+0x4D7B   # codigo huerfano: 14 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x4D7B
+0x4DAD   # codigo huerfano: 34 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x4DAD
+0x4DCF   # codigo huerfano: 12 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x4DCF
+0x4DDB   # codigo huerfano: 14 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x4DDB
+0x4E09   # codigo huerfano: 30 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x4E09
+0x4F64   # codigo huerfano: 62 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x4F64
+0x4FA2   # codigo huerfano: 43 bytes que acaban en un salto; el trazado no entra y ninguna instruccion salta, llama o carga 0x4FA2
+0x4FCD   # codigo huerfano: 12 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x4FCD
+0x4FD9   # codigo huerfano: 12 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x4FD9
+0x5074   # p02:8C39 jp
+0x50E1   # p02:8C09 call
+0x51B5   # codigo huerfano: 17 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x51B5
+0x51C6   # codigo huerfano: 51 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x51C6
+0x51F9   # codigo huerfano: 59 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x51F9
+0x533F   # codigo huerfano: pone 0xC0B9 a cero y sigue en p00:5347; ninguna instruccion lo llama ni lo carga
+0x5342   # codigo huerfano: pone 0xC0B9 a uno y sigue en p00:5347 (la otra entrada de p00:533F)
+0x5367   # codigo huerfano: C = 0 y sigue en p00:5369 (la otra entrada de p00:5363)
+0x5383   # codigo huerfano: 21 bytes que acaban en un salto; el trazado no entra y ninguna instruccion salta, llama o carga 0x5383
+0x5565   # codigo huerfano: pone 0xC0B9 a cero y sigue en p00:556D; ninguna instruccion lo llama
+0x5568   # codigo huerfano: pone 0xC0B9 a uno y sigue en p00:556D (la otra entrada de p00:5565)
+0x56C6   # p01:6186 call
+0x56DF   # p04:B114 call
+0x570B   # codigo huerfano: call 0x5746 y sigue en p00:570E
+0x57D3   # p03:B019 call
+0x5806   # p03:ADAE call
+0x5810   # p04:B0EF call
+0x5828   # p03:ADB1 call
+0x5834   # p03:B01C call
+0x5840   # codigo huerfano: 12 bytes que acaban en un salto; el trazado no entra y ninguna instruccion salta, llama o carga 0x5840
+0x584C   # p03:A65B call
+0x58A2   # p03:A6BE call
+0x599A   # p02:8EEF call
+0x59C1   # codigo huerfano: 12 bytes que acaban en un salto; el trazado no entra y ninguna instruccion salta, llama o carga 0x59C1
+0x59CD   # p02:979F call
+0x5AAA   # p04:B111 call
+0x5AB1   # p04:AA41 call
+0x5AB8   # p04:A9FA call
+0x5ABF   # p04:AB39 call
+0x5AC6   # p04:AA2B call
+0x5ACD   # p03:B68B call
+0x5ACF   # p03:B506 call
+0x5B23   # p03:A669 call
+0x5CF5   # p00:5CE6 entrada 0 de la tabla de 0x5CE9 (call 0x4066 en 0x5CE6)
+0x5D01   # p00:5CE6 entrada 1 de la tabla de 0x5CE9 (call 0x4066 en 0x5CE6)
+0x5D2B   # p00:5CE6 entrada 2 de la tabla de 0x5CE9 (call 0x4066 en 0x5CE6)
+0x5D51   # p00:5CE6 entrada 3 de la tabla de 0x5CE9 (call 0x4066 en 0x5CE6)
+0x5D6B   # p00:5CE6 entrada 4 de la tabla de 0x5CE9 (call 0x4066 en 0x5CE6)
+0x5D8C   # p00:5CE6 entrada 5 de la tabla de 0x5CE9 (call 0x4066 en 0x5CE6)
+0x5DC7   # codigo huerfano: 30 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x5DC7
+0x5E4D   # p02:935C call
+0x5E54   # p02:8D0D call
+0x5EAD   # p00:5EA2 entrada 0 de la tabla de 0x5EA5 (call 0x4066 en 0x5EA2)
+0x5F45   # p00:5EA2 entrada 1 de la tabla de 0x5EA5 (call 0x4066 en 0x5EA2)
+0x5F90   # p00:5EA2 entrada 2 de la tabla de 0x5EA5 (call 0x4066 en 0x5EA2)
+0x5FA0   # p00:5EA2 entrada 3 de la tabla de 0x5EA5 (call 0x4066 en 0x5EA2)
+0x5FCC   # p03:B5C3 call

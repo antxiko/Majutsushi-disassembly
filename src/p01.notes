@@ -1,0 +1,953 @@
+
+
+# --- A MANO: comentarios escritos leyendo el codigo ---
+C 0x6060 dibuja el cuadro de cuenta atras (fichas que quedan): guarda el fondo, lo pinta y escribe el numero (0xC20E)
+C 0x6099 fichas que quedan = 0x7A - 0xC1C1 - 0xC210, en BCD, a 0xC20E
+C 0x60B2 devuelve a la pagina 0 los cuatro bloques del fondo guardados en la pagina 1 (a partir de 0xA248)
+C 0x6146 pasa lo que han dicho las teclas de funcion (0xC00C) a un sonido: cada bit pide uno, si no es el mismo de antes
+C 0x6149 recorre los cinco bits de las teclas de funcion de 0xC00C: el primero que esta puesto elige su sonido
+C 0x617C prepara la partida: pone a cero 0xC009 y 0xC24D, carga el fondo y el marco
+C 0x618F busca otro cartucho con la memoria de partidas: recorre las 4 ranuras primarias y sus secundarias
+C 0x61C2 mira si en la ranura A (0xF0F5) hay un cartucho con 'YZ' en 0x4010-0x4011 (RDSLT); si lo hay, A = ranura y acarreo
+C 0x61E6 salva la partida en el otro cartucho: pone un RET en el gancho de interrupcion (0xFD9F) mientras dura
+C 0x61FE carga la partida del otro cartucho (igual, con 0x62F9)
+C 0x6222 copia 5 bytes de 0x6244 a 0xC5C0 (el nombre del fichero) y pone a cero 8 bytes
+C 0x6249 llama a las rutinas del otro cartucho (en 0x8000, con la ranura 0xF0F5): 0, 2, 9 tres veces y 1; si alguna falla va a 0x63A8
+C 0x62F9 igual que 0x6249 pero para cargar (rutinas 0, 2, 8 tres veces y 1)
+C 0x63A8 error al grabar: llama a la rutina 6 del otro cartucho y pone 0xC0E7 = 1
+C 0x63CE error al cargar: 0xC0E8 = 1
+C 0x63D4 pantalla de eleccion de contrasea o de ajustes: si 0xC02B ya no es cero, solo atiende las teclas
+C 0x640E dibuja ocho marcos de 48 x 48 puntos (hay un tile de la hoja en 0x6C40/0x6C70 para cada uno)
+C 0x6413 un marco de la lista de ocho: lee su posicion (X, Y) y calcula el origen del dibujo en la hoja (A = indice)
+C 0x6419 cuenta el marco desde el ultimo (8 - B)
+C 0x6421 el palo del marco (los dos bits bajos) por 16 para sacar su columna en la hoja
+C 0x6428 H = origen X del marco segun la columna; L = 0x40 en la fila de arriba y 0x70 en la de abajo
+C 0x6430 los marcos 4 a 7 estan en la fila de abajo de la hoja (Y = 0x70)
+C 0x643F rellena de 0xBB ocho cuadros de 52 x 52 puntos y escribe 8 x 8 tiles dentro
+C 0x6444 un cuadro de 52 x 52: la posicion menos 8 y rellena de 0xBB desde +6
+C 0x645C color 0xBB de relleno
+C 0x6460 rellena y dibuja encima la ventana de 8 x 8 tiles
+C 0x6484 teclas del cuadro de ajustes: ESPACIO sale (0xC02A = 1); las flechas cambian el registro de color 0xC012/0xC013
+C 0x64A9 sube el registro de ajuste hasta 7 (maximo) con 4 bits
+C 0x64BC escribe el registro 18 del VDP (ajuste de la imagen) con 0xC012 y 0xC013
+C 0x64CD baja el registro de ajuste hasta 8 (minimo, que es -8 en 4 bits)
+C 0x64E3 mira si hay algun jugador con mas de 2 de 0xC0B3: devuelve acarreo
+C 0x64FB recorre los cuatro marcadores (de 3 en 3 bytes): acarreo si alguno pasa de 2
+C 0x6509 por cada jugador (0xC207 o los cuatro) con los bits 3-4 puestos en +0x60 de su mano, hace la jugada de la IA (0x8CF5 y 0x8B8C)
+C 0x6559 cuenta cuantos jugadores tienen los bits 3-4 puestos (0xC0BA) y guarda quienes son (0xC0BB..)
+C 0x6578 mira si el jugador C tiene los bits 3-4 de +0x60 (puede decir ron)
+C 0x6585 cuenta los que pueden en C'
+C 0x65B2 numero al azar: mezcla 0xC1C0 con el registro R del Z80 y el contador de cuadros
+C 0x65C6 dibuja las tres fichas de los rivales
+C 0x65DE dibuja la caja de un rival: borra 52 x 52 con 0xBB y encima la ventana
+C 0x65F1 ventana de 8 x 8 un poco mas arriba y a la izquierda
+C 0x6605 borra con 0 los cuadros 0x48/0x60 de las dos paginas
+C 0x661D dibuja un tile de 48 x 48 de la hoja de la tabla 0x662B (A = cual)
+C 0x67BF recorre los cuatro jugadores (0xD000 + 0x400 x n) y por cada uno que no es el actual prepara su analisis (0x67E0)
+C 0x67E0 analiza la mano de otro jugador: punteros a sus campos en 0xCD80-0xCD88
+C 0x6826 busca en la mano (13 fichas) cuantas son iguales a la ficha de 0xC209 (maximo de tres)
+C 0x6831 busca en la mano las fichas iguales a la de 0xC209 que no son de grupo (bits 6 y 7 limpios)
+C 0x683A con la primera guarda su posicion (0x6852)
+C 0x6840 al acabar mira cuantas son: 1 = pareja posible, 2 = triplete (+0x60 bits 0 y 2)
+C 0x6852 guarda en 0xCD88 la posicion (13 - B) de la primera
+C 0x685E compara las fichas robadas (0xC1C1 + 0xC210) con 0x79: Z/C si se acaba el muro
+C 0x6869 calcula las secuencias (chi) que se pueden hacer con la ficha de 0xC209: tabla 0x6C27, 6 bytes por numero (tres pares)
+C 0x688C copia la escalera (seis bytes) con los bits del palo
+C 0x689F rellena con 0xFF los cinco bytes de la lista de posiciones
+C 0x68A6 prepara el recorrido de las tres escaleras posibles
+C 0x68B1 busca cada ficha de la escalera en la mano
+C 0x68B9 si no esta, y la escalera es la de la ficha (par), anota hueco
+C 0x68C9 si esta, guarda su posicion
+C 0x68D2 si es la segunda de la pareja pone el bit 1 de +0x60 (chi posible)
+C 0x68E0 mira si puede ganar o hacer pon con la mano apuntada por (0xCD80)
+C 0x68F8 prueba si la mano de HL gana con la ficha de 0xC621..0xC62E (B = 1 si es por robo, 2 si es por descarte); pone el acarreo si gana
+C 0x6947 suma los puntos (han) que salen de la tabla 0xC2E0 (pares codigo, valor): el 0x1C no cuenta
+C 0x694C suma los han de la lista de yaku sin contar el 0x1C (dora)
+C 0x695C con los han en C: con cero no gana; con uno gana si la opcion 0xC029 lo permite y quedan honba
+C 0x696F el acarreo dice si hay alguna espera: la lista esta en +0x0F de la mano (cuenta) y +0x10 (fichas)
+C 0x69B8 prueba una mano y marca con el bit 4 de +0x60 si gana
+C 0x69D3 si quedan menos de 4 fichas en el muro (0xC1C1 + 0xC210 > 0x75) no hay mas jugada: acarreo
+C 0x6A10 prueba cada yaku de la lista 0x6AF7 (un byte por yaku, 0 acaba) sobre la mano de 0xC621
+C 0x6A81 prepara 0xC621: copia la mano de 13 fichas y la ficha de 0xC209 en la posicion que toque
+C 0x6AC2 suma los han de 0xC2E0 salvo los de codigo 0x1C, 4 y 2; con acarreo si no hay ninguno que valga
+C 0x6AC7 igual que 0x694C pero para la lista de 0x20 pares: cuenta menos los codigos 0x1C, 4 y 2
+C 0x6ACC avanza al valor del yaku
+C 0x6AD0 salta los codigos 0x1C (dora), 4 (tsumo) y 2 (ippatsu), que no cuentan para saber si hay yaku
+C 0x6ADC suma el valor del yaku a C
+C 0x6AE2 mismo control: sin han no vale
+C 0x6B1A prueba cada espera de la lista de +0x0F (cada ficha que completa la mano)
+C 0x6B4D calcula para los cuatro jugadores si estan en espera: guarda 1 o 0 en +0x81 de cada mano
+C 0x6B8E prueba la lista de yaku sobre la mano de 0xCD5C
+C 0x6BEE busca el primer jugador desde 0xC0B7 que tenga el bit C de +0x60 (C = 1, 2, 4 u 8): el siguiente que lo cumple
+C 0x6BFD busca desde el jugador de 0xC20D el primero que tiene el bit pedido en C de +0x60
+C 0x6C0E el siguiente jugador, modulo 4
+C 0x6C5D PREPARA el analisis de la mano para el que le toca: pone la mano, llama a los analizadores (0x6CD5) y la voz
+C 0x6CB1 el jugador humano esta en la partida (0xC0B1/0xC207/0xC20D = 0)? y mira si hay una orden fija (0xCDA0)
+C 0x6CD5 analiza la mano del jugador: yaku en 0xC2E0, luego dos tablas de rutinas (0x716B y 0x71A5)
+C 0x6CED recorre las 32 comprobaciones de la tabla 0x716B (un yaku cada una, por el despachador)
+C 0x6D47 pone a cero la lista de yaku (0xC2E0, 32 bytes) y copia la mano a 0xC621
+C 0x6D69 DESCOMPONE la mano de 0xC621 en grupos: copia a 0xCD10 la mano de 14 fichas, y busca sus tripletes y secuencias (las parejas en 0xCD04)
+C 0x6DEC mira si la mano de 0xCD10 se ha quedado vacia (carry si lo esta)
+C 0x6DF1 mira si la mano de 0xCD10 esta vacia (14 bytes a cero)
+C 0x6DF9 quita de la mano un triplete o una secuencia de las que hay en 0xCD10
+C 0x6E14 intenta quitar una escalera: la ficha debe ser de numero hasta 7
+C 0x6E1A mira que la ficha sea de numero 1 a 7 (empieza una escalera)
+C 0x6E24 las tres fichas de la escalera: C, D = C + 1 y E = C + 2
+C 0x6E2B comprueba que las tres estan en la mano
+C 0x6E3C mira las tres fichas C, D y E en la mano
+C 0x6E4C busca la ficha A en la mano (acarreo si falta)
+C 0x6E61 cuantas fichas iguales a A hay (tabla 0xCD20 y cuenta en 0xCD30)
+C 0x6E70 B = cuantas fichas distintas de cero hay en 0xCD10
+C 0x6E75 cuenta las fichas distintas de cero
+C 0x6E7C reordena y cuenta las fichas de 0xCD10 (6FA2)
+C 0x6E97 por cada ficha con cuenta 2 o mas y menor de 0x40 anota la pareja
+C 0x6E9B toma solo las fichas con cuenta 2 o mas
+C 0x6EA4 guarda la ficha en la lista de parejas y cuenta
+C 0x6EB2 recorre las 14 fichas de 0xCD10 y por su palo (bits 6-7) va a una rutina de la tabla 0x6ECA
+C 0x6EB7 por cada ficha de la mano va a la rutina de su palo (tabla 0x6ECA)
+C 0x6EB8 el palo esta en los bits 6-7 de la ficha: se pasa a los dos bits bajos
+C 0x6EC1 salta a la rutina de ese palo (tabla 0x6ECA)
+C 0x6EDE quita de la mano (0xCD10) las tres fichas C, D y E
+C 0x6EE6 quita de la mano la ficha C (y resta uno en su cuenta de 0xCD30)
+C 0x6EEB busca la ficha C en la mano
+C 0x6F09 saca una escalera de tres fichas con el bit 7 puesto en su grupo
+C 0x6F0C marca la escalera con el bit 7 en la lista de escaleras
+C 0x6F17 quita de la mano las tres fichas
+C 0x6F1A saca un triplete de tres iguales
+C 0x6F2D mira si la ficha esta en la lista de descartes (+0x41): deja C = 0x80 si no
+C 0x6F30 HL = la lista de descartes +0x41 de la mano que se analiza
+C 0x6F3B compara la ficha con cada descarte (sin los bits 6-7)
+C 0x6F48 anade la ficha A a la primera casilla libre de la lista 0xCD48 (grupos de la mano)
+C 0x6F55 lo mismo en la lista 0xCD44
+C 0x6F5A lo mismo en la lista 0xCD4C
+C 0x6F5F deja la mano de 0xCD10 sin huecos
+C 0x6F74 copia a 0xC570 las fichas que no son cero
+C 0x6F8A pone a cero 0xCD20 (32 bytes: fichas y cuentas)
+C 0x6F98 cuenta las fichas iguales de 0xC621: 0xCD20 = ficha distinta, 0xCD30 = cuantas hay
+C 0x6FA9 cuenta las fichas iguales seguidas
+C 0x6FB3 guarda la ficha y su cuenta y sigue con el resto
+C 0x6FB4 guarda la ficha distinta en 0xCD20
+C 0x6FB9 y su cuenta en 0xCD30
+C 0x6FC1 acaba las listas con un cero
+C 0x6FC6 cuenta cuantas casillas de la lista 0xCD44 estan ocupadas
+C 0x6FE1 comprueba la mano especial de las siete parejas (0xCD9E aparte): todas las cuentas valen 2
+C 0x700C busca la primera casilla libre de la lista de yaku
+C 0x7019 copia la lista de 0xCD48 (grupos) a 0xCD95 sin los ceros
+C 0x7035 escribe el texto del viento de la ronda y del jugador (0xCD90..): '1' + 0xC0B2, el asiento, y 0x35-0x37
+C 0x7053 los cuatro vientos como numero 0x31 + la posicion
+C 0x705A despues los tres dragones 0x35, 0x36 y 0x37
+C 0x7064 compara la cuenta de 0xCD20 con la mano de 0x7075 (la de los trece huerfanos)
+C 0x706C compara la cuenta con la mano de los trece huerfanos
+C 0x7083 mira si algun jugador tiene una mano que no vale (con 0xC023)
+C 0x709D mira si algun jugador tiene una mano que le impide
+C 0x70C5 mira si en la mano (HL + 0x0F) hay alguna ficha de numero 2 a 8
+C 0x70CB si la ficha es de numero 2 a 8
+C 0x70DD pone a cero 0xCD02 y 0xCD00, y mira 0xC022
+C 0x7102 pone a cero 0xCD20 (6F8A)
+C 0x710A mira las 14 cuentas de 0xCD30: si alguna llega a 3 no vale; cuenta cuantas son 2 (parejas)
+C 0x710C cuenta cuantas fichas distintas de la mano tienen cuenta 2
+C 0x7118 solo vale si hay exactamente una pareja
+C 0x711C comprueba que las 12 primeras fichas distintas no pasen de 0x30 y que cada paso entre una y la siguiente sea de 3 o mas
+C 0x7121 comprueba que cada par de fichas numeradas distintas esten a 3 o mas
+C 0x7130 se cumple: 0xCD02 = 0xCD00 = 1 y el yaku 0x2F (con el codigo 0x83) a la lista de 0xC2E0
+C 0x7144 mira las cuatro manos (0xD040 + 0x400 x n): D = 1 si alguna tiene ese campo distinto de cero, y lo guarda en 0xCD01
+C 0x714B mira las cuatro manos
+C 0x715C 0xCD9D = 0 y pide por 0xA0AB (banco 3) el codigo 0x21
+C 0x71CD turno de un jugador de la maquina: el campo +0x34 de su mano decide si esta en espera
+C 0x71D9 el campo +0x80 distinto de cero lleva a 0x72AE
+C 0x71E8 prepara la mano (0x7284), la cambia por 0x8711 y sigue con 0x7208, 0x896D, 0x8680
+C 0x7208 busca una ficha que no deba tirar: mira la lista de +0x150 (cuenta) y la de +0x37 (cuenta en +0x3F, de 2 en 2)
+C 0x7238 busca la ficha de DE en la lista de pares de +0x37
+C 0x7255 cuenta las fichas iguales a C y mira si son cuatro
+C 0x7262 DE = la ficha que toca (0xC209, o la que ocupa la posicion de la mano): usa 13 menos tres veces los grupos de +0x0E
+C 0x7284 un turno: prepara tablas (72BF), cuenta fichas (72D2), analiza la mano (7349) y sigue con 0x8039
+C 0x7291 el campo +0x34 esta puesto: prueba 0x68EF y, si no gana, deja en 0xC20A el numero de fichas sueltas (13 - 3 x grupos)
+C 0x72AE devuelve 0xC0B1 a 1 si +0x76 es cero
+C 0x72BF borra las tablas de analisis de la mano: 0x300 bytes a partir de +0x100
+C 0x72C9 pone a cero BC bytes
+C 0x72D2 REPARTE LA MANO POR PALOS: copia las 13 fichas de la mano y la 14a (0xC209) a 0xC600, las ordena y mete cada una en la tabla de su palo (+0x100, +0x110, +0x120, +0x130), con su cuenta
+C 0x72EC por cada ficha de la mano que no es de grupo, elige su tabla por el palo (+0x100, 0x110, 0x120, 0x130)
+C 0x72EE las fichas con bits 6-7 puestos (honores o ficha dada) no se reparten
+C 0x731D ordena de menor a mayor las 14 fichas de 0xC600 (burbuja; HL = 0xC600)
+C 0x7320 ordena de menor a mayor las 14 fichas de HL
+C 0x7331 un paso de la ordenacion: intercambia dos fichas contiguas si estan al reves
+C 0x7349 ANALISIS DE LA MANO PARA LA MAQUINA: 7775 (mano especial) y, si +0x70 es cero, 784C y 7361; luego 75C4
+C 0x7361 busca la mejor combinacion de fichas para descartar: prueba 7498 (de uno en uno) y deja las 4 elegidas en 0xC610
+C 0x7373 recorre los cuatro palos en 0x1C1+: por cada uno con fichas va a 0x7422 (una) o 0x73BF (varias)
+C 0x7398 mete en las listas de +0x140 (fichas propias) o +0x150 (con bit 6) las que ha elegido
+C 0x739D elige la lista de +0x140 o +0x150 segun el bit 6
+C 0x73BF elige entre varias opciones al azar (0xC003) o por la que tiene menos
+C 0x7410 mira cual de las cuatro fichas del bloque lleva el bit 6
+C 0x742B multiplica C por 16
+C 0x7431 busca el bloque de cuatro fichas de ese palo
+C 0x7449 mira si las fichas son de un palo que no vale (7523, 7551) o de numero 2-8 (7576, 759D)
+C 0x7469 si C es 0 a 2, la lista del palo; con mas, la suma de las tres cuentas por cuatro
+C 0x7474 palo 1
+C 0x747A los tres palos juntos: suma las tres cuentas
+C 0x7498 busca tres fichas de un mismo numero en los tres palos (D = 1..7) y deja el resultado en 0xC610
+C 0x74A1 si hay fichas de los tres palos, empieza a probar las siete posibles
+C 0x74AB prueba la posicion D en el primer palo
+C 0x74B7 y en el segundo
+C 0x74BC y en el tercero
+C 0x74C1 acaba sin encontrar: borra 0xC610 (4 bytes)
+C 0x74C6 si ninguna sirve deja a cero los cuatro bytes del resultado
+C 0x74F0 busca en el palo A la ficha de numero D
+C 0x74FF mira en el bloque de cuatro fichas si alguna tiene el numero D
+C 0x7508 no hay: pasa al bloque siguiente
+C 0x7512 hay: copia sus fichas al resultado
+C 0x7516 copia las cuatro fichas del bloque a 0xC610
+C 0x7523 mira si hay un 1 y un 9 del mismo palo
+C 0x752A mira si la lista tiene un 1 y un 9
+C 0x752C primer numero del bloque
+C 0x7535 busca un 1 (D = 4) y un 7 (E = 7)
+C 0x7543 siguiente bloque de cuatro
+C 0x7551 mira si hay una pareja de fichas iguales
+C 0x755E busca una pareja
+C 0x7568 siguiente bloque
+C 0x7576 mira si todas las fichas son de numero 2 a 8
+C 0x7581 mira si todas las fichas son de numero 2 a 8
+C 0x7593 sigue con el bloque siguiente
+C 0x759D mira si alguna ficha es de 1, 9 o honor
+C 0x75A8 mira cada ficha del bloque: de numero entre 2 y 8
+C 0x75BA bloque siguiente
+C 0x75C4 copia la mano ordenada a 0xC621 y sigue con cuatro analisis: 75E9, 7EB7, 7625, 7638 y 7752
+C 0x75E9 quita de la mano los tripletes y escaleras que ya estan hechos (listas de +0x140 y +0x150)
+C 0x75F6 quita de la mano una escalera de la lista de grupos (C, C + 1, C + 2)
+C 0x7600 la quita de la mano
+C 0x7604 siguiente grupo de la lista
+C 0x7614 quita de la mano un triplete de la lista de grupos (C, C, C)
+C 0x761C la quita de la mano
+C 0x7620 siguiente grupo de la lista
+C 0x7625 cuenta en 0xC620 las fichas de 0xC621 que quedan
+C 0x7638 elige la tabla de rutinas de busqueda de partes (7804) segun el numero de grupos y la fase de la partida
+C 0x769A llama a la rutina de HL para cada ficha que queda
+C 0x769F llama a la rutina de HL para cada una de las fichas que quedan (B veces)
+C 0x76A3 llama a la rutina que da HL (una de las cuatro de 0x7804)
+C 0x76AA siguiente ficha
+C 0x76AE DOS FICHAS CON UN HUECO: la primera menor de 0x30 y la segunda dos mas
+C 0x76BB resta la primera a la segunda: tiene que dar 2
+C 0x76BF las quita de la mano
+C 0x76C3 y las apunta en la lista de +0x190
+C 0x76D5 DOS FICHAS SEGUIDAS por los dos lados: las dos con numero de 2 a 8
+C 0x76E2 la segunda es la primera mas uno
+C 0x76ED y las dos de numero de 2 a 8
+C 0x76F5 las quita de la mano y las apunta en +0x180
+C 0x7704 DOS FICHAS SEGUIDAS en el borde: una de ellas es 1 o 9
+C 0x7711 la segunda es la primera mas uno
+C 0x7714 mira que no sean las dos de numero de 2 a 8
+C 0x7725 las quita y las apunta en +0x1A0
+C 0x7734 PAREJA: dos fichas iguales (sin los bits 6-7)
+C 0x7741 las dos son iguales
+C 0x7743 las quita y las apunta en +0x160
+C 0x7752 las fichas que quedan sin pareja van a la lista +0x1B0
+C 0x7775 comprueba si la mano va a las siete parejas: cuenta las parejas que lleva y las compara con 4 o 5
+C 0x77D8 cuenta las fichas iguales consecutivas en 0xCC80
+C 0x77F0 al acabar compara con el limite de parejas: A = 1 si llega
+C 0x77FA descarta la mano de siete parejas: pone a cero el campo +0x70 de la mano
+C 0x77FB deja en +0x70 el resultado (A = 1 si lleva 4 o 5 parejas segun el nivel, 0 si no)
+C 0x784C analiza una por una las cuatro tablas de palo de la mano (+0x101, +0x111, +0x121 y +0x131) buscando grupos con la tabla de patrones del banco 15
+C 0x787E analiza un palo: pone a cero 0xC640, 0xC700 y el contador 0xC800, ordena el palo y mira cuantos numeros distintos tiene (0xC630)
+C 0x789D por cada patron posible: deja la mano de 0xC621 en 0xC540, pasa la combinacion a 0xC640 y quita sus fichas
+C 0x78D6 guarda en la lista de combinaciones de 0xC800 (cuatro bytes cada una) la que se acaba de probar; el bit 6 marca las que son de ficha sola
+C 0x78EA completa el bloque de cuatro con las fichas de 0xC640, poniendo el bit 6 en las que ya estaban
+C 0x78F8 copia la mano de 0xC621 a 0xC540 (14 bytes)
+C 0x7904 devuelve la mano de 0xC540 a 0xC621
+C 0x7910 ordena y pasa por 0xCC80 cada combinacion de 0xC800 (resta 1, ordena, suma 1)
+C 0x7928 ordena de menor a mayor los cuatro bytes de 0xCC80 (burbuja)
+C 0x7930 un paso de la ordenacion de los cuatro bytes: si el siguiente es menor los cambia
+C 0x7945 resta uno a cada uno de los cuatro bytes de la combinacion
+C 0x7952 suma uno a cada uno de los cuatro bytes
+C 0x795A quita de 0xC800 las combinaciones repetidas
+C 0x7962 copia la combinacion B a 0xCC80 para compararla con las siguientes
+C 0x7976 compara cuatro bytes con la siguiente combinacion
+C 0x797E si son iguales borra la repetida (4 bytes a cero)
+C 0x798A pasa a la siguiente combinacion
+C 0x7992 recupera el puntero a la lista de combinaciones
+C 0x7997 pone a cero 0xC640 (5 bytes)
+C 0x79A4 pone a cero 0xC700 (256 bytes)
+C 0x79B2 el nibble alto del patron es cuantas fichas lleva
+C 0x79BD guarda en 0xC640 cuantas fichas lleva
+C 0x79C0 cada ficha del patron sale de la tabla 0xC631 por su numero
+C 0x79D3 quita de la mano (0xC621) las fichas de la combinacion de 0xC640 (en la mano de 14 fichas) y deja la mano sin huecos
+C 0x79E2 quita de la mano la ficha del patron si coincide
+C 0x79EE al acabar las quita y deja la mano sin huecos
+C 0x7A1C cuenta cuantas fichas de cada numero hay: deja en 0xC638 una mascara de 9 bits por palo (un bit por numero)
+C 0x7A2F primera ficha de la mano de trabajo: si es cero acaba
+C 0x7A35 el numero 9 pasa a la segunda mascara
+C 0x7A45 busca la mascara libre
+C 0x7A53 copia la mano de HL a 0xC620/0xC621: el primer byte es el palo (bits 4-5), luego los numeros sin los bits de honor
+C 0x7A6E copia el numero de cada ficha que no es de grupo
+C 0x7A7D de la mascara de 0xC63C saca la lista de numeros presentes en 0xC631 y su cuenta en 0xC630
+C 0x7A97 por cada numero con su bit puesto lo anota en la lista
+C 0x7A9C el numero va de 1 a 9
+C 0x7AAC elige de la tabla 0x7AB9 las 8 combinaciones que se prueban segun cuantos numeros hay
+C 0x7B3D ordena las combinaciones y las pone en 0xC801 con las fichas que sobran (bit 6)
+C 0x7B6B pone el bit 6 a las fichas de la combinacion
+C 0x7B73 recupera la cuenta de fichas y el puntero
+C 0x7B7A siguiente combinacion (4 bytes)
+C 0x7B7D pasa por las tres rutinas siguientes: 7BE6, 7B87 y 7C67
+C 0x7B87 mira las 4 mascaras de 0xC638 contra la tabla 0xA306 del banco 15 (44 patrones) y copia los grupos de la tabla 0xA35C a 0xC700
+C 0x7B92 lee la mascara de 9 bits del palo (dos bytes): si es cero acaba y vuelve a los bancos del juego
+C 0x7BBF copia el grupo de patrones de la tabla 0xA35C a 0xC700 + 0x20 x el palo
+C 0x7BD5 HL = el bloque de patrones de esa clave
+C 0x7BDC cada dato de patron ocupa cuatro bytes
+C 0x7BDF copia los bytes del patron
+C 0x7BE6 prepara de cada mascara 0xC638 las cuentas de fichas seguidas (de 3 y mas)
+C 0x7BEB lee la mascara de cada palo y la pasa a una cuenta de bits seguidos
+C 0x7BF2 pasa a la siguiente mascara
+C 0x7BF9 los nueve numeros en 0xCC80
+C 0x7C14 deja en el resultado el patron de los numeros con cuenta
+C 0x7C19 la cuenta resultante
+C 0x7C1D la guarda con su acarreo
+C 0x7C26 quita de las cuentas las que no llegan a tres fichas seguidas en los bordes
+C 0x7C2C quita los extremos que no llegan a tres seguidos
+C 0x7C3C si la cuenta es menor de 3 la borra
+C 0x7C40 quita ese numero de la lista
+C 0x7C46 mira el otro extremo
+C 0x7C4D mira el extremo opuesto
+C 0x7C51 y el vecino
+C 0x7C56 limpia la cuenta de dos
+C 0x7C67 busca para los cuatro bloques de 0xC700 su combinacion con las tablas 0xA589 y 0xA5D7 (banco 15)
+C 0x7C86 los cuatro grupos de 0xC700: mete en 0xC564 su primer byte; si no hay ninguno 0xC635 = 1
+C 0x7C93 si no hay ninguno de los cuatro, avisa en 0xC635
+C 0x7C9E junta en D y E las parejas de nibbles de los cuatro grupos
+C 0x7CB2 pone el banco 15 y busca el par en la tabla 0xA589
+C 0x7D1B pone a cero la combinacion y copia 0xC550
+C 0x7D31 copia los cuatro bytes que no son cero
+C 0x7D56 prueba la primera pasada de las combinaciones y la segunda (7D7B)
+C 0x7D9D pone a cero 0xC568 y toma la mascara de 0xC63C
+C 0x7DAE pasa el bit mas bajo de la mascara al acarreo
+C 0x7DB1 B = 9 numeros, C = 0x41
+C 0x7DBF cuenta cuantos numeros hay en D
+C 0x7DDF dibuja con las tablas 0xA306 y 0xA35C las combinaciones por palo
+C 0x7E2B mete las cuatro fichas del grupo en 0xC64A (una por casilla libre)
+C 0x7E4E mete D en la primera casilla libre de las cuatro de 0xC64A
+C 0x7E53 busca la primera casilla libre de los cuatro
+C 0x7E5D abre una combinacion nueva en 0xC800 y copia 0xC56C
+C 0x7E7F quita de la mano las fichas de las cuatro casillas de HL
+C 0x7E8E quita de la mano la ficha C, y la siguiente y la otra (secuencia C, D, E) o el triplete si tiene el bit 6
+C 0x7EA7 quita de la mano la ficha C (la primera de 0xC621 igual a C)
+C 0x7EAC busca la ficha C en la mano
+C 0x7EB7 deja la mano de 0xC621 sin huecos
+C 0x7EE1 guarda la mano de 0xC621 en 0xC530
+C 0x7EED devuelve la mano de 0xC530 a 0xC621
+C 0x7EF9 guarda 0xC638 en 0xC520 (8 bytes)
+C 0x7F05 devuelve 0xC520 a 0xC638
+C 0x7F11 pasa las combinaciones de 0xC800 a las tablas de la mano (+0x200 y +0x1C0) para este palo (C = base del palo)
+C 0x7F36 por cada ficha de la combinacion pasa su numero a la tabla
+C 0x7F56 siguiente combinacion
+C 0x7F5F guarda la cuenta de combinaciones en +0x1C1 + palo
+C 0x7F76 cuenta cuantas fichas tiene cada combinacion de 0xC800 y quita las que tienen menos de las que podria
+C 0x7F99 cuenta cuantas fichas hay en cada combinacion
+C 0x7FA7 busca la cuenta D
+C 0x7FC3 cuenta cuantas veces aparece el palo C entre las combinaciones de +0x200
+C 0x7FDB cuenta las combinaciones del palo C
+C 0x7FDC palo de cada combinacion (bits 4-5)
+C 0x7FE7 si coincide con el buscado suma uno
+C 0x7FEF si 0xC630 es cero no hace nada; si no, pone a cero 3 bytes de 0xCC80
+# --- fin de lo escrito a mano ---
+
+
+# --- BLOQUES QUE LEE EL CODIGO (seccion que reescribe tools/bloques.py; no editar a mano) ---
+D 0x6000 0x6001 partida_6000  los 1 ultimos bytes de la instruccion de p00:5FFF (3E 02), que empieza en el banco 0; lo leen p00:5FFF (1 bytes)
+F 0x6000 1
+D 0x6140 0x6146 tiles_6140  lista de tiles (p00:5363): X, Y y los tiles, 0xFE trae otro X, Y y 0xFF acaba; lo leen p01:608A (6 bytes)
+F 0x6140 16
+D 0x7FFF 0x8000 partida_7FFF  los 1 primeros bytes de una instruccion de 2 (ED B0) que sigue en el banco 2: el trazador de un solo banco no puede verla entera (tools/bancos.py); lo leen p01:7FFF (1 bytes)
+F 0x7FFF 1
+D 0x60FA 0x6140 resto_60FA  lo apuntan con el banco puesto p00:5EF5 (0x60FA), p00:5EEF (0x610F), p00:5F2F (0x6124), p00:5F35 (0x6132); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p00:5EF5, p00:5EEF, p00:5F2F, p00:5F35 (70 bytes)
+F 0x60FA 16
+D 0x6216 0x6222 resto_6216  lo apuntan con el banco puesto p01:6293 (0x6216), p01:6343 (0x6216); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p01:6293, p01:6343 (12 bytes)
+F 0x6216 16
+D 0x6244 0x6249 resto_6244  lo apuntan con el banco puesto p01:6222 (0x6244); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p01:6222 (5 bytes)
+F 0x6244 16
+D 0x646F 0x6484 resto_646F  lo apuntan con el banco puesto p01:6410 (0x646F), p01:6441 (0x646F), p00:5EC5 (0x6478), p00:5EE0 (0x6478), p00:5F05 (0x6478), p00:5F20 (0x6478); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p01:6410, p01:6441, p00:5EC5, p00:5EE0, p00:5F05, p00:5F20 (21 bytes)
+F 0x646F 16
+D 0x662B 0x67BF resto_662B  lo apuntan con el banco puesto p01:661D (0x662B), p03:AEF7 (0x662B), p04:A9F5 (0x663B), p04:AA33 (0x6640), p04:AA48 (0x664E), p03:B787 (0x665E); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p01:661D, p03:AEF7, p04:A9F5, p04:AA33, p04:AA48, p03:B787 (404 bytes)
+F 0x662B 16
+D 0x6AF7 0x6B1A resto_6AF7  lo apuntan con el banco puesto p01:6A10 (0x6AF7), p01:6B8E (0x6AF7); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p01:6A10, p01:6B8E (35 bytes)
+F 0x6AF7 16
+D 0x6C27 0x6C5D resto_6C27  lo apuntan con el banco puesto p01:687A (0x6C27), p00:4BD5 (0x6C2B), p00:4BDE (0x6C33), p00:4C48 (0x6C34), p00:4BF1 (0x6C3D), p01:6060 (0x6C50); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p01:687A, p00:4BD5, p00:4BDE, p00:4C48, p00:4BF1, p01:6060 (54 bytes)
+F 0x6C27 16
+D 0x6ECA 0x6ED2 resto_6ECA  lo apuntan con el banco puesto p01:6EBE (0x6ECA); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p01:6EBE (8 bytes)
+F 0x6ECA 16
+D 0x7075 0x7083 resto_7075  lo apuntan con el banco puesto p01:7067 (0x7075), p03:A679 (0x7078); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p01:7067, p03:A679 (14 bytes)
+F 0x7075 16
+D 0x716B 0x71CD resto_716B  lo apuntan con el banco puesto p01:6CF5 (0x716B), p01:6D2A (0x71A5); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p01:6CF5, p01:6D2A (98 bytes)
+F 0x716B 16
+D 0x7804 0x784C resto_7804  lo apuntan con el banco puesto p01:768A (0x7804), p01:766F (0x780C), p01:7647 (0x7818), p01:764C (0x781C), p01:7681 (0x7838); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p01:768A, p01:766F, p01:7647, p01:764C, p01:7681 (72 bytes)
+F 0x7804 16
+D 0x7AB9 0x7B3D resto_7AB9  lo apuntan con el banco puesto p01:7AB0 (0x7AB9); el tamano es lo que hay hasta lo siguiente, no sale de recorrerlo; lo leen p01:7AB0 (132 bytes)
+F 0x7AB9 16
+# --- fin de los bloques de bloques.py ---
+
+# --- ANOTACIONES AUTOMATICAS (seccion que reescribe tools/anota.py; no editar a mano) ---
+L 0x6060 cuadro_fichas_que_quedan dibuja el cuadro de las fichas que quedan
+L 0x6099 cuenta_fichas_que_quedan calcula las fichas que quedan en el muro (BCD)
+L 0x60B2 devuelve_fondo devuelve a la pagina 0 los cuatro fondos guardados
+L 0x6146 teclas_a_sonidos pide el sonido que dicen las teclas de funcion
+L 0x617C prepara_inicio prepara el fondo de la partida
+L 0x618F busca_otro_cartucho busca el cartucho de la memoria de partidas en las ranuras
+L 0x61E6 graba_partida graba la partida en el otro cartucho
+L 0x61FE carga_partida carga la partida del otro cartucho
+L 0x64BC ajusta_pantalla escribe el registro 18 del VDP con el ajuste de la pantalla
+L 0x65B2 azar numero al azar en A
+L 0x65C6 dibuja_rivales dibuja las tres fichas de los rivales
+L 0x6605 borra_cuadros borra los cuadros del fondo
+L 0x661D dibuja_cara dibuja la cara de 48 x 48 del personaje A
+L 0x67BF analiza_otros analiza las manos de los otros tres jugadores
+L 0x68EF prueba_ganar_robo prueba si la mano gana por robo (B = 1)
+L 0x68F8 prueba_ganar prueba si la mano gana con la ficha de 0xC621; carry = gana
+L 0x69B8 marca_si_gana marca con el bit 4 de +0x60 si la mano gana
+L 0x69D3 quedan_pocas carry si quedan menos de 4 fichas muertas
+L 0x6A10 prueba_todos_los_yaku prueba los yaku de la lista 0x6AF7
+L 0x6BEE busca_jugador_con_bit busca el primer jugador con un bit de +0x60
+L 0x6C5D analiza_mano_actual analiza la mano del jugador al que le toca
+L 0x6CD5 analiza_yaku analiza los yaku de la mano (tablas 0x716B y 0x71A5)
+L 0x6D47 prepara_analisis pone a cero la lista de yaku y copia la mano a 0xC621
+L 0x6D69 descompone_mano descompone la mano en grupos (escaleras, tripletes, pareja)
+L 0x6E7C cuenta_fichas ordena y cuenta las fichas iguales de 0xCD10
+L 0x6F8A borra_cuentas pone a cero 0xCD20 (fichas y cuentas)
+L 0x6F98 cuenta_iguales cuenta las fichas iguales de 0xC621: 0xCD20 = ficha, 0xCD30 = cuantas
+L 0x6FC6 cuenta_escaleras cuenta las escaleras de la lista 0xCD44
+L 0x6FD7 cuenta_tripletes cuenta los tripletes de la lista 0xCD48
+L 0x6FDC cuenta_kan cuenta los kan de la lista 0xCD4C
+L 0x6FE1 mira_siete_parejas mira si la mano son siete parejas
+L 0x7019 copia_grupos copia los grupos de 0xCD48 a 0xCD95
+L 0x7035 pon_vientos_propios pone en 0xCD90 los honores que cuentan: viento de la ronda, el propio y dragones
+L 0x7064 mira_trece_huerfanos compara 0xCD20 con la mano de los trece huerfanos
+L 0x7144 mira_manos_con_grupos 0xCD01 = 1 si algun jugador ha bajado grupos
+L 0x7284 prepara_mano_ia prepara el analisis de la mano de la maquina
+L 0x72D2 reparte_por_palos reparte la mano por palos en +0x100-+0x13F
+L 0x7320 ordena_mano ordena de menor a mayor las 14 fichas de HL
+L 0x7349 analiza_ia analisis de la mano para la maquina
+L 0x7469 hl_lista_del_palo HL = la lista de fichas del palo C en +0x200
+L 0x75C4 copia_y_analiza copia la mano ordenada y la analiza
+L 0x7775 prueba_siete_parejas_ia comprueba si la mano de la maquina va a las siete parejas
+L 0x784C analiza_palos analiza los cuatro palos con la tabla del banco 15
+C 0x6001 vdp_copia: HMMM: copia un rectangulo de la VRAM (origen HL, destino DE, tamano BC, A = paginas)
+C 0x600E vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0x601B vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0x6028 vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0x6035 vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0x603E ventana: dibuja una ventana con marco (H = ancho, L = alto, DE = esquina)
+C 0x6047 ventana: dibuja una ventana con marco (H = ancho, L = alto, DE = esquina)
+C 0x6050 ventana: dibuja una ventana con marco (H = ancho, L = alto, DE = esquina)
+C 0x6059 ventana: dibuja una ventana con marco (H = ancho, L = alto, DE = esquina)
+C 0x606B vdp_copia: HMMM: copia un rectangulo de la VRAM (origen HL, destino DE, tamano BC, A = paginas)
+C 0x6078 vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0x6081 ventana: dibuja una ventana con marco (H = ancho, L = alto, DE = esquina)
+C 0x6084 cuenta_fichas_que_quedan: calcula las fichas que quedan en el muro (BCD)
+C 0x608A dibuja_lista_tiles: dibuja una lista de tiles de HL (x, y, tiles; 0xFF acaba)
+C 0x608D apunta a las fichas que quedan en el muro (BCD)
+C 0x6095 numero_sin_ceros: escribe B bytes BCD de HL en DE sin ceros por la izquierda
+C 0x609C apunta a cuantas fichas se han robado del muro
+C 0x60A0 apunta a las fichas sacadas del final del muro (por kan)
+C 0x60AE guarda las fichas que quedan en el muro (BCD)
+C 0x60BD vdp_copia: HMMM: copia un rectangulo de la VRAM (origen HL, destino DE, tamano BC, A = paginas)
+C 0x60CB vdp_copia: HMMM: copia un rectangulo de la VRAM (origen HL, destino DE, tamano BC, A = paginas)
+C 0x60D9 vdp_copia: HMMM: copia un rectangulo de la VRAM (origen HL, destino DE, tamano BC, A = paginas)
+C 0x60E7 vdp_copia: HMMM: copia un rectangulo de la VRAM (origen HL, destino DE, tamano BC, A = paginas)
+C 0x60F6 vdp_copia: HMMM: copia un rectangulo de la VRAM (origen HL, destino DE, tamano BC, A = paginas)
+C 0x6183 carga_fondo_mesa: carga el fondo de la mesa (bancos 7-9)
+C 0x6186 carga una imagen de los bancos 10-11 (HL = lista de tiles, DE = tabla) (p00:56C6)
+C 0x618B guarda 1 cuando la partida esta lista
+C 0x619D mira si en la ranura A (0xF0F5) hay un cartucho con 'YZ' en 0x4010-0x4011 (RDSLT); si lo hay, A = ranura y acarreo
+C 0x61AE guarda la ranura del otro cartucho (la memoria de partidas)
+C 0x61B8 mira si en la ranura A (0xF0F5) hay un cartucho con 'YZ' en 0x4010-0x4011 (RDSLT); si lo hay, A = ranura y acarreo
+C 0x61D2 lee la ranura del otro cartucho (la memoria de partidas)
+C 0x61DC lee la ranura del otro cartucho (la memoria de partidas)
+C 0x61E1 lee la ranura del otro cartucho (la memoria de partidas)
+C 0x61F1 copia 5 bytes de 0x6244 a 0xC5C0 (el nombre del fichero) y pone a cero 8 bytes
+C 0x61F4 llama a las rutinas del otro cartucho (en 0x8000, con la ranura 0xF0F5): 0, 2, 9 tres veces y 1; si alguna falla va a 0x63A8
+C 0x6209 copia 5 bytes de 0x6244 a 0xC5C0 (el nombre del fichero) y pone a cero 8 bytes
+C 0x623F lee la ranura del cartucho
+C 0x624D lee la ranura del otro cartucho (la memoria de partidas)
+C 0x6264 lee la ranura del cartucho
+C 0x6271 lee la ranura del otro cartucho (la memoria de partidas)
+C 0x6288 lee la ranura del cartucho
+C 0x62A4 lee la ranura del otro cartucho (la memoria de partidas)
+C 0x62BB lee la ranura del cartucho
+C 0x62D0 lee la ranura del otro cartucho (la memoria de partidas)
+C 0x62E7 lee la ranura del cartucho
+C 0x62F5 guarda 1 si ha fallado el grabar
+C 0x62FD lee la ranura del otro cartucho (la memoria de partidas)
+C 0x6314 lee la ranura del cartucho
+C 0x6321 lee la ranura del otro cartucho (la memoria de partidas)
+C 0x6338 lee la ranura del cartucho
+C 0x6354 lee la ranura del otro cartucho (la memoria de partidas)
+C 0x636B lee la ranura del cartucho
+C 0x6380 lee la ranura del otro cartucho (la memoria de partidas)
+C 0x6397 lee la ranura del cartucho
+C 0x63A4 guarda 1 si ha fallado el cargar
+C 0x63BF lee la ranura del cartucho
+C 0x63CA guarda 1 si ha fallado el grabar
+C 0x63D0 guarda 1 si ha fallado el cargar
+C 0x63DB limpia_pantalla: apaga la pantalla, quita los sprites y borra la VRAM visible
+C 0x63DE pantalla_off: apaga la pantalla
+C 0x63EB vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0x63F4 ventana: dibuja una ventana con marco (H = ancho, L = alto, DE = esquina)
+C 0x63FD escribe_texto: escribe un texto de letras de 16 puntos de alto en D,E
+C 0x6400 rellena de 0xBB ocho cuadros de 52 x 52 puntos y escribe 8 x 8 tiles dentro
+C 0x6403 dibuja ocho marcos de 48 x 48 puntos (hay un tile de la hoja en 0x6C40/0x6C70 para cada uno)
+C 0x6406 pantalla_on: enciende la pantalla
+C 0x6409 apunta a variable de los pasos de las pantallas de menu
+C 0x6437 vdp_copia: HMMM: copia un rectangulo de la VRAM (origen HL, destino DE, tamano BC, A = paginas)
+C 0x6467 ventana: dibuja una ventana con marco (H = ancho, L = alto, DE = esquina)
+C 0x648B lee el contador de cuadros
+C 0x6490 lee el estado anterior de las teclas del mando
+C 0x64A2 guarda 1 cuando la pantalla de menu ha acabado
+C 0x64A6 apunta a el ajuste horizontal de la imagen (registro 18 del VDP)
+C 0x64B1 apunta a el ajuste horizontal de la imagen (registro 18 del VDP)
+C 0x64CA apunta a el ajuste horizontal de la imagen (registro 18 del VDP)
+C 0x64D7 apunta a el ajuste vertical de la imagen (registro 18 del VDP)
+C 0x64DD apunta a el ajuste vertical de la imagen (registro 18 del VDP)
+C 0x64E9 lee el viento de la ronda (0 este)
+C 0x64EF lee el numero de la mano dentro del viento (0-3)
+C 0x650D apunta a el jugador al que le toca (0 = el humano)
+C 0x6510 lee la regla del ron doble (ダブルロン; de serie si)
+C 0x651A lee como se gana la mano: 1 por robo, 2 por la ficha tirada
+C 0x651E lee el jugador al que le toca (0 = el humano)
+C 0x6523 lee el jugador que responde a la ficha tirada
+C 0x653A guarda 1 si las manos se ven boca arriba
+C 0x653D dibuja_mano: dibuja las 13 fichas de la mano del jugador 0xC207
+C 0x6545 lee la ficha robada o tirada
+C 0x6548 dibuja_ficha_2: dibuja la ficha A del jugador 0xC207 (sin el cambio por el reverso)
+C 0x6555 guarda el jugador al que le toca (0 = el humano)
+C 0x6565 lee como se gana la mano: 1 por robo, 2 por la ficha tirada
+C 0x656B lee el jugador que reparte (0-3)
+C 0x6594 guarda cuantos jugadores responden a la ficha tirada
+C 0x659B guarda cuantos jugadores responden a la ficha tirada
+C 0x659E lee el jugador al que le toca (0 = el humano)
+C 0x65BB lee el contador de cuadros
+C 0x65C2 guarda la semilla del azar
+C 0x65CC dibuja la caja de un rival: borra 52 x 52 con 0xBB y encima la ventana
+C 0x65D5 dibuja la caja de un rival: borra 52 x 52 con 0xBB y encima la ventana
+C 0x65ED vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0x65FC ventana: dibuja una ventana con marco (H = ancho, L = alto, DE = esquina)
+C 0x661A vdp_hmmv_2: HMMV: rellena un rectangulo con el color A (origen HL, D = pagina, tamano BC)
+C 0x6620 palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0x6628 vdp_lmmm: LMMM: copia un rectangulo con operacion logica (A)
+C 0x67CF lee el jugador al que le toca (0 = el humano)
+C 0x67D3 analiza la mano de otro jugador: punteros a sus campos en 0xCD80-0xCD88
+C 0x6808 lee 1 si se gana con la ficha del kan de otro
+C 0x680E compara las fichas robadas (0xC1C1 + 0xC210) con 0x79: Z/C si se acaba el muro
+C 0x6818 lee el jugador al que le toca (0 = el humano)
+C 0x681C calcula las secuencias (chi) que se pueden hacer con la ficha de 0xC209: tabla 0x6C27, 6 bytes por numero (tres pares)
+C 0x681F busca en la mano (13 fichas) cuantas son iguales a la ficha de 0xC209 (maximo de tres)
+C 0x6822 mira si puede ganar o hacer pon con la mano apuntada por (0xCD80)
+C 0x6829 lee la ficha robada o tirada
+C 0x683C guarda en 0xCD88 la posicion (13 - B) de la primera
+C 0x6862 lee las fichas sacadas del final del muro (por kan)
+C 0x687D suma_a_hl: HL = HL + A
+C 0x6886 lee la ficha robada o tirada
+C 0x68E5 prueba_ganar: prueba si la mano gana con la ficha de 0xC621; carry = gana
+C 0x68F5 lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0x68FC guarda la direccion de la mano que se analiza y el byte siguiente (16 bits)
+C 0x68FF lee el jugador que responde a la ficha tirada
+C 0x6908 guarda el jugador que responde a la ficha tirada
+C 0x690B lee como se gana la mano: 1 por robo, 2 por la ficha tirada
+C 0x6910 guarda como se gana la mano: 1 por robo, 2 por la ficha tirada
+C 0x6913 prepara_analisis: pone a cero la lista de yaku y copia la mano a 0xC621
+C 0x6916 descompone_mano: descompone la mano en grupos (escaleras, tripletes, pareja)
+C 0x6919 lee la pareja de la mano
+C 0x691F mira_siete_parejas: mira si la mano son siete parejas
+C 0x6925 guarda como se gana la mano: 1 por robo, 2 por la ficha tirada
+C 0x6929 guarda el jugador que responde a la ficha tirada
+C 0x692C cuenta_iguales: cuenta las fichas iguales de 0xC621: 0xCD20 = ficha, 0xCD30 = cuantas
+C 0x692F mira_trece_huerfanos: compara 0xCD20 con la mano de los trece huerfanos
+C 0x6936 copia_grupos: copia los grupos de 0xCD48 a 0xCD95
+C 0x6939 cuenta_iguales: cuenta las fichas iguales de 0xC621: 0xCD20 = ficha, 0xCD30 = cuantas
+C 0x693C recorre las 32 comprobaciones de la tabla 0x716B (un yaku cada una, por el despachador)
+C 0x6940 guarda como se gana la mano: 1 por robo, 2 por la ficha tirada
+C 0x6944 guarda el jugador que responde a la ficha tirada
+C 0x6963 lee la regla de dos han como minimo (二翻縛り; de serie si)
+C 0x6969 lee las barras de honba (BCD)
+C 0x6975 lee la direccion de la mano que se analiza y el byte siguiente (16 bits)
+C 0x6985 lee la direccion de la mano que se analiza y el byte siguiente (16 bits)
+C 0x6988 apunta a la mano de trabajo de 14 fichas ordenada
+C 0x6991 apunta a la mano de trabajo de 14 fichas ordenada
+C 0x6994 ordena_mano: ordena de menor a mayor las 14 fichas de HL
+C 0x6997 descompone_mano: descompone la mano en grupos (escaleras, tripletes, pareja)
+C 0x699A lee la pareja de la mano
+C 0x69A0 mira_siete_parejas: mira si la mano son siete parejas
+C 0x69A5 cuenta_iguales: cuenta las fichas iguales de 0xC621: 0xCD20 = ficha, 0xCD30 = cuantas
+C 0x69A8 mira_trece_huerfanos: compara 0xCD20 con la mano de los trece huerfanos
+C 0x69BC lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0x69C7 pone a cero 0xCD02 y 0xCD00, y mira 0xC022
+C 0x69D7 lee las fichas sacadas del final del muro (por kan)
+C 0x69E3 lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0x69ED lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0x69FC prueba_todos_los_yaku: prueba los yaku de la lista 0x6AF7
+C 0x6A00 lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0x6A1B prepara 0xC621: copia la mano de 13 fichas y la ficha de 0xC209 en la posicion que toque
+C 0x6A1F lee la pareja de la mano
+C 0x6A26 mira_siete_parejas: mira si la mano son siete parejas
+C 0x6A2D cuenta_iguales: cuenta las fichas iguales de 0xC621: 0xCD20 = ficha, 0xCD30 = cuantas
+C 0x6A30 mira_trece_huerfanos: compara 0xCD20 con la mano de los trece huerfanos
+C 0x6A38 apunta a la lista de yaku de la mano: pares codigo, valor (32 como mucho)
+C 0x6A43 lee el jugador que responde a la ficha tirada
+C 0x6A4E guarda el jugador que responde a la ficha tirada
+C 0x6A51 lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0x6A5D copia_grupos: copia los grupos de 0xCD48 a 0xCD95
+C 0x6A60 cuenta_iguales: cuenta las fichas iguales de 0xC621: 0xCD20 = ficha, 0xCD30 = cuantas
+C 0x6A63 recorre las 32 comprobaciones de la tabla 0x716B (un yaku cada una, por el despachador)
+C 0x6A6A guarda el jugador que responde a la ficha tirada
+C 0x6A6D suma los han de 0xC2E0 salvo los de codigo 0x1C, 4 y 2; con acarreo si no hay ninguno que valga
+C 0x6A78 prueba cada espera de la lista de +0x0F (cada ficha que completa la mano)
+C 0x6A84 guarda la direccion de la mano que se analiza y el byte siguiente (16 bits)
+C 0x6A88 apunta a la mano de trabajo de 14 fichas ordenada
+C 0x6A90 lee la ficha robada o tirada
+C 0x6A94 lee la posicion de la ficha en la mano
+C 0x6A98 lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0x6AB0 apunta a la mano de trabajo de 14 fichas ordenada
+C 0x6AB3 suma_a_hl: HL = HL + A
+C 0x6AB8 apunta a la mano de trabajo de 14 fichas ordenada
+C 0x6ABB ordena_mano: ordena de menor a mayor las 14 fichas de HL
+C 0x6ABE descompone_mano: descompone la mano en grupos (escaleras, tripletes, pareja)
+C 0x6AE9 lee la regla de dos han como minimo (二翻縛り; de serie si)
+C 0x6AEF lee las barras de honba (BCD)
+C 0x6B2A lee la direccion de la mano que se analiza y el byte siguiente (16 bits)
+C 0x6B30 lee la pareja de la mano
+C 0x6B37 mira_siete_parejas: mira si la mano son siete parejas
+C 0x6B3D cuenta_iguales: cuenta las fichas iguales de 0xC621: 0xCD20 = ficha, 0xCD30 = cuantas
+C 0x6B40 mira_trece_huerfanos: compara 0xCD20 con la mano de los trece huerfanos
+C 0x6B4F guarda como se gana la mano: 1 por robo, 2 por la ficha tirada
+C 0x6B55 lee el jugador que responde a la ficha tirada
+C 0x6B5C lee el jugador que responde a la ficha tirada
+C 0x6B66 guarda la direccion de la mano que se analiza y el byte siguiente (16 bits)
+C 0x6B69 prueba la lista de yaku sobre la mano de 0xCD5C
+C 0x6B71 lee la direccion de la mano que se analiza y el byte siguiente (16 bits)
+C 0x6B79 lee el jugador que responde a la ficha tirada
+C 0x6B7F guarda el jugador que responde a la ficha tirada
+C 0x6B86 guarda el jugador que responde a la ficha tirada
+C 0x6B8A guarda como se gana la mano: 1 por robo, 2 por la ficha tirada
+C 0x6B99 lee la direccion de la mano que se analiza y el byte siguiente (16 bits)
+C 0x6B9C apunta a la mano de trabajo de 14 fichas ordenada
+C 0x6BA5 apunta a la mano de trabajo de 14 fichas ordenada
+C 0x6BA8 ordena_mano: ordena de menor a mayor las 14 fichas de HL
+C 0x6BAC guarda cuantas fichas se han robado del muro
+C 0x6BAF apunta a la lista de yaku de la mano: pares codigo, valor (32 como mucho)
+C 0x6BBC descompone_mano: descompone la mano en grupos (escaleras, tripletes, pareja)
+C 0x6BC0 lee la pareja de la mano
+C 0x6BC7 mira_siete_parejas: mira si la mano son siete parejas
+C 0x6BCF cuenta_iguales: cuenta las fichas iguales de 0xC621: 0xCD20 = ficha, 0xCD30 = cuantas
+C 0x6BD2 mira_trece_huerfanos: compara 0xCD20 con la mano de los trece huerfanos
+C 0x6BDC copia_grupos: copia los grupos de 0xCD48 a 0xCD95
+C 0x6BDF cuenta_iguales: cuenta las fichas iguales de 0xC621: 0xCD20 = ficha, 0xCD30 = cuantas
+C 0x6BE2 recorre las 32 comprobaciones de la tabla 0x716B (un yaku cada una, por el despachador)
+C 0x6BE7 suma los puntos (han) que salen de la tabla 0xC2E0 (pares codigo, valor): el 0x1C no cuenta
+C 0x6BF4 lee el jugador que reparte (0-3)
+C 0x6BF7 apunta a el jugador que responde a la ficha tirada
+C 0x6C6D lee el jugador que responde a la ficha tirada
+C 0x6C77 lee como se gana la mano: 1 por robo, 2 por la ficha tirada
+C 0x6C7D lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0x6C80 guarda la direccion de la mano que se analiza y el byte siguiente (16 bits)
+C 0x6C83 analiza_yaku: analiza los yaku de la mano (tablas 0x716B y 0x71A5)
+C 0x6C86 bancos_15: pone el 15 (y sus copias en 0xF0F1-3)
+C 0x6C89 calcula_fu: calcula los fu de la mano
+C 0x6C8C bancos_1_2_3: pone los bancos 1-2-3 (y sus copias en 0xF0F1-3)
+C 0x6C92 lee los fu de la mano (BCD)
+C 0x6C9F guarda los fu de la mano (nivel)
+C 0x6CA3 apunta a los fu de la mano (BCD)
+C 0x6CB5 lee el jugador al que le toca (0 = el humano)
+C 0x6CBA lee el jugador que responde a la ficha tirada
+C 0x6CBF lee 1 si el humano ha decidido ganar
+C 0x6CC6 guarda 1 si la mano es de limite
+C 0x6CCB guarda la lista de yaku de la mano: pares codigo, valor (32 como mucho)
+C 0x6CD8 descompone_mano: descompone la mano en grupos (escaleras, tripletes, pareja)
+C 0x6CDB copia_grupos: copia los grupos de 0xCD48 a 0xCD95
+C 0x6CDF guarda 1 si la mano es de limite
+C 0x6CE2 cuenta_iguales: cuenta las fichas iguales de 0xC621: 0xCD20 = ficha, 0xCD30 = cuantas
+C 0x6CE8 lee 1 si la mano es de limite
+C 0x6CFF bancos_1_2_3: pone los bancos 1-2-3 (y sus copias en 0xF0F1-3)
+C 0x6D02 lee la regla de las ocho manos seguidas (八連荘; de serie no)
+C 0x6D08 lee como se gana la mano: 1 por robo, 2 por la ficha tirada
+C 0x6D0C lee el jugador al que le toca (0 = el humano)
+C 0x6D11 lee el jugador que responde a la ficha tirada
+C 0x6D15 lee el jugador que reparte (0-3)
+C 0x6D1B lee las manos seguidas del que reparte
+C 0x6D22 bancos_4: pone el 4 (y sus copias en 0xF0F1-3)
+C 0x6D34 bancos_1_2_3: pone los bancos 1-2-3 (y sus copias en 0xF0F1-3)
+C 0x6D39 guarda la lista de yaku de la mano: pares codigo, valor (32 como mucho)
+C 0x6D43 guarda 1 si la mano es de limite
+C 0x6D54 lee la direccion de la mano que se analiza y el byte siguiente (16 bits)
+C 0x6D57 apunta a la mano de trabajo de 14 fichas ordenada
+C 0x6D5F lee la ficha robada o tirada
+C 0x6D63 apunta a la mano de trabajo de 14 fichas ordenada
+C 0x6D66 ordena_mano: ordena de menor a mayor las 14 fichas de HL
+C 0x6D73 apunta a la mano de trabajo de 14 fichas ordenada
+C 0x6D76 apunta a la mano de 14 fichas que se descompone
+C 0x6D82 cuenta_fichas: ordena y cuenta las fichas iguales de 0xCD10
+C 0x6D85 recorre las 14 fichas de 0xCD10 y por su palo (bits 6-7) va a una rutina de la tabla 0x6ECA
+C 0x6D88 deja la mano de 0xCD10 sin huecos
+C 0x6D8B cuenta_fichas: ordena y cuenta las fichas iguales de 0xCD10
+C 0x6D91 apunta a la pareja de la mano
+C 0x6D9C apunta a la mano de 14 fichas que se descompone
+C 0x6DB4 quita de la mano la ficha C (y resta uno en su cuenta de 0xCD30)
+C 0x6DB7 quita de la mano la ficha C (y resta uno en su cuenta de 0xCD30)
+C 0x6DBA deja la mano de 0xCD10 sin huecos
+C 0x6DBD cuenta_fichas: ordena y cuenta las fichas iguales de 0xCD10
+C 0x6DC0 quita de la mano un triplete o una secuencia de las que hay en 0xCD10
+C 0x6DC3 mira si la mano de 0xCD10 se ha quedado vacia (carry si lo esta)
+C 0x6DCD apunta a la pareja de la mano
+C 0x6DD8 apunta a la mano de 14 fichas que se descompone
+C 0x6DE0 cuenta_fichas: ordena y cuenta las fichas iguales de 0xCD10
+C 0x6DE8 guarda la pareja de la mano
+C 0x6DFC apunta a la mano de 14 fichas que se descompone
+C 0x6E05 cuantas fichas iguales a A hay (tabla 0xCD20 y cuenta en 0xCD30)
+C 0x6E0A intenta quitar una escalera: la ficha debe ser de numero hasta 7
+C 0x6E37 quita de la mano (0xCD10) las tres fichas C, D y E
+C 0x6E47 apunta a la mano de 14 fichas que se descompone
+C 0x6E55 anade la ficha A a la primera casilla libre de la lista 0xCD48 (grupos de la mano)
+C 0x6E5C quita de la mano (0xCD10) las tres fichas C, D y E
+C 0x6E64 apunta a cuantas hay de cada una
+C 0x6E7D apunta a las fichas distintas de la mano
+C 0x6E80 apunta a cuantas hay de cada una
+C 0x6E84 apunta a la mano de 14 fichas que se descompone
+C 0x6E8A apunta a cuantas hay de cada una
+C 0x6E8D apunta a las fichas distintas de la mano
+C 0x6ED7 anade la ficha A a la primera casilla libre de la lista 0xCD48 (grupos de la mano)
+C 0x6EE2 quita de la mano la ficha C (y resta uno en su cuenta de 0xCD30)
+C 0x6EF8 apunta a las fichas distintas de la mano
+C 0x6EFB apunta a cuantas hay de cada una
+C 0x6F1B mira si la ficha esta en la lista de descartes (+0x41): deja C = 0x80 si no
+C 0x6F6C apunta a la mano de 14 fichas que se descompone
+C 0x6F81 apunta a la mano de 14 fichas que se descompone
+C 0x6F9B apunta a cuantas hay de cada una
+C 0x6F9F apunta a la mano de trabajo de 14 fichas ordenada
+C 0x6FD7 apunta a los tripletes de la mano
+C 0x6FDC apunta a los kan de la mano
+C 0x6FE7 guarda 1 si la mano es de siete parejas
+C 0x6FEA lee la direccion de la mano que se analiza y el byte siguiente (16 bits)
+C 0x6FF4 apunta a cuantas hay de cada una
+C 0x7002 guarda 1 si la mano es de siete parejas
+C 0x7009 apunta a la lista de yaku de la mano: pares codigo, valor (32 como mucho)
+C 0x7023 apunta a los tripletes de la mano
+C 0x7026 apunta a los grupos de la mano (4)
+C 0x7038 lee el viento de la ronda (0 este)
+C 0x703F lee el jugador que reparte (0-3)
+C 0x7047 lee como se gana la mano: 1 por robo, 2 por la ficha tirada
+C 0x704B lee el jugador al que le toca (0 = el humano)
+C 0x7050 lee el jugador que responde a la ficha tirada
+C 0x7084 guarda 1 si la mano es de limite
+C 0x7087 lee la regla del descarte de punta y honor (流し満貫; de serie si)
+C 0x708C mira_manos_con_grupos: 0xCD01 = 1 si algun jugador ha bajado grupos
+C 0x708F lee 1 si algun jugador ha bajado grupos
+C 0x7094 prepara_analisis: pone a cero la lista de yaku y copia la mano a 0xC621
+C 0x709F mira si en la mano (HL + 0x0F) hay alguna ficha de numero 2 a 8
+C 0x70AF guarda el jugador al que le toca (0 = el humano)
+C 0x70B4 guarda como se gana la mano: 1 por robo, 2 por la ficha tirada
+C 0x70B7 guarda 1 si la mano es de limite
+C 0x70BC guarda la lista de yaku de la mano: pares codigo, valor (32 como mucho)
+C 0x70E1 guarda 1 si la mano es de limite
+C 0x70E4 lee la regla de los trece sin grupos (十三不搭; de serie si)
+C 0x70E9 lee cuantas fichas se han robado del muro
+C 0x70F1 mira_manos_con_grupos: 0xCD01 = 1 si algun jugador ha bajado grupos
+C 0x70F4 lee 1 si algun jugador ha bajado grupos
+C 0x70F9 lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0x70FC guarda la direccion de la mano que se analiza y el byte siguiente (16 bits)
+C 0x70FF prepara_analisis: pone a cero la lista de yaku y copia la mano a 0xC621
+C 0x7105 apunta a cuantas hay de cada una
+C 0x7135 guarda 1 si la mano es de limite
+C 0x713A guarda la lista de yaku de la mano: pares codigo, valor (32 como mucho)
+C 0x7158 guarda 1 si algun jugador ha bajado grupos
+C 0x7162 bancos_4: pone el 4 (y sus copias en 0xF0F1-3)
+C 0x7165 anota_yaku: anota el yaku C con valor B en 0xC2E0
+C 0x7168 bancos_1_2_3: pone los bancos 1-2-3 (y sus copias en 0xF0F1-3)
+C 0x71DC lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0x71EB busca_ficha_util: busca una ficha que le sirva entre las listas de los demas
+C 0x71EF busca una ficha que no deba tirar: mira la lista de +0x150 (cuenta) y la de +0x37 (cuenta en +0x3F, de 2 en 2)
+C 0x71F7 mira si quedan menos de 4 fichas (0x69D3); si el bit 5 de +0x60 no esta, vuelve (p02:896D)
+C 0x71FA lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0x7204 manera_de_jugar: despacha por la manera de jugar de la maquina (+0x96)
+C 0x720C lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0x7218 DE = la ficha que toca (0xC209, o la que ocupa la posicion de la mano): usa 13 menos tres veces los grupos de +0x0E
+C 0x7222 lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0x722D lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0x7234 DE = la ficha que toca (0xC209, o la que ocupa la posicion de la mano): usa 13 menos tres veces los grupos de +0x0E
+C 0x7242 lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0x724D apunta a la ficha robada o tirada
+C 0x7263 lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0x7272 apunta a la ficha robada o tirada
+C 0x7275 lee la posicion de la ficha en la mano
+C 0x727B lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0x727F suma_a_de: DE = DE + A
+C 0x7287 reparte_por_palos: reparte la mano por palos en +0x100-+0x13F
+C 0x728A analiza_ia: analisis de la mano para la maquina
+C 0x728D prepara_descarte: elige la ficha que va a tirar la maquina
+C 0x7296 lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0x72A4 guarda la posicion de la ficha en la mano
+C 0x72AA guarda como se gana la mano: 1 por robo, 2 por la ficha tirada
+C 0x72B6 piensa_si_sigue: decide si vale la pena seguir con esa mano
+C 0x72BA mira si quedan menos de 4 fichas (0x69D3); si el bit 5 de +0x60 no esta, vuelve (p02:896D)
+C 0x72D5 apunta a la mano de 14 fichas para repartir por palos
+C 0x72DD lee la ficha robada o tirada
+C 0x72E1 ordena de menor a mayor las 14 fichas de 0xC600 (burbuja; HL = 0xC600)
+C 0x72E4 lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0x72E7 apunta a la mano de 14 fichas para repartir por palos
+C 0x7312 suma_a_hl: HL = HL + A
+C 0x7325 guarda contador de trabajo de las fichas de la mano
+C 0x7340 apunta a contador de trabajo de las fichas de la mano
+C 0x734C lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0x7357 analiza_palos: analiza los cuatro palos con la tabla del banco 15
+C 0x735A busca la mejor combinacion de fichas para descartar: prueba 7498 (de uno en uno) y deja las 4 elegidas en 0xC610
+C 0x735D copia_y_analiza: copia la mano ordenada y la analiza
+C 0x736E busca tres fichas de un mismo numero en los tres palos (D = 1..7) y deja el resultado en 0xC610
+C 0x738A elige entre varias opciones al azar (0xC003) o por la que tiene menos
+C 0x73AB lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0x73B4 suma_a_hl: HL = HL + A
+C 0x73C0 lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0x73D5 mira si las fichas son de un palo que no vale (7523, 7551) o de numero 2-8 (7576, 759D)
+C 0x73DD lee el contador de cuadros
+C 0x73E5 lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0x73F0 suma_a_hl: HL = HL + A
+C 0x73F9 lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0x740B suma_a_hl: HL = HL + A
+C 0x7423 lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0x744A mira si hay un 1 y un 9 del mismo palo
+C 0x7450 mira si hay una pareja de fichas iguales
+C 0x7455 lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0x7461 mira si todas las fichas son de numero 2 a 8
+C 0x7465 mira si alguna ficha es de 1, 9 o honor
+C 0x748D lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0x7494 suma_a_hl: HL = HL + A
+C 0x74DE busca en el palo A la ficha de numero D
+C 0x74E7 busca en el palo A la ficha de numero D
+C 0x74F7 hl_lista_del_palo: HL = la lista de fichas del palo C en +0x200
+C 0x7527 hl_lista_del_palo: HL = la lista de fichas del palo C en +0x200
+C 0x7555 hl_lista_del_palo: HL = la lista de fichas del palo C en +0x200
+C 0x757A hl_lista_del_palo: HL = la lista de fichas del palo C en +0x200
+C 0x75A1 hl_lista_del_palo: HL = la lista de fichas del palo C en +0x200
+C 0x75C7 apunta a la mano de trabajo de 14 fichas ordenada
+C 0x75CF lee la ficha robada o tirada
+C 0x75D3 apunta a la mano de trabajo de 14 fichas ordenada
+C 0x75D6 ordena_mano: ordena de menor a mayor las 14 fichas de HL
+C 0x75D9 quita de la mano los tripletes y escaleras que ya estan hechos (listas de +0x140 y +0x150)
+C 0x75DC deja la mano de 0xC621 sin huecos
+C 0x75DF cuenta en 0xC620 las fichas de 0xC621 que quedan
+C 0x75E2 elige la tabla de rutinas de busqueda de partes (7804) segun el numero de grupos y la fase de la partida
+C 0x75E5 las fichas que quedan sin pareja van a la lista +0x1B0
+C 0x75EC lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0x760B lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0x7634 guarda cuantas fichas hay en la mano de trabajo
+C 0x763F lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0x7651 lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0x765E lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0x7672 suma_a_hl: HL = HL + A
+C 0x7676 lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0x768D palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0x7691 llama a la rutina de HL para cada ficha que queda
+C 0x76CE suma_a_hl: HL = HL + A
+C 0x76F9 lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0x7729 lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0x7747 lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0x7761 lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0x776B suma_a_hl: HL = HL + A
+C 0x7780 lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0x778B lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0x779D lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0x77AE lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0x77B1 apunta a la mano de trabajo de 14 fichas ordenada
+C 0x77B9 lee la ficha robada o tirada
+C 0x77BD apunta a la mano de trabajo de 14 fichas ordenada
+C 0x77C0 ordena_mano: ordena de menor a mayor las 14 fichas de HL
+C 0x77D0 apunta a la mano de trabajo de 14 fichas ordenada
+C 0x784F analiza un palo: pone a cero 0xC640, 0xC700 y el contador 0xC800, ordena el palo y mira cuantos numeros distintos tiene (0xC630)
+C 0x7854 pasa las combinaciones de 0xC800 a las tablas de la mano (+0x200 y +0x1C0) para este palo (C = base del palo)
+C 0x785A analiza un palo: pone a cero 0xC640, 0xC700 y el contador 0xC800, ordena el palo y mira cuantos numeros distintos tiene (0xC630)
+C 0x785F pasa las combinaciones de 0xC800 a las tablas de la mano (+0x200 y +0x1C0) para este palo (C = base del palo)
+C 0x7865 analiza un palo: pone a cero 0xC640, 0xC700 y el contador 0xC800, ordena el palo y mira cuantos numeros distintos tiene (0xC630)
+C 0x786A pasa las combinaciones de 0xC800 a las tablas de la mano (+0x200 y +0x1C0) para este palo (C = base del palo)
+C 0x7870 lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0x7874 cuenta cuantas fichas de cada numero hay: deja en 0xC638 una mascara de 9 bits por palo (un bit por numero)
+C 0x7877 de la mascara de 0xC63C saca la lista de numeros presentes en 0xC631 y su cuenta en 0xC630
+C 0x787A si 0xC630 es cero no hace nada; si no, pone a cero 3 bytes de 0xCC80
+C 0x787F pone a cero 0xC640 (5 bytes)
+C 0x7882 pone a cero 0xC700 (256 bytes)
+C 0x7886 guarda las combinaciones que prueba la maquina
+C 0x788A lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0x788E cuenta cuantas fichas de cada numero hay: deja en 0xC638 una mascara de 9 bits por palo (un bit por numero)
+C 0x7891 de la mascara de 0xC63C saca la lista de numeros presentes en 0xC631 y su cuenta en 0xC630
+C 0x789A elige de la tabla 0x7AB9 las 8 combinaciones que se prueban segun cuantos numeros hay
+C 0x78A4 copia la mano de 0xC621 a 0xC540 (14 bytes)
+C 0x78A8 pone a cero 0xC640 (5 bytes)
+C 0x78AB el nibble alto del patron es cuantas fichas lleva
+C 0x78AE quita de la mano (0xC621) las fichas de la combinacion de 0xC640 (en la mano de 14 fichas) y deja la mano sin huecos
+C 0x78B1 ordena las combinaciones y las pone en 0xC801 con las fichas que sobran (bit 6)
+C 0x78B4 devuelve la mano de 0xC540 a 0xC621
+C 0x78C3 guarda en la lista de combinaciones de 0xC800 (cuatro bytes cada una) la que se acaba de probar; el bit 6 marca las que son de ficha sola
+C 0x78C8 ordena las combinaciones y las pone en 0xC801 con las fichas que sobran (bit 6)
+C 0x78CF ordena y pasa por 0xCC80 cada combinacion de 0xC800 (resta 1, ordena, suma 1)
+C 0x78D2 quita de 0xC800 las combinaciones repetidas
+C 0x78E0 suma_a_de: DE = DE + A
+C 0x791D ordena de menor a mayor los cuatro bytes de 0xCC80 (burbuja)
+C 0x79C8 suma_a_hl: HL = HL + A
+C 0x79DF apunta a la mano de trabajo de 14 fichas ordenada
+C 0x79FF apunta a la mano de trabajo de 14 fichas ordenada
+C 0x7A13 apunta a la mano de trabajo de 14 fichas ordenada
+C 0x7A2C apunta a la mano de trabajo de 14 fichas ordenada
+C 0x7A54 apunta a cuantas fichas hay en la mano de trabajo
+C 0x7A57 apunta a la mano de trabajo de 14 fichas ordenada
+C 0x7A62 apunta a cuantas fichas hay en la mano de trabajo
+C 0x7AB3 palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0x7B40 pasa por las tres rutinas siguientes: 7BE6, 7B87 y 7C67
+C 0x7B43 lee las combinaciones que prueba la maquina
+C 0x7B80 mira las 4 mascaras de 0xC638 contra la tabla 0xA306 del banco 15 (44 patrones) y copia los grupos de la tabla 0xA35C a 0xC700
+C 0x7B83 busca para los cuatro bloques de 0xC700 su combinacion con las tablas 0xA589 y 0xA5D7 (banco 15)
+C 0x7B8A bancos_15: pone el 15 (y sus copias en 0xF0F1-3)
+C 0x7B9A bancos_1_2_3: pone los bancos 1-2-3 (y sus copias en 0xF0F1-3)
+C 0x7BA7 palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0x7BB4 copia el grupo de patrones de la tabla 0xA35C a 0xC700 + 0x20 x el palo
+C 0x7BBB bancos_1_2_3: pone los bancos 1-2-3 (y sus copias en 0xF0F1-3)
+C 0x7C06 quita de las cuentas las que no llegan a tres fichas seguidas en los bordes
+C 0x7C74 lee las combinaciones que prueba la maquina
+C 0x7C8D suma_a_de: DE = DE + A
+C 0x7CBB palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0x7CCA palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0x7CCD lee las combinaciones que prueba la maquina
+C 0x7CD2 guarda las combinaciones que prueba la maquina
+C 0x7CFE suma_a_hl: HL = HL + A
+C 0x7D07 suma_a_de: DE = DE + A
+C 0x7D16 suma_a_hl: HL = HL + A
+C 0x7D3D prueba la primera pasada de las combinaciones y la segunda (7D7B)
+C 0x7D52 bancos_1_2_3: pone los bancos 1-2-3 (y sus copias en 0xF0F1-3)
+C 0x7D59 guarda 0xC638 en 0xC520 (8 bytes)
+C 0x7D5F quita de la mano las fichas de las cuatro casillas de HL
+C 0x7D62 deja la mano de 0xC621 sin huecos
+C 0x7D68 prepara de cada mascara 0xC638 las cuentas de fichas seguidas (de 3 y mas)
+C 0x7D71 dibuja con las tablas 0xA306 y 0xA35C las combinaciones por palo
+C 0x7D74 devuelve la mano de 0xC530 a 0xC621
+C 0x7D77 devuelve 0xC520 a 0xC638
+C 0x7D7B guarda la mano de 0xC621 en 0xC530
+C 0x7D7E guarda 0xC638 en 0xC520 (8 bytes)
+C 0x7D84 quita de la mano las fichas de las cuatro casillas de HL
+C 0x7D87 deja la mano de 0xC621 sin huecos
+C 0x7D93 pone a cero 0xC568 y toma la mascara de 0xC63C
+C 0x7D96 devuelve la mano de 0xC530 a 0xC621
+C 0x7D99 devuelve 0xC520 a 0xC638
+C 0x7DD6 suma_a_de: DE = DE + A
+C 0x7DF7 palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0x7E06 palabra_de_tabla: HL = la palabra numero A de la tabla que apunta HL
+C 0x7E11 abre una combinacion nueva en 0xC800 y copia 0xC56C
+C 0x7E1E mete las cuatro fichas del grupo en 0xC64A (una por casilla libre)
+C 0x7E27 bancos_1_2_3: pone los bancos 1-2-3 (y sus copias en 0xF0F1-3)
+C 0x7E2D mete D en la primera casilla libre de las cuatro de 0xC64A
+C 0x7E37 mete D en la primera casilla libre de las cuatro de 0xC64A
+C 0x7E40 mete D en la primera casilla libre de las cuatro de 0xC64A
+C 0x7E49 mete D en la primera casilla libre de las cuatro de 0xC64A
+C 0x7E70 apunta a las combinaciones que prueba la maquina
+C 0x7E85 quita de la mano la ficha C, y la siguiente y la otra (secuencia C, D, E) o el triplete si tiene el bit 6
+C 0x7E9F quita de la mano la ficha C (la primera de 0xC621 igual a C)
+C 0x7EA3 quita de la mano la ficha C (la primera de 0xC621 igual a C)
+C 0x7EC4 apunta a la mano de trabajo de 14 fichas ordenada
+C 0x7ED8 apunta a la mano de trabajo de 14 fichas ordenada
+C 0x7F18 cuenta cuantas fichas tiene cada combinacion de 0xC800 y quita las que tienen menos de las que podria
+C 0x7F20 lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0x7F2D lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0x7F47 suma_a_de: DE = DE + A
+C 0x7F60 lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+C 0x7F6E suma_a_hl: HL = HL + A
+C 0x7F83 lee las combinaciones que prueba la maquina
+C 0x7FCB lee la direccion de la mano del jugador actual y el byte siguiente (16 bits)
+# --- fin de las anotaciones de anota.py ---

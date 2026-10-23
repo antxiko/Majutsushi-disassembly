@@ -1,0 +1,5 @@
+
+# --- BLOQUES QUE LEE EL CODIGO (seccion que reescribe tools/bloques.py; no editar a mano) ---
+D 0x8000 0xA000 letras  la fuente de 128 letras de 16 x 16 puntos, 64 bytes cada una (p00:5B29); lo leen p00:5B53, p00:5B55 (8192 bytes)
+F 0x8000 64
+# --- fin de los bloques de bloques.py ---
