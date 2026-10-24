@@ -17,6 +17,8 @@ RUTINAS_JUEGO = {
     (0, 0x4120): ("pide_sonido_08", "pide el sonido 0x08"),
     (0, 0x4125): ("pide_sonido_09", "pide el sonido 0x09"),
     (0, 0x412A): ("pide_sonido_0A", "pide el sonido 0x0A"),
+    (0, 0x412F): ("pide_musica_0B", "pide la musica 0x0B (la de la tecla F3)"),
+    (0, 0x4134): ("pide_musica_0C", "pide la musica 0x0C (la de la partida, tecla F2)"),
     (0, 0x4139): ("pide_sonido_0D", "pide el sonido 0x0D"),
     (0, 0x413E): ("pide_sonido_0E", "pide el sonido 0x0E"),
     (0, 0x4143): ("pide_sonido_0F", "pide el sonido 0x0F"),

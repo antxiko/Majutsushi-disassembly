@@ -15,10 +15,10 @@ CATALOGO = "RC-765"
 ANIO = 1989
 REPOSITORIO = "https://github.com/antxiko/Majutsushi-disassembly"
 
-CODIGO = 39764
-DATOS = 91308
-RUTINAS = 2448
-INSTRUCCIONES = 20776
+CODIGO = 39774
+DATOS = 91298
+RUTINAS = 2450
+INSTRUCCIONES = 20780
 COMENTARIOS = 5377
 
 
@@ -87,7 +87,10 @@ PAGINAS = [
       "cada mano que reconoce el juego, medida ejecut&aacute;ndola"),
      ("THE-VOICES.html", "LAS-VOCES.html", "The voices", "Las voces",
       "the eight digital voices, decoded from the ROM",
-      "las ocho voces digitales, decodificadas de la ROM")],
+      "las ocho voces digitales, decodificadas de la ROM"),
+     ("THE-MUSIC.html", "LA-MUSICA.html", "The music", "La m&uacute;sica",
+      "the fourteen PSG tunes and effects, played by the cartridge's own engine",
+      "las catorce m&uacute;sicas y efectos del PSG, tocados por el motor del propio cartucho")],
     [("CURIOSITIES.html", "CURIOSIDADES.html", "Curiosities", "Curiosidades",
       "the false-win penalty, the free space, a cartridge with a DAC",
       "la penalizaci&oacute;n por ganar en falso, el espacio libre, un cartucho con DAC")],

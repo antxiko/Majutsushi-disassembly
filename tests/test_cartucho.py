@@ -138,6 +138,22 @@ class Yaku(unittest.TestCase):
         y = self.codigos([3, 3, 6, 6, 6, 8, 8, 8, 0x16, 0x16, 0x32, 0x32, 0x32], 0x16)
         self.assertEqual(y, {0x20: 0x81})
 
+    def test_pinfu_solo_con_ron(self):
+        mano = [0x02, 0x03, 0x04, 0x14, 0x15, 0x16, 0x25, 0x26, 0x27, 0x22, 0x22, 0x05, 0x06]
+        m = self.Mesa()
+        m.pon_mano(mano, 0x07, robo=False)
+        m.mem[0xD00F], m.mem[0xD010] = 1, 0x31          # ya ha descartado: no es renhou
+        m.analiza()
+        self.assertEqual(dict(m.yakus()).get(0x03), 1)
+        self.assertNotIn(0x03, dict(self.codigos(mano, 0x07)))   # con robo no hay pinfu
+
+    def test_la_declaracion_falsa_da_el_0x35(self):
+        m = self.Mesa()
+        m.pon_mano([2, 3, 4, 0x14, 0x15, 0x16, 0x25, 0x26, 0x27, 0x22, 0x22, 5, 9], 7)
+        m.mem[0xCDA0] = 1
+        m.llama(0x6C5D)
+        self.assertEqual(m.yakus(), [(0x35, 0x83)])
+
     def test_renhou_es_limite(self):
         y = self.codigos([1, 2, 3, 3, 4, 5, 5, 5, 0x17, 0x17, 0x17, 0x27, 0x27], 0x27, robo=False)
         self.assertEqual(y.get(0x2B), 0x81)

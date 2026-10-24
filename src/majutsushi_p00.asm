@@ -31,7 +31,7 @@ DATA_cabecera_ab:
 	defb 041h,042h,070h,040h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h	; 4000  ABp@............
 
 ; ======================================================================
-; CODIGO 0x4010..0x412f  (287 bytes)
+; CODIGO 0x4010..0x41b7  (423 bytes)
 ; ======================================================================
 
 
@@ -210,20 +210,12 @@ pide_sonido_09:		; pide el sonido 0x09
 pide_sonido_0A:		; pide el sonido 0x0A
 	ld a,00ah		;412a   ; pide el sonido 0x0A
 	jp pide_sonido		;412c   ; pide_sonido: pide al motor de sonido (p12:6003) el sonido A; pone los bancos 12-13-14 y devuelve los de antes
-
-; ----------------------------------------------------------------------
-; DATOS resto_412F: lo apuntan con el banco puesto p01:616D (0x412F), p00:44A4
-;   (0x4134), p01:6168 (0x4134); el tamano es lo que hay hasta lo siguiente,
-;   no sale de recorrerlo; lo leen p01:616D, p00:44A4, p01:6168 (10 bytes)
-;   0x412f..0x4139  (10 bytes)
-DATA_resto_412F:
-	defb 03eh,00bh,0c3h,0d5h,041h,03eh,00ch,0c3h,0d5h,041h	; 412f  >...A>...A
-
-; ======================================================================
-; CODIGO 0x4139..0x41b7  (126 bytes)
-; ======================================================================
-
-
+pide_musica_0B:		; pide la musica 0x0B (la de la tecla F3)
+	ld a,00bh		;412f
+	jp pide_sonido		;4131
+pide_musica_0C:		; pide la musica 0x0C (la de la partida, tecla F2)
+	ld a,00ch		;4134
+	jp pide_sonido		;4136
 pide_sonido_0D:		; pide el sonido 0x0D
 	ld a,00dh		;4139   ; pide el sonido 0x0D
 	jp pide_sonido		;413b   ; pide_sonido: pide al motor de sonido (p12:6003) el sonido A; pone los bancos 12-13-14 y devuelve los de antes

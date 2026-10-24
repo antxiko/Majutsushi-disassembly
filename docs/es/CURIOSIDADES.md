@@ -5,7 +5,8 @@
 Si el jugador humano declara una victoria sin tener una mano que gane, p01:6CB1 no se niega: escribe el yaku 0x35 con
 valor 0x83 en la lista (p01:6CC9) y la pantalla de puntuación toma el camino especial de p04:A943, que suena la voz
 0x17 (p04:A5D5). Es la penalización del juego por una declaración falsa; el nombre estándar sería *chombo*, pero no se
-ha leído el nombre que dibuja la pantalla, así que la página lo llama 0x35.
+ha leído el nombre que dibuja la pantalla, así que la página lo llama 0x35. Medido: con 0xCDA0 puesto, p01:6C5D
+sobre una mano que no gana deja en la lista un solo par, 0x35 y 0x83 (`tests/test_cartucho.py`).
 
 ## La máquina aprende
 
@@ -26,7 +27,7 @@ Los sonidos 0x17 y 0x18 necesitan el último banco en 0xA000. El motor no usa pa
 ## Espacio que nadie usa
 
 Las colas de 0xFF al final de los bancos suman 1.649 bytes; la mayor, de 1.157 bytes, está al final del banco 14
-(0xBB7B-0xBFFF).
+(0xBB7B-0xBFFF). Medido en openMSX, nadie la lee, y es donde el [parche tutorial](https://antxiko.github.io/Majutsushi-TutorialPatch/es/) guarda su fuente y sus cinco páginas.
 
 ## Código que nadie llama
 

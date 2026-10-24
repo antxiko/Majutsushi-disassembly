@@ -9,8 +9,7 @@
 #
 #   MAJ_SOLO_FOTO 1: solo la captura en cada tiempo (sin volcar VRAM ni RAM: mucho mas rapido)
 #
-# El banco puesto en cada ventana se lee de las copias 0xF0F1-3 (p00:4035), salvo mientras suena
-# el motor de sonido (0xC006 = 1: 12, 13, 14).
+# El banco puesto en cada ventana lo da el mapper (ver banco_ventana).
 proc opcion {nombre porDefecto} {
     global env
     if {[info exists env($nombre)]} { return $env($nombre) }
@@ -23,10 +22,16 @@ file mkdir $::SALIDA
 set throttle off
 array set ::visto {}
 
-proc banco_ventana {v} {
-    if {[peek 0xC006] == 1} { return [expr {$v + 12}] }
-    return [peek [expr {0xF0F1 + $v}]]
-}
+# El banco de cada ventana se lleva al dia vigilando las escrituras al mapper (cualquier escritura en
+# 0x6000-0xBFFF elige el banco de su ventana; son pocas). Las copias de 0xF0F1-3 no bastan: para las
+# voces 0x17 y 0x18 el motor escribe 0x0F directamente en 0xA000 (p12:627C) sin tocarlas. Al empezar,
+# el banco de cada ventana lo da el debuggable "romblocks" del cartucho.
+set ::ROMBLOCKS ""
+foreach d [debug list] { if {[string match "*Majutsushi*romblocks" $d]} { set ::ROMBLOCKS $d } }
+foreach v {0 1 2} { set ::banco($v) [debug read $::ROMBLOCKS [expr {0x6000 + 0x2000 * $v}]] }
+proc mapper {} { set ::banco([expr {($::wp_last_address - 0x6000) >> 13}]) [expr {$::wp_last_value & 0x0F}] }
+debug set_watchpoint write_mem {0x6000 0xBFFF} {} mapper
+proc banco_ventana {v} { return $::banco($v) }
 proc lectura {} {
     set a $::wp_last_address
     set v [expr {($a - 0x6000) >> 13}]
@@ -40,6 +45,7 @@ proc lectura {} {
 if {[opcion MAJ_SOLO_FOTO 0] != 1} { debug set_watchpoint read_mem {0x6000 0xBFFF} {} lectura }
 
 proc vuelca {etiqueta} {
+    if {[opcion MAJ_SOLO_FOTO 0] != 1} { guarda_leido }
     if {[opcion MAJ_SOLO_FOTO 0] == 1} {
         screenshot [file join $::SALIDA "ver-$etiqueta.png"]
         return
@@ -77,5 +83,13 @@ foreach k [opcion MAJ_POKES {}] {
     after time $t "poke $d $v"
 }
 foreach t $::TIEMPOS { after time $t "vuelca $t" }
+# avance: cada 30 s de reloj emulado, una linea en <MAJ_SALIDA>/avance.txt
+proc avance {} {
+    set f [open [file join $::SALIDA avance.txt] a]
+    puts $f "[machine_info time] s, [array size ::visto] bytes vistos, bancos $::banco(0) $::banco(1) $::banco(2)"
+    close $f
+    after time 30 avance
+}
+after time 30 avance
 after time [expr {[lindex $::TIEMPOS end] + 1}] "guarda_leido; exit"
 

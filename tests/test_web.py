@@ -78,11 +78,15 @@ class TestWeb(unittest.TestCase):
         self.assertEqual(todas - usadas["en"], set())
         self.assertEqual(todas - usadas["es"], set())
 
-    def test_las_voces_estan(self):
+    def test_los_audios_estan(self):
+        """Cada voz (.wav) y cada musica (.mp3) que enlaza una pagina existe, y estan todas enlazadas."""
+        usados = set()
         for p in paginas():
             base = os.path.dirname(p)
-            for ruta in re.findall(r'src="([^"?]+\.wav)', open(p, encoding="utf-8").read()):
+            for ruta in re.findall(r'src="([^"?]+\.(?:wav|mp3))', open(p, encoding="utf-8").read()):
                 self.assertTrue(os.path.exists(os.path.join(base, ruta)), "%s: %s" % (p, ruta))
+                usados.add(os.path.basename(ruta))
+        self.assertEqual(set(os.listdir(os.path.join(DOCS, "audio"))) - usados, set())
 
     def test_nunca_consola(self):
         # el MSX es un ordenador; las pantallas del juego son el ordenador de a bordo

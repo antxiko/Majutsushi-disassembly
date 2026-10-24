@@ -22,6 +22,8 @@
 0x4116   # p03:B555 call
 0x411B   # p03:B532 call
 0x4120   # p02:8AED call
+0x412F   # pide la musica 0x0B: p01:616D la guarda en 0xC0C2 (tecla F3) y p01:6167 salta con jp (hl)
+0x4134   # pide la musica 0x0C: p01:6168 (tecla F2) y p00:44A4 la guardan en 0xC0C2; se salta con jp (hl)
 0x414D   # p02:973B call
 0x4158   # p02:9747 call
 0x4163   # p02:9729 call
@@ -140,7 +142,7 @@
 0x5D51   # p00:5CE6 entrada 3 de la tabla de 0x5CE9 (call 0x4066 en 0x5CE6)
 0x5D6B   # p00:5CE6 entrada 4 de la tabla de 0x5CE9 (call 0x4066 en 0x5CE6)
 0x5D8C   # p00:5CE6 entrada 5 de la tabla de 0x5CE9 (call 0x4066 en 0x5CE6)
-0x5DC7   # codigo huerfano: 30 bytes que acaban en ret; el trazado no entra y ninguna instruccion salta, llama o carga 0x5DC7
+0x5DC7   # lo llama p00:49EC: el paso al estado 1 (p00:49CC) cuando se pulsa una tecla en los estados 0 y 2 (p00:499E)
 0x5E4D   # p02:935C call
 0x5E54   # p02:8D0D call
 0x5EAD   # p00:5EA2 entrada 0 de la tabla de 0x5EA5 (call 0x4066 en 0x5EA2)

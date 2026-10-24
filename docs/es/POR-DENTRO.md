@@ -16,9 +16,9 @@ Hace falta la imagen del cartucho (`majutsushi.rom`, 131.072 bytes, sha256
 | | |
 |---|---|
 | explicado | el 100 % de los 131.072 bytes |
-| código | 39.764 bytes, 20.776 instrucciones |
-| datos | 91.308 bytes |
-| rutinas | 2.448, ninguna con menos del 10 % comentado |
+| código | 39.774 bytes, 20.780 instrucciones |
+| datos | 91.298 bytes |
+| rutinas | 2.450, ninguna con menos del 10 % comentado |
 
 ## El cartucho
 
@@ -84,6 +84,32 @@ listas de imagen llevan seis bytes por entrada (formato, paleta, tile, cuántos,
 (`tools/bancos.py` sigue el mapper por todo el cartucho). Con eso se explican las listas de imagen, las paletas, los
 RLE, las listas de tiles, la fuente, las voces y los flujos de sonido; el resto son tablas a las que apunta alguna
 instrucción o una nota explícita del listado.
+
+### Lo que lee una partida, medido
+
+`tools/omsx_leido.tcl` ejecuta el cartucho en openMSX con un punto de vigilancia en cada lectura
+de 0x6000-0xBFFF y apunta, la primera vez, qué byte de qué banco se lee y qué instrucción lo lee; el
+banco es el que tiene de verdad el mapper, seguido por sus escrituras (las voces 0x17 y 0x18 ponen
+el banco 15 sin tocar las copias de 0xF0F1-3). Quince minutos de título, menús y dos manos, con
+espacio cada pocos segundos (`tools/cobertura_leido.py`):
+
+| banco | datos leídos |
+|---|---|
+| 5 | 2.753 de 8.192 bytes |
+| 6 | 5.041 de 7.985 |
+| 7 | 6.495 de 8.192 |
+| 8 | 8.135 de 8.192 |
+| 9 | 6.711 de 8.030 |
+| 10 | 2.894 de 8.192 |
+| 11 | 1.493 de 8.178 |
+| 13 | 6.247 de 8.192 |
+| 14 | 7.035 de 7.035 |
+| 15 | 2.859 de 7.375 |
+| total | 49.663 de 79.563 (62,4 %) |
+
+Un byte que esta pasada no lee no es un byte que no lea nadie: la pasada solo recorre las pantallas
+a las que lleva la tecla de espacio. Lo que sí enseña es que ni una sola lectura cae en el relleno de
+0xFF del final de los bancos.
 
 ## El sonido
 

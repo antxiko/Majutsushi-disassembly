@@ -6,7 +6,8 @@ If the human player declares a win without a hand that wins, p01:6CB1 does not r
 yaku 0x35 with value 0x83 into the list (p01:6CC9) and the scoring screen takes the special path
 of p04:A943, which plays voice 0x17 (p04:A5D5). It is the game's penalty for a false
 declaration; the standard name would be *chombo* but the name the screen draws was not
-read, so the page calls it 0x35.
+read, so the page calls it 0x35. Measured: with 0xCDA0 set, p01:6C5D on a hand that does not win
+leaves exactly one pair in the list, 0x35 and 0x83 (`tests/test_cartucho.py`).
 
 ## The computer players learn
 
@@ -30,7 +31,7 @@ at 0xAE00 and 0xB6E2 are the only data of bank 15 beyond its tables and code.
 ## Space nobody uses
 
 The tails of 0xFF at the end of the banks add up to 1,649 bytes; the largest is 1,157 bytes at the
-end of bank 14 (0xBB7B-0xBFFF).
+end of bank 14 (0xBB7B-0xBFFF). Measured in openMSX, nobody reads it, and it is where the [tutorial patch](https://antxiko.github.io/Majutsushi-TutorialPatch/) keeps its font and its five pages.
 
 ## Code nobody calls
 

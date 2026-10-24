@@ -16,9 +16,9 @@ You need the cartridge image (`majutsushi.rom`, 131,072 bytes, sha256
 | | |
 |---|---|
 | explained | 100% of the 131,072 bytes |
-| code | 39,764 bytes, 20,776 instructions |
-| data | 91,308 bytes |
-| routines | 2,448, none under 10% commented |
+| code | 39,774 bytes, 20,780 instructions |
+| data | 91,298 bytes |
+| routines | 2,450, none under 10% commented |
 
 ## The cartridge
 
@@ -87,6 +87,32 @@ loader runs (`tools/bancos.py` follows the mapper through the whole cartridge). 
 accounts for the image lists, the palettes, the RLE streams, the tile lists, the font, the
 voices and the sound streams; the rest are tables that an instruction points to or an explicit
 note in the listing.
+
+### What a game reads, measured
+
+`tools/omsx_leido.tcl` runs the cartridge in openMSX with a watchpoint on every read of
+0x6000-0xBFFF and notes, the first time, which byte of which bank was read and by which
+instruction; the bank is the one the mapper really has, followed through its writes (the voices
+0x17 and 0x18 switch bank 15 in without touching the copies at 0xF0F1-3). Fifteen minutes of
+title, menus and two hands, with space pressed every few seconds (`tools/cobertura_leido.py`):
+
+| bank | data read |
+|---|---|
+| 5 | 2,753 of 8,192 bytes |
+| 6 | 5,041 of 7,985 |
+| 7 | 6,495 of 8,192 |
+| 8 | 8,135 of 8,192 |
+| 9 | 6,711 of 8,030 |
+| 10 | 2,894 of 8,192 |
+| 11 | 1,493 of 8,178 |
+| 13 | 6,247 of 8,192 |
+| 14 | 7,035 of 7,035 |
+| 15 | 2,859 of 7,375 |
+| total | 49,663 of 79,563 (62.4 %) |
+
+A byte this run does not read is not a byte nobody reads: the run only goes through the screens
+that the space key leads to. What it does show is that not a single read falls in the 0xFF fill at
+the ends of the banks.
 
 ## The sound
 
