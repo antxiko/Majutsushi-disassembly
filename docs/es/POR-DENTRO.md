@@ -117,3 +117,30 @@ p12 corre cinco canales (tres músicas en el PSG y dos de efectos que se quedan 
 de notas (el nibble alto la nota, el bajo la duración) y órdenes: 0xD0-0xDF y 0xE0-0xFE, 0xFF acaba. Los flujos de los 16
 sonidos están en p12:6F72-p13:903F, y todos acaban justo donde empieza el siguiente una vez contadas las subrutinas que
 llama 0xF9. Los sonidos 0x11-0x18 son las voces de [Las voces](LAS-VOCES.html).
+
+## Código compartido con otros cartuchos de Konami
+
+Este desensamblado se ha comparado, instrucción por instrucción, con
+todos los demás de Konami de la serie. Cuenta un bloque cuando las
+mismas instrucciones, al menos seis desde una etiqueta hasta su `ret`
+o su salto sin condición, están en los dos cartuchos; las direcciones
+no se miran, porque cambian de un cartucho a otro. De los otros 57,
+**41** tienen al menos un bloque en común con este; estos son los
+que más comparten:
+
+| Cartucho | Bloques | Instrucciones | Por ejemplo (aquí = allí) |
+|---|---:|---:|---|
+| [Konami’s Game Master 2](https://antxiko.github.io/GameMaster2-disassembly/es/) | 54 | 661 | `vuelca_psg` (p12:6C12) = `sonido_mezcla` |
+| [The Pro Yakyuu Gekitotsu Pennant Race](https://antxiko.github.io/PennantRace-disassembly/es/) | 52 | 581 | `cartucho_en_8000` (p00:40C1) = `cartucho_en_pagina_2` |
+| [Gekitotsu Pennant Race 2](https://antxiko.github.io/PennantRace2-disassembly/es/) | 48 | 558 | `cartucho_en_8000` (p00:40C1) = `cartucho_en_pagina_2` |
+| [King's Valley II](https://antxiko.github.io/KingsValley2-disassembly/es/) | 45 | 541 | `cartucho_en_8000` (p00:40C1) |
+| [Shalom: Knightmare III](https://antxiko.github.io/Shalom-disassembly/es/) | 43 | 553 | `cartucho_en_8000` (p00:40C1) |
+| [Nemesis 3 - The Eve of Destruction](https://antxiko.github.io/Nemesis3-disassembly/es/) | 35 | 385 | `cartucho_en_8000` (p00:40C1) |
+| [Parodius](https://antxiko.github.io/Parodius-disassembly/es/) | 29 | 331 | `despacha` (p00:4066) |
+| [Salamander - Operation X](https://antxiko.github.io/Salamander-disassembly/es/) | 29 | 324 | `cartucho_en_8000` (p00:40C1) |
+| [The Treasure of Usas](https://antxiko.github.io/TreasureOfUsas-disassembly/es/) | 26 | 274 | `vuelca_lista_vram` (p00:4E27) = `rle_a_vram_con_destino` |
+| [Ganbare Goemon! Karakuri Dōchū](https://antxiko.github.io/GanbareGoemon-disassembly/es/) | 23 | 241 | `vuelca_lista_vram` (p00:4E27) = `rle_con_destino` |
+
+La matriz entera, los 58 cartuchos entre sí, está en
+[Las rutinas](https://antxiko.github.io/MSX-disassembly-database/es/LAS-RUTINAS.html) de la base de datos de la
+serie, con el método y el programa que la mide.
